@@ -2,15 +2,19 @@
 
 import * as L from './logica.js';
 import * as P from './pedidos.js';
-import { SABORES, IDS_SABORES, svgSimbolo } from './sabores.js';
+import { SABORES, IDS_SABORES, svgSimbolo, dibujoSimbolo } from './sabores.js';
+import * as B from './botella.js';
+import { RECETAS, YAPA_RECETA, recetasNuevas, botellaReceta } from './recetario.js';
+import { compartir } from '../shared/compartir.js';
+import { iniciarPlataforma } from '../shared/plataforma.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
-import { t, aplicarTextos, nombreSabor } from '../shared/i18n.js';
+import { t, aplicarTextos, nombreSabor, nombreReceta, descReceta } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
-import { iniciarAnuncios, anuncios, tocaAnuncio } from '../shared/anuncios.js';
+import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
 import { chipYapa, contadorYapa, aviso, flotante, ventana, escapar, confeti, celebrarNivel } from '../shared/ui.js';
 import { caserito } from '../shared/marca.js';
-import { aplicarDecoracion } from '../shared/decoracion.js';
+import { aplicarDecoracion, enUso } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
 const COSTO_EXTRA = 25;
@@ -83,6 +87,12 @@ function esperar(ms) {
 
 // ---------- Pintar ----------
 
+function forma() {
+  return enUso('vaso');
+}
+
+let terminadosAntes = new Set();
+
 function pintarVasos(opc = {}) {
   const t0 = tablero();
   const zona = $('#vasos');
@@ -91,31 +101,50 @@ function pintarVasos(opc = {}) {
   zona.style.setProperty('--por-fila', porFila);
   zona.dataset.filas = n <= 5 ? 1 : 2;
   const enfocado = zona.contains(document.activeElement) ? document.activeElement.dataset.i : null;
+  const terminados = new Set();
 
   zona.innerHTML = t0.vasos
     .map((v, i) => {
-      const completo = L.estaCompleto(v, t0.cap);
+      const terminado = L.vasoTerminado(t0, i);
+      if (terminado) terminados.add(i);
       const clases = ['vaso'];
       if (juego.sel === i) clases.push('elegido');
-      if (completo) clases.push('completo');
+      if (terminado) clases.push('completo');
+      if (terminado && !terminadosAntes.has(i) && !opc.sinTapar) clases.push('tapando');
       if (opc.nuevos?.has(i)) clases.push('nuevo');
       if (opc.sacude === i) clases.push('sacude');
       if (juego.pista?.[0] === i) clases.push('pista-origen');
       if (juego.pista?.[1] === i) clases.push('pista-destino');
-      const capas = v
-        .map((s, k) => {
-          const llega = opc.llega && opc.llega.vaso === i && k >= v.length - opc.llega.n;
-          const retraso = llega ? (k - (v.length - opc.llega.n)) * 70 : 0;
-          return `<div class="capa${llega ? ' llega' : ''}" style="--c:${SABORES[s].color};--retraso:${retraso}ms">${svgSimbolo(s)}</div>`;
-        })
-        .join('');
-      let etiqueta = `${t('vaso', { n: i + 1 })}: ${v.length ? v.map(nombreSabor).join(', ') : t('vacio')}`;
-      if (completo) etiqueta += `, ${t('completo')}`;
+      const capas = v.map((s, k) => {
+        const llega = opc.llega && opc.llega.vaso === i && k >= v.length - opc.llega.n;
+        return {
+          color: SABORES[s].color,
+          simbolo: dibujoSimbolo(s),
+          oculta: L.capaOculta(t0, i, k),
+          llega,
+          retraso: llega ? (k - (v.length - opc.llega.n)) * 80 : 0,
+          revelada: opc.revelada === i && k === v.length - 1,
+        };
+      });
+      const solo = t0.solo[i] ? { color: SABORES[t0.solo[i]].color, simbolo: dibujoSimbolo(t0.solo[i]) } : null;
+      const svg = B.svgVaso(capas, {
+        id: i,
+        forma: forma(),
+        cap: L.capDe(t0, i),
+        solo,
+        terminado: terminado ? SABORES[v[0]].color : null,
+      });
+      let etiqueta = `${t('vaso', { n: i + 1 })}: ${
+        v.length ? v.map((s, k) => (L.capaOculta(t0, i, k) ? '?' : nombreSabor(s))).join(', ') : t('vacio')
+      }`;
+      if (solo) etiqueta += `, ${t('soloAcepta', { sabor: nombreSabor(t0.solo[i]) })}`;
+      if (terminado) etiqueta += `, ${t('completo')}`;
       if (juego.sel === i) etiqueta += `, ${t('seleccionado')}`;
-      const brillo = completo ? SABORES[v[0]].color : 'transparent';
-      return `<button type="button" class="${clases.join(' ')}" data-i="${i}" aria-label="${escapar(etiqueta)}" style="--brillo:${brillo}"><span class="vaso-interior">${capas}</span></button>`;
+      const brillo = terminado ? SABORES[v[0]].color : 'transparent';
+      return `<button type="button" class="${clases.join(' ')}" data-i="${i}" aria-label="${escapar(etiqueta)}" style="--brillo:${brillo}">${svg}</button>`;
     })
     .join('');
+  terminadosAntes = terminados;
 
   if (enfocado !== null) zona.querySelector(`[data-i="${enfocado}"]`)?.focus();
   ajustarTamano();
@@ -126,10 +155,11 @@ function ajustarTamano() {
   const n = tablero().vasos.length;
   const porFila = n <= 5 ? n : Math.ceil(n / 2);
   const filas = n <= 5 ? 1 : 2;
-  const hueco = 12;
-  const porAncho = (zona.clientWidth - hueco * (porFila - 1)) / porFila;
-  const porAlto = (zona.clientHeight - 28 * filas - 20 * (filas - 1)) / filas / 3.9;
-  const ancho = Math.max(30, Math.min(72, porAncho, porAlto));
+  const hueco = porFila > 5 ? 10 : 16;
+  zona.style.setProperty('--hueco', `${hueco}px`);
+  const porAncho = (zona.clientWidth - 16 - hueco * (porFila - 1)) / porFila;
+  const porAlto = (zona.clientHeight - 30 * filas - 34 * (filas - 1)) / filas / (B.ALTO / B.ANCHO);
+  const ancho = Math.max(30, Math.min(78, porAncho, porAlto));
   zona.style.setProperty('--ancho', `${Math.floor(ancho)}px`);
 }
 
@@ -200,10 +230,29 @@ function empezarNiveles() {
   juego.bloqueado = false;
   pintar();
   jugar(true);
-  if (!visto('tuto-niveles')) {
-    abrir({ titulo: t('refresquera'), texto: t('tutoNiveles'), conCasera: true, botones: [{ texto: t('entendido') }] }).then(() =>
-      marcarVisto('tuto-niveles')
-    );
+  presentarNovedades();
+}
+
+/** La primera vez que aparece un vaso especial, se explica con un dibujo. */
+async function presentarNovedades() {
+  const t0 = juego.tablero;
+  const lista = [];
+  if (!visto('tuto-niveles')) lista.push({ clave: 'tuto-niveles', titulo: t('refresquera'), texto: t('tutoNiveles'), casera: true });
+  const ejemplo = (capas, op) => `<div class="ejemplo-vaso">${B.svgVaso(capas, { id: 950, forma: forma(), ...op })}</div>`;
+  const capa = (s, extra = {}) => ({ color: SABORES[s].color, simbolo: dibujoSimbolo(s), ...extra });
+  if (t0.hielo.some((h) => h > 0) && !visto('tuto-hielo')) {
+    lista.push({ clave: 'tuto-hielo', titulo: t('nuevoHielo'), texto: t('nuevoHieloTexto'), html: ejemplo([capa('api', { oculta: true }), capa('tumbo', { oculta: true }), capa('frutilla')], {}) });
+  }
+  const conTapa = t0.solo.find(Boolean);
+  if (conTapa && !visto('tuto-tapa')) {
+    lista.push({ clave: 'tuto-tapa', titulo: t('nuevoTapa'), texto: t('nuevoTapaTexto'), html: ejemplo([], { solo: { color: SABORES[conTapa].color, simbolo: dibujoSimbolo(conTapa) } }) });
+  }
+  if (t0.caps.includes(L.CAPACIDAD_CHICO) && !visto('tuto-chico')) {
+    lista.push({ clave: 'tuto-chico', titulo: t('nuevoChico'), texto: t('nuevoChicoTexto'), html: ejemplo([capa('limonada'), capa('limonada')], { cap: L.CAPACIDAD_CHICO }) });
+  }
+  for (const n of lista) {
+    await abrir({ titulo: n.titulo, texto: n.texto, html: n.html || '', conCasera: Boolean(n.casera), botones: [{ texto: t('entendido') }] });
+    marcarVisto(n.clave);
   }
 }
 
@@ -259,6 +308,14 @@ function tocarVaso(i) {
     mover(juego.sel, i);
     return;
   }
+  // Vaso con etiqueta: avisa qué sabor acepta.
+  const sabor = L.arriba(t0.vasos[juego.sel]);
+  if (t0.solo[i] && t0.solo[i] !== sabor && t0.vasos[i].length < L.capDe(t0, i)) {
+    sonar.no();
+    aviso(t('soloAcepta', { sabor: nombreSabor(t0.solo[i]) }));
+    pintarVasos({ sacude: i });
+    return;
+  }
   // No se puede: si el otro vaso tiene refresco, pasa a ser el elegido.
   if (t0.vasos[i].length) {
     juego.sel = i;
@@ -271,49 +328,91 @@ function tocarVaso(i) {
   }
 }
 
-/** Inclina el vaso de origen sobre el de destino, como al servir. Devuelve la pose para volver. */
-async function animarVertido(desde, hacia) {
-  const a = document.querySelector(`.vaso[data-i="${desde}"]`);
-  const b = document.querySelector(`.vaso[data-i="${hacia}"]`);
+/**
+ * Inclina la botella de origen sobre la de destino y deja caer un chorro del refresco.
+ * Devuelve { pose, chorro } para terminar la animación después de pintar.
+ */
+async function animarVertido(desde, hacia, color, nivelFinal) {
+  const a = document.querySelector(`.vaso[data-i="${desde}"] .botella`);
+  const b = document.querySelector(`.vaso[data-i="${hacia}"] .botella`);
   if (!a || !b || !a.animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return null;
+  const t0 = tablero();
   const ra = a.getBoundingClientRect();
   const rb = b.getBoundingClientRect();
-  const aLaIzquierda = rb.left < ra.left;
-  const dx = rb.left - ra.left + (aLaIzquierda ? ra.width * 0.95 : -ra.width * 0.95);
-  const dy = rb.top - ra.top - ra.height * 0.5 + 16;
-  const pose = `translate(${dx}px, ${dy}px) rotate(${aLaIzquierda ? -58 : 58}deg)`;
-  a.style.zIndex = '5';
-  a.animate([{ transform: 'translateY(-16px)' }, { transform: pose }], { duration: 170, easing: 'ease-out', fill: 'forwards' });
-  await esperar(250);
-  return pose;
+  const escalaA = ra.height / B.ALTO;
+  const escalaB = rb.height / B.ALTO;
+  const gA = B.geometria(forma(), L.capDe(t0, desde));
+  const gB = B.geometria(forma(), L.capDe(t0, hacia));
+  const izquierda = rb.left + rb.width / 2 < ra.left + ra.width / 2;
+  const ang = izquierda ? -66 : 66;
+  const rad = (ang * Math.PI) / 180;
+  // Punta de la botella inclinada, girando sobre su centro
+  const d = (B.ALTO / 2 - gA.boca) * escalaA;
+  const cx = ra.left + ra.width / 2;
+  const cy = ra.top + ra.height / 2;
+  const puntaX = cx + d * Math.sin(rad);
+  const puntaY = cy - d * Math.cos(rad);
+  const bocaX = rb.left + rb.width / 2 + (izquierda ? 5 : -5) * escalaB;
+  const bocaY = rb.top + (gB.boca - 16) * escalaB;
+  const pose = `translate(${bocaX - puntaX}px, ${bocaY - puntaY}px) rotate(${ang}deg)`;
+  a.style.transformOrigin = '50% 50%';
+  a.closest('.vaso').style.zIndex = '5';
+  a.animate([{ transform: 'translateY(-16px)' }, { transform: pose }], { duration: 210, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' });
+  await esperar(200);
+  // El chorro cae desde la punta hasta la superficie del refresco en el destino
+  const superficie = rb.top + (gB.fondo - nivelFinal * B.CAPA) * escalaB;
+  const chorro = document.createElement('div');
+  chorro.className = 'chorro';
+  chorro.style.background = color;
+  chorro.style.left = `${bocaX - 2.5 * escalaB}px`;
+  chorro.style.width = `${Math.max(3, 5 * escalaB)}px`;
+  chorro.style.top = `${bocaY}px`;
+  chorro.style.height = `${Math.max(8, superficie - bocaY)}px`;
+  document.body.appendChild(chorro);
+  chorro.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 130, easing: 'ease-in' });
+  await esperar(160);
+  return { pose, chorro };
+}
+
+function terminarVertido(desde, anim) {
+  if (!anim) return;
+  const { pose, chorro } = anim;
+  chorro.animate([{ opacity: 1 }, { opacity: 0, transform: 'scaleY(.2) translateY(60px)' }], { duration: 180, easing: 'ease-in' }).onfinish = () =>
+    chorro.remove();
+  const vuelve = document.querySelector(`.vaso[data-i="${desde}"] .botella`);
+  if (!vuelve) return;
+  const caja = vuelve.closest('.vaso');
+  caja.style.zIndex = '5';
+  vuelve.style.transformOrigin = '50% 50%';
+  vuelve.animate([{ transform: pose }, { transform: 'none' }], { duration: 230, easing: 'cubic-bezier(.4,0,.3,1)' }).onfinish = () => {
+    caja.style.zIndex = '';
+    vuelve.style.transformOrigin = '';
+  };
 }
 
 async function mover(desde, hacia) {
   const antes = tablero();
-  const { tablero: despues, cantidad } = L.verter(antes, desde, hacia);
+  const { tablero: despues, cantidad, revelada } = L.verter(antes, desde, hacia);
   if (!cantidad) return;
   juego.bloqueado = true;
-  const pose = await animarVertido(desde, hacia);
+  const color = SABORES[L.arriba(antes.vasos[desde])].color;
+  sonar.verter(cantidad);
+  const anim = await animarVertido(desde, hacia, color, despues.vasos[hacia].length);
   juego.bloqueado = false;
-  if (tablero() !== antes) return; // la partida cambió mientras se vertía
+  if (tablero() !== antes) {
+    anim?.chorro.remove();
+    return; // la partida cambió mientras se vertía
+  }
   if (juego.modo === 'niveles') juego.historial.push(antes);
   ponerTablero(despues);
   juego.sel = null;
   juego.pista = null;
-  sonar.verter(cantidad);
   if (marcarJuego() && obtener().racha > 1) aviso(t('rachaSube', { n: obtener().racha }), { tipo: 'exito' });
   pintarBarra();
-  pintarVasos({ llega: { vaso: hacia, n: cantidad } });
-  if (pose) {
-    const vuelve = document.querySelector(`.vaso[data-i="${desde}"]`);
-    if (vuelve) {
-      vuelve.style.zIndex = '5';
-      vuelve.animate([{ transform: pose }, { transform: 'none' }], { duration: 190, easing: 'ease-in' }).onfinish = () => {
-        vuelve.style.zIndex = '';
-      };
-    }
-  }
-  if (L.estaCompleto(despues.vasos[hacia], despues.cap)) setTimeout(() => sonar.listo(), 120);
+  pintarVasos({ llega: { vaso: hacia, n: cantidad }, revelada: revelada ? desde : null });
+  terminarVertido(desde, anim);
+  if (revelada) setTimeout(() => sonar.elegir(), 150);
+  if (L.vasoTerminado(despues, hacia)) setTimeout(() => sonar.listo(), 160);
 
   if (juego.modo === 'niveles') {
     if (L.estaResuelto(despues)) nivelCompleto();
@@ -361,7 +460,6 @@ async function intentarServir() {
 
 async function nivelCompleto() {
   juego.bloqueado = true;
-  const terminado = datos.nivel;
   datos.nivel++;
   guardar();
   sumarYapa(YAPA_NIVEL);
@@ -380,9 +478,37 @@ async function nivelCompleto() {
     cerrable: false,
     botones: [{ texto: t('siguiente'), valor: 'sig' }],
   });
+  const nuevas = recetasNuevas(datos, datos.nivel - 1);
+  if (nuevas.length) {
+    const yapa = YAPA_RECETA * nuevas.length;
+    sumarYapa(yapa);
+    await abrir({
+      titulo: t('recetaNueva', { nombre: nuevas.map((r) => nombreReceta(r.id)).join(', '), n: yapa }),
+      texto: nuevas.length === 1 ? descReceta(nuevas[0].id) : '',
+      html: `<div class="recetas-nuevas">${nuevas.map((r, k) => `<div class="ejemplo-vaso">${botellaReceta(r.id, forma(), k)}</div>`).join('')}</div>`,
+      botones: [{ texto: t('entendido') }],
+    });
+  }
+  guardar();
   jugar(false);
-  if (tocaAnuncio(terminado)) await anuncios.pausaEntreNiveles();
   empezarNiveles();
+}
+
+/** Semana del año (lunes a domingo) para la tabla de la semana. */
+function semanaActual() {
+  const d = new Date();
+  const jueves = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate() + 3 - ((d.getDay() + 6) % 7)));
+  const inicio = new Date(Date.UTC(jueves.getUTCFullYear(), 0, 4));
+  const semana = 1 + Math.round(((jueves - inicio) / 86400000 - 3 + ((inicio.getUTCDay() + 6) % 7)) / 7);
+  return `${jueves.getUTCFullYear()}-S${semana}`;
+}
+
+function anotarSemana(atendidos) {
+  const id = semanaActual();
+  if (!datos.semana || datos.semana.id !== id) datos.semana = { id, atendidos: 0, mejor: 0 };
+  datos.semana.atendidos += atendidos;
+  datos.semana.mejor = Math.max(datos.semana.mejor, atendidos);
+  return datos.semana;
 }
 
 async function finPedidos() {
@@ -394,22 +520,59 @@ async function finPedidos() {
   const record = e.atendidos > 0 && e.atendidos >= datos.record;
   datos.record = Math.max(datos.record, e.atendidos);
   datos.partidasPedidos++;
+  const semana = anotarSemana(e.atendidos);
   guardar();
   pintarPedidos();
-  const eleccion = await abrir({
-    titulo: t('filaLlena'),
-    texto: `${t('atendiste', { n: e.atendidos })}${record ? ` ${t('nuevoRecord')}` : ''}`,
-    conCasera: true,
-    cerrable: false,
-    botones: [
-      { texto: t('otraVez'), valor: 'otra' },
-      { texto: t('irNiveles'), valor: 'niveles', clase: 'secundario' },
-    ],
-  });
-  if (datos.partidasPedidos % 3 === 0) await anuncios.pausaEntreNiveles();
+  let eleccion = 'retar';
+  while (eleccion === 'retar') {
+    eleccion = await abrir({
+      titulo: t('filaLlena'),
+      texto: `${t('atendiste', { n: e.atendidos })}${record ? ` ${t('nuevoRecord')}` : ''} ${t('estaSemana', { n: semana.atendidos, mejor: semana.mejor })}`,
+      conCasera: true,
+      cerrable: false,
+      botones: [
+        { texto: t('otraVez'), valor: 'otra' },
+        ...(e.atendidos > 0 ? [{ texto: t('retar'), valor: 'retar', clase: 'hierbabuena' }] : []),
+        { texto: t('irNiveles'), valor: 'niveles', clase: 'secundario' },
+      ],
+    });
+    if (eleccion === 'retar') {
+      const r = await compartir(t('retoRefresquera', { n: e.atendidos }));
+      if (r === 'copiado') aviso(t('copiado'), { tipo: 'exito' });
+    }
+  }
   if (eleccion === 'niveles') cambiarModo('niveles');
   else empezarPedidos();
 }
+
+/** El recetario: los doce refrescos, los que ya tienes y cuándo llegan los demás. */
+function abrirRecetario() {
+  if (juego.pausas) return;
+  const hechos = datos.nivel - 1;
+  const tienes = RECETAS.filter((r) => hechos >= r.niveles).length;
+  const tarjetas = RECETAS.map((r, n) => {
+    const abierta = hechos >= r.niveles;
+    return `<button type="button" class="receta${abierta ? '' : ' cerrada'}" data-receta="${r.id}" ${abierta ? '' : 'disabled'}>
+      ${botellaReceta(r.id, forma(), n)}
+      <span>${escapar(abierta ? nombreReceta(r.id) : t('recetaBloqueada', { n: r.niveles }))}</span>
+    </button>`;
+  }).join('');
+  abrir({
+    titulo: t('recetario'),
+    texto: t('recetasTienes', { n: tienes, total: RECETAS.length }),
+    html: `<div class="recetario">${tarjetas}</div><p class="receta-detalle" id="receta-detalle"></p>`,
+    botones: [{ texto: t('cerrar') }],
+  });
+}
+
+document.addEventListener('click', (ev) => {
+  const r = ev.target.closest('[data-receta]');
+  if (!r) return;
+  const detalle = document.getElementById('receta-detalle');
+  if (detalle) detalle.textContent = `${nombreReceta(r.dataset.receta)}: ${descReceta(r.dataset.receta)}`;
+  for (const x of document.querySelectorAll('.receta.elegida')) x.classList.remove('elegida');
+  r.classList.add('elegida');
+});
 
 // ---------- Ayudas ----------
 
@@ -418,9 +581,7 @@ function agregarVaso() {
   if (juego.modo === 'pedidos') {
     P.agregarVaso(juego.pedidos);
   } else {
-    const nuevo = L.clonar(juego.tablero);
-    nuevo.vasos.push([]);
-    juego.tablero = nuevo;
+    juego.tablero = L.agregarVacio(L.clonar(juego.tablero));
   }
   sonar.listo();
   pintar({ nuevos: new Set([tablero().vasos.length - 1]) });
@@ -507,7 +668,7 @@ function deshacer() {
   }
   const previo = L.clonar(juego.historial.pop());
   // Si se compró un vaso extra después, se conserva.
-  while (previo.vasos.length < juego.tablero.vasos.length) previo.vasos.push([]);
+  while (previo.vasos.length < juego.tablero.vasos.length) L.agregarVacio(previo);
   juego.tablero = previo;
   juego.sel = null;
   juego.pista = null;
@@ -522,7 +683,7 @@ function reiniciar() {
     return;
   }
   const t0 = L.clonar(juego.inicial);
-  for (let i = 0; i < juego.extras; i++) t0.vasos.push([]);
+  for (let i = 0; i < juego.extras; i++) L.agregarVacio(t0);
   juego.tablero = t0;
   juego.historial = [];
   juego.sel = null;
@@ -530,7 +691,7 @@ function reiniciar() {
   pintar();
 }
 
-function darPista() {
+async function darPista() {
   if (juego.bloqueado) return;
   const t0 = tablero();
   const mov = juego.modo === 'niveles' ? L.pista(t0) : L.mejorMovimiento(t0);
@@ -539,8 +700,20 @@ function darPista() {
     return;
   }
   if (!gastarYapa(COSTO_PISTA)) {
-    aviso(t('faltaYapa'), { tipo: 'alerta' });
-    return;
+    if (!anuncios.hayRecompensa) {
+      aviso(t('faltaYapa'), { tipo: 'alerta' });
+      return;
+    }
+    // Sin yapa suficiente: la pista puede salir gratis viendo un anuncio
+    const eleccion = await abrir({ titulo: t('pista'), texto: t('faltaYapa'), botones: [{ texto: t('pistaGratis'), valor: 'anuncio', clase: 'hierbabuena' }, { texto: t('cerrar'), valor: null, clase: 'secundario' }] });
+    if (eleccion !== 'anuncio') return;
+    juego.pausas++;
+    const vio = await anuncios.verRecompensa();
+    juego.pausas--;
+    if (!vio) {
+      aviso(t('anuncioFallo'), { tipo: 'alerta' });
+      return;
+    }
   }
   juego.pista = mov;
   juego.sel = null;
@@ -584,6 +757,8 @@ function reloj(ahora) {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  document.body.insertAdjacentHTML('afterbegin', B.definiciones());
+  iniciarPlataforma({ esPuesto: true });
   aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();
@@ -609,6 +784,7 @@ function iniciar() {
     alternar();
     pintarBarra();
   });
+  $('#recetario').addEventListener('click', abrirRecetario);
   document.addEventListener('qhatu:idioma', () => pintar());
   window.addEventListener('resize', ajustarTamano);
 

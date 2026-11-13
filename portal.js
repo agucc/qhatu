@@ -3,10 +3,12 @@
 import { obtener, guardar, diaLocal, rachaVigente, regaloDisponible, recibirRegalo, montoRegalo, alCambiar } from './shared/almacen.js';
 import { t, aplicarTextos, IDIOMAS, idioma, cambiarIdioma } from './shared/i18n.js';
 import { logo, casera, toldo, COLORES } from './shared/marca.js';
-import { chipYapa, contadorYapa, flotante, aviso, escapar } from './shared/ui.js';
+import { chipYapa, contadorYapa, flotante, aviso, escapar, ventana } from './shared/ui.js';
 import { sonar } from './shared/sonido.js';
 import { EN_APP } from './shared/config.js';
 import { aplicarDecoracion } from './shared/decoracion.js';
+import { exportar, leerCodigo } from './shared/transferir.js';
+import { iniciarPlataforma } from './shared/plataforma.js';
 import { progresoPuesto } from './shared/progreso.js';
 
 // Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
@@ -123,6 +125,7 @@ function pintarTodo() {
 
 window.QHATU_LISTO = true;
 aplicarDecoracion();
+iniciarPlataforma();
 document.getElementById('logo').innerHTML = logo();
 document.getElementById('casera').innerHTML = casera();
 document.getElementById('chip-yapa').innerHTML = chipYapa();
@@ -163,3 +166,62 @@ document.getElementById('instalar').addEventListener('click', async () => {
 if (!EN_APP && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+
+// ---------- Pasar el progreso a otro dispositivo ----------
+
+async function copiarTexto(texto) {
+  try {
+    await navigator.clipboard.writeText(texto);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+document.getElementById('pasar').addEventListener('click', async () => {
+  const eleccion = await ventana({
+    titulo: t('pasarProgreso'),
+    texto: t('pasarTexto'),
+    botones: [
+      { texto: t('copiarCodigo'), valor: 'copiar' },
+      { texto: t('pegarCodigo'), valor: 'pegar', clase: 'secundario' },
+      { texto: t('cerrar'), valor: null, clase: 'secundario' },
+    ],
+  });
+  if (eleccion === 'copiar') {
+    const codigo = exportar();
+    const copiado = await copiarTexto(codigo);
+    if (copiado) aviso(t('copiado'), { tipo: 'exito' });
+    // También se muestra, por si el portapapeles no está disponible
+    await ventana({
+      titulo: t('tuCodigo'),
+      html: `<textarea class="codigo" readonly rows="5">${escapar(codigo)}</textarea>`,
+      botones: [{ texto: t('cerrar') }],
+    });
+  } else if (eleccion === 'pegar') {
+    const valor = await ventana({
+      titulo: t('pegarCodigo'),
+      texto: t('reemplazaProgreso'),
+      html: `<textarea class="codigo" id="codigo-entrada" rows="5" placeholder="${escapar(t('codigoAqui'))}"></textarea>`,
+      botones: [
+        { texto: t('cargar'), valor: 'cargar' },
+        { texto: t('cerrar'), valor: null, clase: 'secundario' },
+      ],
+    });
+    const campo = document.getElementById('codigo-entrada');
+    if (valor !== 'cargar' || !campo) return;
+    const datos = leerCodigo(campo.value);
+    if (!datos) {
+      aviso(t('codigoMalo'), { tipo: 'alerta' });
+      return;
+    }
+    try {
+      localStorage.setItem('qhatu.v1', JSON.stringify(datos));
+    } catch {
+      aviso(t('codigoMalo'), { tipo: 'alerta' });
+      return;
+    }
+    aviso(t('progresoCargado'), { tipo: 'exito' });
+    setTimeout(() => location.reload(), 900);
+  }
+});

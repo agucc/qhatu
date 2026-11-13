@@ -9,6 +9,8 @@ import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
 import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNivel } from '../shared/ui.js';
 import { caserito } from '../shared/marca.js';
+import { compartir } from '../shared/compartir.js';
+import { iniciarPlataforma } from '../shared/plataforma.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
@@ -205,6 +207,7 @@ async function finPartida() {
     if (anuncios.hayRecompensa) botones.push({ texto: t('verAnuncio'), valor: 'anuncio', clase: 'hierbabuena' });
   }
   botones.push({ texto: t('otraVez'), valor: 'otra', clase: juego.seguirUsado ? '' : 'secundario' });
+  if (m.puntos > 0) botones.push({ texto: t('retar'), valor: 'retar', clase: 'secundario' });
   const texto = `${t('hiciste', { n: m.puntos })}${record ? ` ${t('nuevoRecord')}` : ''}${juego.seguirUsado ? '' : ` ${t('seguirTexto')}`}`;
   const eleccion = await abrir({ titulo: t('canastoLleno'), texto, conCasera: true, cerrable: false, botones });
 
@@ -222,6 +225,13 @@ async function finPartida() {
     jugar(true);
     return;
   }
+  if (eleccion === 'retar') {
+    const r = await compartir(t('retoFrutera', { n: m.puntos }));
+    if (r === 'copiado') aviso(t('copiado'), { tipo: 'exito' });
+    
+    finPartida();
+    return;
+  }
   if (eleccion === 'yapa' || eleccion === 'anuncio') {
     // No se pudo seguir: vuelve a mostrar las opciones
     finPartida();
@@ -229,7 +239,6 @@ async function finPartida() {
   }
   datos.partidas++;
   guardar();
-  if (datos.partidas % 3 === 0) await anuncios.pausaEntreNiveles();
   empezar();
 }
 
@@ -474,6 +483,7 @@ $('#sonido').addEventListener('click', () => {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  iniciarPlataforma({ esPuesto: true });
   aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();

@@ -10,6 +10,7 @@ import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNive
 import { caserito } from '../shared/marca.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
+import { iniciarPlataforma } from '../shared/plataforma.js';
 
 const COSTO_PICO = 15;
 
@@ -287,6 +288,7 @@ function bucle(ahora) {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  iniciarPlataforma({ esPuesto: true });
   aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();

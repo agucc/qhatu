@@ -4,9 +4,11 @@ import { obtener, guardar, diaLocal, anunciosYapaRestantes, cobrarAnuncioYapa, Y
 import { t, aplicarTextos, nombreDeco } from '../shared/i18n.js';
 import { sonar } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
-import { PRODUCTOS, modoCompras, comprar, precio, sinAnuncios } from '../shared/compras.js';
+import { PRODUCTOS, modoCompras, comprar, precio, sinAnuncios, iniciarCompras } from '../shared/compras.js';
 import { GRUPOS, aplicarDecoracion, enUso, esMio, usar } from '../shared/decoracion.js';
 import { chipYapa, contadorYapa, aviso, confeti, escapar } from '../shared/ui.js';
+import { iniciarPlataforma } from '../shared/plataforma.js';
+import { svgVaso, definiciones } from '../refresquera/botella.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -87,7 +89,8 @@ function muestra(grupo, item) {
   if (grupo === 'toldo') {
     return `<span class="muestra muestra-toldo">${item.colores.map((c) => `<i style="background:${c}"></i>`).join('')}</span>`;
   }
-  return `<span class="muestra muestra-vaso" data-forma="${item.id}"><i></i></span>`;
+  const capa = (color) => ({ color, simbolo: '' });
+  return `<span class="muestra muestra-vaso">${svgVaso([capa('#9a48b8'), capa('#ffb520'), capa('#ef476f')], { id: 700 + item.precio + item.id.length, forma: item.id, burbujas: false })}</span>`;
 }
 
 function pintarDecoracion() {
@@ -127,6 +130,8 @@ document.querySelector('.tienda-cuerpo').addEventListener('click', (ev) => {
 // ---------- Arranque ----------
 
 window.QHATU_LISTO = true;
+document.body.insertAdjacentHTML('afterbegin', definiciones());
+iniciarPlataforma({ esPuesto: true });
 aplicarDecoracion();
 aplicarTextos();
 $('#chip-yapa').innerHTML = chipYapa();
@@ -139,6 +144,7 @@ document.addEventListener('qhatu:idioma', () => {
   pintarProductos();
   pintarDecoracion();
 });
+iniciarCompras().then(pintarProductos);
 iniciarAnuncios().then(() => {
   anuncios.cargaLista();
   pintarGratis();

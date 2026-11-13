@@ -1,10 +1,12 @@
 // Anuncios con una sola interfaz para todos los puestos.
-// Reglas: nunca en medio de una partida, uno obligatorio como máximo cada tres niveles,
-// y el anuncio con recompensa siempre lo elige el jugador.
+// Reglas de Qhatu: los anuncios solo sirven para ganar yapa y siempre los elige el jugador.
+// No hay anuncios obligatorios. Quien compra el pase sin anuncios recibe la recompensa sin verlos.
 
 import { PORTAL, ANUNCIOS_DEMO, EN_APP } from './config.js';
 import { obtener } from './almacen.js';
 import { pausar } from './sonido.js';
+import { complementoNativo } from './nativo.js';
+import { VERSION_DE_PRUEBA, ADMOB_RECOMPENSA } from './compilacion.js';
 
 const SDK_CRAZYGAMES = 'https://sdk.crazygames.com/crazygames-sdk-v3.js';
 const SDK_POKI = 'https://game-cdn.poki.com/scripts/v2/poki-sdk.js';
@@ -27,7 +29,6 @@ const sinAnuncios = {
   async verRecompensa() {
     return false;
   },
-  async pausaEntreNiveles() {},
   inicioPartida() {},
   finPartida() {},
   celebrar() {},
@@ -60,26 +61,55 @@ const demo = {
   },
 };
 
+/** AdMob en la app Android: anuncios con recompensa. */
+async function admob(plugin) {
+  await plugin.initialize({ initializeForTesting: VERSION_DE_PRUEBA });
+  const opciones = { adId: ADMOB_RECOMPENSA, isTesting: VERSION_DE_PRUEBA };
+  return {
+    ...sinAnuncios,
+    recompensa: true,
+    async verRecompensa() {
+      let recompensado = false;
+      const oyentes = [];
+      pausar(true);
+      try {
+        const fin = new Promise((ok) => {
+          oyentes.push(plugin.addListener('onRewardedVideoAdReward', () => (recompensado = true)));
+          oyentes.push(plugin.addListener('onRewardedVideoAdDismissed', ok));
+          oyentes.push(plugin.addListener('onRewardedVideoAdFailedToShow', ok));
+        });
+        await plugin.prepareRewardVideoAd(opciones);
+        await plugin.showRewardVideoAd();
+        await fin;
+      } catch {
+        recompensado = false;
+      } finally {
+        pausar(false);
+        for (const o of oyentes) (await o)?.remove?.();
+      }
+      return recompensado;
+    },
+  };
+}
+
 function crazygames() {
   const sdk = window.CrazyGames.SDK;
-  const pedir = (tipo) =>
-    new Promise((ok) => {
-      sdk.ad.requestAd(tipo, {
-        adStarted: () => pausar(true),
-        adFinished: () => {
-          pausar(false);
-          ok(true);
-        },
-        adError: () => {
-          pausar(false);
-          ok(false);
-        },
-      });
-    });
   return {
     recompensa: true,
-    verRecompensa: () => pedir('rewarded'),
-    pausaEntreNiveles: () => pedir('midgame').then(() => {}),
+    verRecompensa: () =>
+      new Promise((ok) => {
+        sdk.ad.requestAd('rewarded', {
+          adStarted: () => pausar(true),
+          adFinished: () => {
+            pausar(false);
+            ok(true);
+          },
+          adError: () => {
+            pausar(false);
+            ok(false);
+          },
+        });
+      }),
     inicioPartida: () => sdk.game.gameplayStart(),
     finPartida: () => sdk.game.gameplayStop(),
     celebrar: () => sdk.game.happytime(),
@@ -96,11 +126,6 @@ function poki() {
       const vio = await sdk.rewardedBreak().catch(() => false);
       pausar(false);
       return Boolean(vio);
-    },
-    async pausaEntreNiveles() {
-      pausar(true);
-      await sdk.commercialBreak().catch(() => {});
-      pausar(false);
     },
     inicioPartida: () => sdk.gameplayStart(),
     finPartida: () => sdk.gameplayStop(),
@@ -121,12 +146,13 @@ export async function iniciarAnuncios() {
       await cargarScript(SDK_POKI);
       await window.PokiSDK.init();
       proveedor = poki();
+    } else if (EN_APP && complementoNativo('AdMob')) {
+      proveedor = await admob(complementoNativo('AdMob'));
     } else {
-      // En la app todavía no hay red de anuncios: se simulan para probar el flujo.
-      proveedor = ANUNCIOS_DEMO || EN_APP ? demo : sinAnuncios;
+      proveedor = ANUNCIOS_DEMO || (EN_APP && VERSION_DE_PRUEBA) ? demo : sinAnuncios;
     }
   } catch {
-    proveedor = sinAnuncios;
+    proveedor = EN_APP && VERSION_DE_PRUEBA ? demo : sinAnuncios;
   }
   return proveedor;
 }
@@ -135,20 +161,26 @@ function p() {
   return proveedor || sinAnuncios;
 }
 
+function tienePase() {
+  return Boolean(obtener().sinAnuncios);
+}
+
 export const anuncios = {
+  /** Hay recompensa si hay anuncios, o si el jugador tiene el pase sin anuncios. */
   get hayRecompensa() {
-    return p().recompensa;
+    return tienePase() || p().recompensa;
   },
-  verRecompensa: () => p().verRecompensa(),
-  /** Quien compró "quitar anuncios" no ve anuncios obligatorios. */
-  pausaEntreNiveles: () => (obtener().sinAnuncios ? Promise.resolve() : p().pausaEntreNiveles()),
+  /** Con el pase sin anuncios la recompensa llega sin ver el anuncio. */
+  verRecompensa: () => (tienePase() ? Promise.resolve(true) : p().verRecompensa()),
+  /** Ya no hay anuncios obligatorios: se deja para no romper a quien la llame. */
+  pausaEntreNiveles: () => Promise.resolve(),
   inicioPartida: () => p().inicioPartida(),
   finPartida: () => p().finPartida(),
   celebrar: () => p().celebrar(),
   cargaLista: () => p().cargaLista(),
 };
 
-/** Después de qué niveles cabe un anuncio obligatorio: nunca en los cinco primeros, y uno cada tres. */
-export function tocaAnuncio(nivelTerminado) {
-  return nivelTerminado >= 6 && nivelTerminado % 3 === 0;
+/** Antes marcaba dónde cabía un anuncio obligatorio. Ya no hay: siempre false. */
+export function tocaAnuncio() {
+  return false;
 }

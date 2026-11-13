@@ -68,3 +68,70 @@ test('la pista propone un movimiento válido', () => {
   const [i, j] = L.pista(t0);
   assert.equal(L.puedeVerter(t0, i, j), true);
 });
+
+// ---------- Vasos especiales ----------
+
+test('vaso con tapa: solo acepta su sabor', () => {
+  const t0 = L.crearTablero([['a', 'b'], ['b'], []], 4, { solo: [null, null, 'a'] });
+  assert.equal(L.puedeVerter(t0, 1, 2), false, 'b no entra en el vaso de a');
+  assert.equal(L.puedeVerter(t0, 0, 1), true);
+  const { tablero } = L.verter(t0, 0, 1);
+  assert.equal(L.puedeVerter(tablero, 0, 2), true, 'a sí entra');
+});
+
+test('vaso chico: le caben tres capas', () => {
+  const t0 = L.crearTablero([['a', 'a', 'a', 'a'], []], 4, { caps: [4, 3] });
+  const { tablero, cantidad } = L.verter(t0, 0, 1);
+  assert.equal(cantidad, 3);
+  assert.deepEqual(tablero.vasos, [['a'], ['a', 'a', 'a']]);
+  assert.equal(L.estaResuelto(tablero), false, 'un sabor partido en dos vasos no está resuelto');
+});
+
+test('hielo: las capas tapadas se descongelan al quedar arriba', () => {
+  const t0 = L.crearTablero([['a', 'b', 'c', 'd'], [], []], 4, { hielo: [2, 0, 0] });
+  assert.equal(L.capaOculta(t0, 0, 0), true);
+  assert.equal(L.capaOculta(t0, 0, 1), true);
+  assert.equal(L.capaOculta(t0, 0, 2), false);
+  let r = L.verter(t0, 0, 1); // sale d
+  assert.equal(r.revelada, false);
+  r = L.verter(r.tablero, 0, 2); // sale c: queda b arriba, se descongela
+  assert.equal(r.revelada, true);
+  assert.equal(L.capaOculta(r.tablero, 0, 1), false);
+  assert.equal(L.capaOculta(r.tablero, 0, 0), true, 'la de abajo sigue con hielo');
+});
+
+test('los niveles con vasos especiales tienen solución', () => {
+  let conHielo = 0;
+  let conTapa = 0;
+  let conChico = 0;
+  for (let n = 1; n <= 60; n++) {
+    const t = L.generarNivel(n, IDS_SABORES);
+    const { especial } = L.dificultad(n);
+    if (especial.hielo) {
+      conHielo++;
+      assert.ok(t.hielo.some((h) => h > 0), `nivel ${n} trae hielo`);
+    }
+    if (especial.tapa) {
+      conTapa++;
+      assert.ok(t.solo.some(Boolean), `nivel ${n} trae tapa`);
+    }
+    if (especial.chico) {
+      conChico++;
+      assert.ok(t.caps.includes(L.CAPACIDAD_CHICO), `nivel ${n} trae vaso chico`);
+    }
+    if (especial.hielo || especial.tapa || especial.chico) assert.ok(L.resolver(t, 200000), `nivel ${n} tiene solución`);
+  }
+  assert.ok(conHielo > 5 && conTapa > 5 && conChico > 3);
+  for (let n = 1; n <= 8; n++) {
+    const e = L.dificultad(n).especial;
+    assert.ok(!e.hielo && !e.tapa && !e.chico, 'los primeros niveles son simples');
+  }
+});
+
+test('agregar un vaso extra conserva las reglas de los demás', () => {
+  const t0 = L.crearTablero([['a'], []], 4, { solo: [null, 'a'], hielo: [0, 0] });
+  const t1 = L.agregarVacio(L.clonar(t0));
+  assert.equal(t1.vasos.length, 3);
+  assert.deepEqual(t1.solo, [null, 'a', null]);
+  assert.equal(t0.vasos.length, 2, 'el original no cambia');
+});

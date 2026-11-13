@@ -1,5 +1,5 @@
 // Guarda el mercado para jugar sin conexión. Sube VERSION al publicar cambios.
-const VERSION = 'qhatu-5';
+const VERSION = 'qhatu-6';
 const ARCHIVOS = [
   './',
   'index.html',
@@ -30,6 +30,13 @@ const ARCHIVOS = [
   'refresquera/logica.js',
   'refresquera/pedidos.js',
   'refresquera/sabores.js',
+  'refresquera/botella.js',
+  'refresquera/recetario.js',
+  'shared/nativo.js',
+  'shared/compartir.js',
+  'shared/transferir.js',
+  'shared/plataforma.js',
+  'shared/compilacion.js',
   'shared/puesto.css',
   'frutera/index.html',
   'frutera/frutera.css',

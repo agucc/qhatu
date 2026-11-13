@@ -18,5 +18,10 @@
     "@capacitor/core": "^8.6.2",
     "@fontsource/chango": "^5.3.0",
     "@fontsource/figtree": "^5.3.0"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.2.1",
+    "@capacitor/share": "8.0.3",
+    "@capgo/native-purchases": "8.9.6"
   }
 }

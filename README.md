@@ -15,11 +15,12 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 
 ### La Refresquera v2
 
+- **Botellas de vidrio** dibujadas en SVG (`refresquera/botella.js`): refresco con volumen, superficie que se mueve, burbujas, brillo del vidrio y chapa que cae al completar un vaso. Al verter, la botella se inclina y cae un chorro del sabor. Tres formas que se eligen en la tienda: botella, frasco y copa.
 - **Niveles:** infinitos, con semilla (el nivel N siempre es igual) y con solución comprobada. Los cinco primeros se ganan en menos de un minuto.
-- **Modo pedidos:** llegan caseritos pidiendo un sabor. Cada vaso completo de ese sabor se sirve solo y en su lugar entra un vaso nuevo mezclado. La partida termina cuando se llena la fila.
-- **Vaso extra:** se paga con yapa o viendo un anuncio con recompensa.
-- **Pistas, deshacer y reiniciar.**
-- **Símbolos por sabor:** cada refresco tiene un ícono además del color.
+- **Vasos especiales** (desde el nivel 9): capas con **hielo** que no muestran su sabor hasta quedar arriba, vaso con **etiqueta** que solo acepta un sabor y vaso **chico** de tres capas. La primera vez se explican con un dibujo.
+- **Recetario:** doce refrescos bolivianos (mocochinchi, api, somó, linaza, cebada, copoazú…) que se desbloquean al avanzar y regalan yapa.
+- **Modo pedidos:** llegan caseritos pidiendo un sabor. Cada vaso completo de ese sabor se sirve solo y entra uno nuevo mezclado. Se acaba cuando se llena la fila. Lleva la cuenta de la semana y permite **retar a un amigo**.
+- **Vaso extra, pistas, deshacer y reiniciar.** Sin yapa, la pista sale gratis viendo un anuncio.
 
 ### La Frutera
 
@@ -46,10 +47,18 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 
 ## La tienda (`tienda/`)
 
-- **Yapa gratis:** ver un anuncio da 15 de yapa, hasta 5 veces por día. El anuncio siempre lo elige el jugador.
-- **Packs de yapa** (0,99 / 2,99 / 4,99 USD) y **quitar anuncios** (2,99 USD), como en el plan. La compra real pasa por Google Play (`shared/compras.js` espera un complemento `QhatuCompras`); mientras la app no esté publicada, la versión de prueba simula la compra sin cobrar y lo dice en pantalla. En el sitio y los portales no se vende.
-- **Decoración con yapa:** fondos, toldos y vasos. Solo cambia cómo se ve; nadie paga para ganar.
-- Sin premios en dinero, sin cajas al azar y sin contadores falsos.
+- **Yapa gratis:** ver un anuncio da 15 de yapa, hasta 5 veces por día.
+- **Packs de yapa** (0,99 / 2,99 / 4,99 USD) y **pase sin anuncios** (2,99 USD): quien lo compra recibe la yapa de los anuncios sin verlos.
+- **Decoración con yapa:** fondos, toldos y formas de vaso. Solo cambia cómo se ve; nadie paga para ganar.
+
+### Reglas de dinero
+
+- **Los anuncios solo sirven para ganar yapa y siempre los elige el jugador.** No hay anuncios obligatorios.
+- No hay premios en dinero, cajas al azar ni contadores falsos.
+
+## Pasar el progreso
+
+En la portada, **Pasar mi progreso** da un código para copiar en un dispositivo y pegar en otro: lleva la yapa, los puestos y la decoración, sin cuentas ni servidor (`shared/transferir.js`). El código trae una suma de control y no se acepta si está incompleto o alterado.
 
 ## Nivel de cada puesto
 
@@ -68,12 +77,17 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `qhatu.css` | Colores de la marca (los refrescos del mercado) y componentes |
 | `progreso.js` | Nivel y experiencia de cada puesto |
 | `decoracion.js` | Fondos, toldos y vasos que se compran con yapa |
-| `compras.js` | Packs de yapa y quitar anuncios |
+| `compras.js` | Packs de yapa y pase sin anuncios (Google Play Billing) |
+| `compilacion.js` | Versión de prueba o de tienda, e identificadores de AdMob |
+| `compartir.js` | Retar a un amigo (Telegram, menú de Android o portapapeles) |
+| `transferir.js` | Código para pasar el progreso a otro dispositivo |
+| `plataforma.js` | Mini app de Telegram |
+| `nativo.js` | Acceso a los complementos de la app Android |
 | `puesto.css` | Barra de arriba, mesa y botones de abajo de cada puesto |
 
 Reglas del mercado que el código respeta:
 
-- Un anuncio obligatorio como máximo cada tres niveles, nunca en medio de una partida ni en los cinco primeros niveles.
+- Los anuncios solo son para ganar yapa y siempre los elige el jugador: no hay anuncios obligatorios.
 - Todo lo que se compra con yapa también se gana jugando.
 - Sin cajas de premios al azar ni contadores falsos.
 
@@ -88,6 +102,8 @@ Parámetros útiles en la URL:
 
 - `?portal=crazygames` o `?portal=poki`: carga el SDK de ese portal.
 - `?anuncios=demo`: simula un anuncio con recompensa en el sitio propio.
+- `?compras=demo`: simula las compras de la tienda sin cobrar.
+- `?tg=1`: abre como mini app de Telegram.
 
 ## Publicar
 
@@ -98,17 +114,22 @@ Parámetros útiles en la URL:
 
 La app es el mismo código web empaquetado con Capacitor; no se reescribe nada.
 
-- **Desde GitHub:** cada push compila la APK en GitHub Actions (`.github/workflows/apk.yml`) y la publica suelta en el release **apk-prueba**, siempre en el mismo link: `https://github.com/agucc/qhatu/releases/download/apk-prueba/qhatu.apk`.
-- **En tu computadora** (con Android Studio o el SDK de Android instalado):
-
-```bash
-npm install
-npm run android:apk   # deja la APK en android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-`npm run android:sync` copia los cambios del juego a la app sin compilar; después se puede abrir `android/` en Android Studio.
+- **Desde GitHub:** cada push compila la APK en GitHub Actions (`.github/workflows/apk.yml`) y la publica suelta en el release **apk-prueba**: `https://github.com/agucc/qhatu/releases/download/apk-prueba/qhatu.apk`.
+- **Prueba en emulador:** el flujo *Probar APK en emulador* (manual) instala la APK en un Android 14, abre cada pantalla y deja en el registro el estado de la página y los errores.
+- **En tu computadora** (con el SDK de Android): `npm install` y `npm run android:apk`.
 
 El identificador de la app es `bo.qhatu.mercado` (en `capacitor.config.json`). Se puede cambiar hasta que se publique en Google Play; después queda fijo.
+
+### Antes de publicar en Google Play
+
+1. **`shared/compilacion.js`:** poner `VERSION_DE_PRUEBA = false`. En la versión de prueba las compras se simulan sin cobrar y los anuncios son de prueba.
+2. **AdMob** (`@capacitor-community/admob`): crear la app y un bloque de anuncios *bonificado* en AdMob. Cambiar `ADMOB_RECOMPENSA` en `shared/compilacion.js` y `admob_app_id` en `android/app/src/main/res/values/strings.xml`. Hoy tienen los identificadores de prueba de Google, que muestran "Test Ad".
+3. **Compras** (`@capgo/native-purchases`, Google Play Billing): en Play Console crear los productos integrados `yapa_150`, `yapa_500`, `yapa_1000` (consumibles) y `sin_anuncios` (no consumible). Cuando existen, la tienda los usa con el precio de Play; el pase sin anuncios se recupera solo al reinstalar.
+4. Firmar la APK o el AAB de publicación con tu propia clave (la APK de prueba es *debug*).
+
+## Telegram (mini app)
+
+Los mismos juegos funcionan como mini app de Telegram (`shared/plataforma.js`): pantalla completa, colores del mercado y botón atrás de Telegram. Retar a un amigo comparte por Telegram. Para activarla, con [@BotFather](https://t.me/BotFather): crear un bot (`/newbot`) y luego la mini app (`/newapp`) con la dirección del sitio publicado. También se puede abrir cualquier página con `?tg=1` para probar.
 
 ## Estructura
 
@@ -118,6 +139,8 @@ refresquera/                        primer puesto
   logica.js                         reglas, niveles, solucionador y pistas (puro)
   pedidos.js                        modo pedidos (puro)
   sabores.js                        colores y símbolos
+  botella.js                        dibujo de botellas, frascos y copas (SVG)
+  recetario.js                      los doce refrescos coleccionables
   juego.js                          pantalla, yapa y anuncios
 frutera/                            segundo puesto
   fisica.js                         caída, choques y uniones (puro)

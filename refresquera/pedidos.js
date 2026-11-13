@@ -2,7 +2,7 @@
 // se sirve solo y en su lugar entra un vaso nuevo mezclado. Se acaba cuando la fila se llena.
 // Funciones puras: el tiempo y el azar llegan desde afuera.
 
-import { barajar, estaCompleto, generarTablero, clonar } from './logica.js';
+import { barajar, estaCompleto, generarTablero, clonar, agregarVacio } from './logica.js';
 
 export const FILA_MAX = 5;
 export const YAPA_POR_PEDIDO = 2;
@@ -102,6 +102,7 @@ export function servir(estado, rnd) {
       const [caserito] = estado.fila.splice(k, 1);
       const nuevo = clonar(t);
       nuevo.vasos[i] = vasoNuevo(estado, rnd);
+      nuevo.hielo[i] = 0;
       estado.tablero = nuevo;
       estado.atendidos++;
       servidos.push({ vaso: i, caserito });
@@ -113,7 +114,5 @@ export function servir(estado, rnd) {
 }
 
 export function agregarVaso(estado) {
-  const nuevo = clonar(estado.tablero);
-  nuevo.vasos.push([]);
-  estado.tablero = nuevo;
+  estado.tablero = agregarVacio(clonar(estado.tablero));
 }

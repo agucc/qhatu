@@ -173,20 +173,11 @@
 .muestra-vaso {
   place-items: center;
   overflow: visible;
+  height: 72px;
 }
 
-.muestra-vaso i {
-  width: 26px;
-  height: 54px;
-  border-radius: 11px;
-  box-shadow: inset 0 0 0 2.5px #8a7f9c;
-  background: linear-gradient(0deg, var(--api) 0 25%, var(--tumbo) 25% 50%, var(--frutilla) 50% 75%, transparent 75%);
-}
-
-.muestra-vaso[data-forma='recto'] i {
-  border-radius: 4px;
-}
-
-.muestra-vaso[data-forma='copa'] i {
-  border-radius: 4px 4px 13px 13px / 4px 4px 26px 26px;
+.muestra-vaso svg {
+  width: 22px;
+  height: auto;
+  overflow: visible;
 }

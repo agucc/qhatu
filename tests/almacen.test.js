@@ -31,9 +31,21 @@ test('el regalo diario se da una vez al día y crece con la racha', () => {
   assert.equal(montoRegalo(100), montoRegalo(6), 'tiene tope');
 });
 
-test('anuncio obligatorio: nunca en los cinco primeros niveles y como máximo cada tres', () => {
-  for (let n = 1; n <= 5; n++) assert.equal(tocaAnuncio(n), false);
-  const con = [];
-  for (let n = 1; n <= 30; n++) if (tocaAnuncio(n)) con.push(n);
-  for (let i = 1; i < con.length; i++) assert.ok(con[i] - con[i - 1] >= 3);
+test('no hay anuncios obligatorios: solo los que elige el jugador', () => {
+  for (let n = 1; n <= 60; n++) assert.equal(tocaAnuncio(n), false);
+});
+
+import { codigoDe, leerCodigo } from '../shared/transferir.js';
+
+test('pasar el progreso: el código se lee igual y detecta cambios', () => {
+  const e = { ...estadoInicial(), yapa: 777, racha: 4, puestos: { saltenera: { e: { ventas: 12 } } }, idioma: 'pt' };
+  const codigo = codigoDe(e);
+  const leido = leerCodigo(codigo);
+  assert.equal(leido.yapa, 777);
+  assert.equal(leido.racha, 4);
+  assert.equal(leido.puestos.saltenera.e.ventas, 12);
+  assert.equal(leerCodigo(`  ${codigo.slice(0, 40)}\n${codigo.slice(40)} `).yapa, 777, 'tolera espacios y saltos de línea');
+  const tocado = codigo.slice(0, -6) + (codigo.endsWith('A') ? 'B' : 'A') + codigo.slice(-5);
+  assert.equal(leerCodigo(tocado), null, 'un código alterado no se acepta');
+  assert.equal(leerCodigo('hola'), null);
 });

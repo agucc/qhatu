@@ -414,6 +414,19 @@ button {
   gap: 10px;
 }
 
+textarea.codigo {
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid var(--borde);
+  background: var(--noche);
+  color: var(--texto);
+  font: 12px/1.4 ui-monospace, monospace;
+  word-break: break-all;
+  resize: none;
+}
+
 /* ---------- Papel picado ---------- */
 
 .confeti {

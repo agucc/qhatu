@@ -75,8 +75,12 @@ export const SABORES = {
 
 export const IDS_SABORES = Object.keys(SABORES);
 
+/** El dibujo del símbolo (para meterlo dentro de otro SVG de 24 × 24). */
+export function dibujoSimbolo(id, sabores = SABORES) {
+  const s = sabores[id];
+  return `<g opacity=".85">${s.simbolo.replaceAll('{t}', s.tinta).replaceAll('{c}', s.color)}</g>`;
+}
+
 export function svgSimbolo(id) {
-  const s = SABORES[id];
-  const dibujo = s.simbolo.replaceAll('{t}', s.tinta).replaceAll('{c}', s.color);
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><g opacity=".85">${dibujo}</g></svg>`;
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${dibujoSimbolo(id)}</svg>`;
 }
