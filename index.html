@@ -6,6 +6,38 @@
   <title>Qhatu · Juega en el mercado</title>
   <meta name="description" content="Qhatu es un mercado boliviano de juegos casuales. Cada juego es un puesto y todo se paga con yapa.">
   <meta name="theme-color" content="#17131f">
+  <script>
+    // Si el juego no arranca en unos segundos, muestra qué falló (sirve para depurar en celulares).
+    (function () {
+      var errores = [];
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (t && t !== window && (t.src || t.href)) errores.push('No cargó: ' + (t.src || t.href));
+        else errores.push((e.message || 'Error') + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        errores.push('Promesa: ' + ((e.reason && e.reason.message) || e.reason));
+      });
+      setTimeout(function () {
+        if (window.QHATU_LISTO) return;
+        var hojas = [];
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var s = document.styleSheets[i];
+          var n;
+          try { n = s.cssRules.length; } catch (x) { n = 'bloqueada'; }
+          hojas.push((s.href || 'interna') + ' -> ' + n + ' reglas');
+        }
+        var d = document.createElement('pre');
+        d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:70%;overflow:auto;margin:0;padding:12px;background:#fff;color:#000;font:12px monospace;white-space:pre-wrap;z-index:99999;border-radius:8px';
+        d.textContent = 'Qhatu no pudo arrancar. Manda una captura de esto.\n\n' +
+          location.href + '\n' + navigator.userAgent +
+          '\n\nEstilos:\n' + (hojas.join('\n') || 'ninguno') +
+          '\n\nErrores:\n' + (errores.join('\n') || 'ninguno') +
+          '\n\nMódulos JS: ' + ('noModule' in document.createElement('script'));
+        document.body.appendChild(d);
+      }, 4000);
+    })();
+  </script>
   <link rel="icon" href="icono.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="shared/qhatu.css">

@@ -545,6 +545,7 @@ function reloj(ahora) {
 // ---------- Arranque ----------
 
 function iniciar() {
+  window.QHATU_LISTO = true;
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();

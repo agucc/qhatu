@@ -112,6 +112,7 @@ function pintarTodo() {
   pintarPuestos();
 }
 
+window.QHATU_LISTO = true;
 document.getElementById('logo').innerHTML = logo();
 document.getElementById('casera').innerHTML = casera();
 document.getElementById('chip-yapa').innerHTML = chipYapa();
