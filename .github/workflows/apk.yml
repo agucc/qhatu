@@ -5,6 +5,14 @@ on:
     branches: ['**']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+# Si llegan dos push seguidos, solo se publica el último.
+concurrency:
+  group: apk
+  cancel-in-progress: true
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -34,8 +42,18 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: qhatu-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 30
+      # La APK queda suelta en el release "apk-prueba", siempre con el mismo link:
+      # https://github.com/<dueño>/<repo>/releases/download/apk-prueba/qhatu.apk
+      - name: Publicar en el release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk qhatu.apk
+          gh release delete apk-prueba --yes --cleanup-tag || true
+          gh release create apk-prueba qhatu.apk \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Qhatu · APK de prueba" \
+            --notes "Versión de prueba compilada desde la rama ${GITHUB_REF_NAME} (commit ${GITHUB_SHA::7}).
+
+          Para instalar: descarga qhatu.apk en el celular, ábrela y permite instalar apps de origen desconocido."

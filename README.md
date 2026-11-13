@@ -60,7 +60,7 @@ Parámetros útiles en la URL:
 
 La app es el mismo código web empaquetado con Capacitor; no se reescribe nada.
 
-- **Desde GitHub:** cada push compila la APK en GitHub Actions (`.github/workflows/apk.yml`). Se descarga en la pestaña **Actions** → la última ejecución → **Artifacts** → `qhatu-apk`.
+- **Desde GitHub:** cada push compila la APK en GitHub Actions (`.github/workflows/apk.yml`) y la publica suelta en el release **apk-prueba**, siempre en el mismo link: `https://github.com/agucc/qhatu/releases/download/apk-prueba/qhatu.apk`.
 - **En tu computadora** (con Android Studio o el SDK de Android instalado):
 
 ```bash
