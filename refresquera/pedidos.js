@@ -41,7 +41,7 @@ function contarSabores(tablero) {
 }
 
 /** Elige qué pide el caserito: un sabor que se pueda completar y que no esté ya muy pedido. */
-export function elegirPedido(estado, rnd) {
+export function elegirPedido(estado, rnd, preferido = null) {
   const cuenta = contarSabores(estado.tablero);
   const pedidos = {};
   for (const c of estado.fila) pedidos[c.sabor] = (pedidos[c.sabor] || 0) + 1;
@@ -50,17 +50,19 @@ export function elegirPedido(estado, rnd) {
   if (!candidatos.length) candidatos = Object.keys(cuenta).filter((s) => cuenta[s] >= cap);
   if (!candidatos.length) candidatos = Object.keys(cuenta);
   if (!candidatos.length) candidatos = estado.ids;
+  // Un caserito con nombre pide lo suyo si se puede servir.
+  if (preferido && candidatos.includes(preferido)) return preferido;
   return candidatos[Math.floor(rnd() * candidatos.length)];
 }
 
 /** Llega un caserito. Si la fila ya estaba llena, la partida termina. */
-export function llegaCaserito(estado, rnd) {
+export function llegaCaserito(estado, rnd, preferido = null) {
   if (estado.terminado) return null;
   if (estado.fila.length >= FILA_MAX) {
     estado.terminado = true;
     return null;
   }
-  const caserito = { id: estado.siguienteId++, sabor: elegirPedido(estado, rnd), cara: Math.floor(rnd() * 1000) };
+  const caserito = { id: estado.siguienteId++, sabor: elegirPedido(estado, rnd, preferido), cara: Math.floor(rnd() * 1000) };
   estado.fila.push(caserito);
   return caserito;
 }

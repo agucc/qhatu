@@ -54,3 +54,13 @@ Base: versión `32458e6` y la especificación del 13/11/2026. Regla seguida: no 
 - Saludo de la portada en la jerga de cada país (pendiente de validar con personas de cada país).
 - Botón **Volver al mercado** al completar un nivel de La Refresquera, al terminar los pedidos y al terminar una partida de La Frutera y El Aguayo. El avance se guarda antes de salir.
 - Arreglado: el botón "Retar" al terminar una partida de El Aguayo fallaba.
+
+## Cultura para aprender (Álbum, sellos, caseritos y fiestas)
+
+Contenido nuevo, todo **pendiente de validar** con personas de cada país (`shared/cultura.js`):
+
+- 21 datos de frutas (3 por país), 7 de comidas, 7 de tejidos, 7 palabras del mercado y 7 fiestas.
+- 28 caseritos con nombre (uno por puesto y país) y 7 caseritos de fiesta, con frase en tres idiomas.
+- Fechas de las fiestas: Alasitas 24 ene – 8 feb; Inti Raymi 20–26 jun; Día de Muertos 28 oct – 2 nov; Feria de las Flores 1–12 ago; Día de la Tradición 5–15 nov; Festa Junina todo junio; Thanksgiving la semana del cuarto jueves de noviembre.
+
+Recompensas (cambio de balance aprobado al pedir estas funciones): 5 de yapa por lámina y 50 por sello.

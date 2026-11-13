@@ -50,6 +50,9 @@ node scripts/estado-webview.mjs http://localhost:9222 "location.href = '/saltene
 echo "== La tienda =="
 node scripts/estado-webview.mjs http://localhost:9222 "location.href = '/tienda/index.html'" || echo "no se pudo abrir la tienda"
 
+echo "== El álbum =="
+node scripts/estado-webview.mjs http://localhost:9222 "location.href = '/album/index.html'" || echo "no se pudo abrir el álbum"
+
 echo "== ¿Sigue viva la app? =="
 adb shell pidof bo.qhatu.mercado || echo "la app ya no está corriendo"
 echo "== Cierres por memoria o errores graves =="

@@ -9,9 +9,10 @@ import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
 import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNivel } from '../shared/ui.js';
-import { caserito } from '../shared/marca.js';
+import { caserito, casera } from '../shared/marca.js';
 import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
+import { caseritoConHistoria, htmlCaserito, esCasera, anotarFruta, jugarEnFiesta } from '../shared/album.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
@@ -95,11 +96,13 @@ function pintarDatos() {
 
 function pintarPedido({ nuevo = false } = {}) {
   const p = juego.pedido;
-  $('#pedido-cara').innerHTML = caserito(p.cara, datosPais(PAIS).sombreros);
+  $('#pedido-cara').innerHTML = esCasera(p.historia) ? casera(PAIS) : caserito(p.cara, datosPais(PAIS).sombreros);
   pintarMini($('#pedido-fruta'), p.nivel);
   const texto = t('quiereFruta', { fruta: nombreFruta(FRUTAS[p.nivel]) });
-  $('#pedido-texto').textContent = texto;
-  $('#pedido').setAttribute('aria-label', texto);
+  if (p.historia) $('#pedido-texto').innerHTML = htmlCaserito(p.historia);
+  else $('#pedido-texto').textContent = texto;
+  $('#pedido').classList.toggle('con-historia', Boolean(p.historia));
+  $('#pedido').setAttribute('aria-label', p.historia ? `${p.historia.nombre}: ${p.historia.linea} ${texto}` : texto);
   const caja = $('#pedido');
   caja.classList.remove('atendido');
   if (nuevo) {
@@ -114,7 +117,12 @@ function nuevoPedido() {
   const desde = 3;
   let nivel = desde + Math.floor(rnd() * (tope - desde + 1));
   if (juego.pedido && nivel === juego.pedido.nivel) nivel = Math.min(tope, nivel + 1);
-  juego.pedido = { nivel, cara: Math.floor(rnd() * 1000) };
+  // A veces llega un caserito con nombre que pide su fruta (si ya puede salir en el canasto).
+  const esp = caseritoConHistoria(PAIS, 'frutera', rnd);
+  const suya = esp ? FRUTAS.findIndex((f) => f.id === esp.fruta) : -1;
+  const historia = suya >= desde && suya <= tope ? esp : null;
+  if (historia) nivel = suya;
+  juego.pedido = { nivel, cara: Math.floor(rnd() * 1000), historia };
   pintarPedido({ nuevo: true });
 }
 
@@ -149,10 +157,15 @@ function empezar() {
   }
 }
 
+function avisarLamina(texto) {
+  if (texto) aviso(texto, { tipo: 'exito' });
+}
+
 function soltarFruta() {
   const m = juego.mundo;
   if (juego.pausas || m.terminado || juego.espera > 0) return;
   F.soltar(m, juego.enMano, juego.x);
+  avisarLamina(anotarFruta(PAIS, FRUTAS[juego.enMano].id));
   sonar.soltar();
   juego.enMano = juego.siguiente;
   juego.siguiente = frutaAlAzar(rnd);
@@ -177,6 +190,7 @@ function alEvento(e) {
     return;
   }
   sonar.union(e.nivel);
+  avisarLamina(anotarFruta(PAIS, FRUTAS[e.nivel].id));
   juego.efectos.push({ tipo: 'estallido', x: e.x, y: e.y, color: FRUTAS[e.nivel].color, r: FRUTAS[e.nivel].r, vida: 0 });
   if (juego.pedido && e.nivel === juego.pedido.nivel) {
     // El caserito se lleva la fruta: deja espacio en el canasto
@@ -493,6 +507,7 @@ $('#sonido').addEventListener('click', () => {
 function iniciar() {
   window.QHATU_LISTO = true;
   iniciarPlataforma({ esPuesto: true });
+  setTimeout(() => avisarLamina(jugarEnFiesta(PAIS)), 1200);
   aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();

@@ -8,9 +8,10 @@ import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
 import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNivel } from '../shared/ui.js';
-import { caserito } from '../shared/marca.js';
+import { caserito, casera } from '../shared/marca.js';
 import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
+import { caseritoConHistoria, htmlCaserito, esCasera, anotarFranjas, jugarEnFiesta } from '../shared/album.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
@@ -171,11 +172,13 @@ function pintarDatos() {
 
 function pintarPedido({ nuevo = false } = {}) {
   const p = juego.pedido;
-  $('#pedido-cara').innerHTML = caserito(p.cara, datosPais(PAIS).sombreros);
+  $('#pedido-cara').innerHTML = esCasera(p.historia) ? casera(PAIS) : caserito(p.cara, datosPais(PAIS).sombreros);
   $('#pedido-hilo').style.setProperty('--c', colorDe(p.color));
   const texto = t('quiereFranja', { color: nombreHilo(p.color) });
-  $('#pedido-texto').textContent = texto;
-  $('#pedido').setAttribute('aria-label', texto);
+  if (p.historia) $('#pedido-texto').innerHTML = htmlCaserito(p.historia);
+  else $('#pedido-texto').textContent = texto;
+  $('#pedido').classList.toggle('con-historia', Boolean(p.historia));
+  $('#pedido').setAttribute('aria-label', p.historia ? `${p.historia.nombre}: ${p.historia.linea} ${texto}` : texto);
   const caja = $('#pedido');
   caja.classList.remove('atendido');
   if (nuevo) {
@@ -187,7 +190,11 @@ function pintarPedido({ nuevo = false } = {}) {
 
 function nuevoPedido() {
   const opciones = HILOS.filter((h) => !juego.pedido || h !== juego.pedido.color);
-  juego.pedido = { color: opciones[Math.floor(rnd() * opciones.length)], cara: Math.floor(rnd() * 1000) };
+  // A veces llega una tejedora o un caserito con nombre que pide su color.
+  const esp = caseritoConHistoria(PAIS, 'telar', rnd);
+  const historia = esp && opciones.includes(esp.color) ? esp : null;
+  const color = historia ? historia.color : opciones[Math.floor(rnd() * opciones.length)];
+  juego.pedido = { color, cara: Math.floor(rnd() * 1000), historia };
   pintarPedido({ nuevo: true });
 }
 
@@ -251,6 +258,8 @@ function colocarPieza(i, fila, col) {
     juego.bloqueado = true;
     pintarTelar({ lleno: r.lleno, tejer: r.franjas });
     sonar.tejer(r.franjas.length);
+    const lamina = anotarFranjas(PAIS, r.franjas.length);
+    if (lamina) setTimeout(() => aviso(lamina, { tipo: 'exito' }), 900);
     juego.tela = [...r.franjas.map((fr) => fr.colores).reverse(), ...juego.tela].slice(0, MAX_TELA);
     pintarTela(r.franjas.length);
     if (r.franjas.length >= 2) {
@@ -507,6 +516,8 @@ function iniciar() {
   window.QHATU_LISTO = true;
   document.body.dataset.textura = TELAR.textura;
   iniciarPlataforma({ esPuesto: true });
+  const fiesta = jugarEnFiesta(PAIS);
+  if (fiesta) setTimeout(() => aviso(fiesta, { tipo: 'exito' }), 1200);
   aplicarDecoracion();
   aplicarTextos();
   // El nombre del puesto es el del tejido del país (y se mantiene al cambiar de idioma)

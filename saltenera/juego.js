@@ -7,10 +7,11 @@ import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
 import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNivel, escapar } from '../shared/ui.js';
-import { caserito } from '../shared/marca.js';
+import { caserito, casera } from '../shared/marca.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
+import { caseritoConHistoria, caseritoGuardado, htmlCaserito, esCasera, anotarCocina, jugarEnFiesta } from '../shared/album.js';
 import { paisActual, pais as datosPais, texto as enIdioma } from '../shared/paises.js';
 import { svgComida, PARRILLA } from './comidas.js';
 
@@ -101,9 +102,13 @@ function pintarNumeros() {
 function pintarPedido({ nuevo = false } = {}) {
   const p = e.pedido;
   if (!p) return;
-  $('#pedido-cara').innerHTML = caserito(p.cara, PAIS_DATOS.sombreros);
   const texto = t('quiereSaltenas', { n: p.cantidad, comida: enIdioma(PAIS_DATOS.comida.plural) });
-  $('#pedido-texto').textContent = texto;
+  const historia = p.historia ? caseritoGuardado(PAIS_DATOS.id, 'comida', p.historia === 'fiesta') : null;
+  $('#pedido-cara').innerHTML = esCasera(historia) ? casera(PAIS_DATOS.id) : caserito(p.cara, PAIS_DATOS.sombreros);
+  if (historia) $('#pedido-texto').innerHTML = `${htmlCaserito(historia)} (${p.cantidad})`;
+  else $('#pedido-texto').textContent = texto;
+  $('#pedido').classList.toggle('con-historia', Boolean(historia));
+  $('#pedido').setAttribute('aria-label', historia ? `${historia.nombre}: ${historia.linea} ${texto}` : texto);
   $('#pedido-avance').style.width = `${Math.min(100, (p.hechas / p.cantidad) * 100)}%`;
   const caja = $('#pedido');
   caja.classList.remove('atendido');
@@ -160,6 +165,13 @@ function salteVuela(x, y, monto) {
   setTimeout(() => n.remove(), 1000);
 }
 
+/** Pedido nuevo; a veces lo hace un caserito con nombre (se guarda solo si es de fiesta o no). */
+function nuevoPedido() {
+  const p = S.nuevoPedido(e, Math.floor(Math.random() * 1000));
+  const esp = caseritoConHistoria(PAIS_DATOS.id, 'comida');
+  p.historia = esp ? (esp.fiesta ? 'fiesta' : 'caserito') : null;
+}
+
 function revisarHitos() {
   for (const h of S.revisarHitos(e)) {
     sumarYapa(h.yapa);
@@ -171,6 +183,8 @@ function revisarHitos() {
 
 function alTocar(ev) {
   if (juego.pausas) return;
+  const lamina = anotarCocina(PAIS_DATOS.id);
+  if (lamina) aviso(lamina, { tipo: 'exito' });
   const monto = S.toque(e, Date.now());
   const r = $('#horno').getBoundingClientRect();
   const x = ev.clientX || r.left + r.width / 2;
@@ -192,7 +206,7 @@ function alTocar(ev) {
     celebrarNivel(ganarXp('saltenera', 1));
     setTimeout(() => {
       if (!e.pedido) {
-        S.nuevoPedido(e, Math.floor(Math.random() * 1000));
+        nuevoPedido();
         pintarPedido({ nuevo: true });
       }
     }, 700);
@@ -292,6 +306,8 @@ function bucle(ahora) {
 function iniciar() {
   window.QHATU_LISTO = true;
   iniciarPlataforma({ esPuesto: true });
+  const fiesta = jugarEnFiesta(PAIS_DATOS.id);
+  if (fiesta) setTimeout(() => aviso(fiesta, { tipo: 'exito' }), 1200);
   aplicarDecoracion();
   aplicarTextos();
   if (PAIS_DATOS.cocina === 'parrilla') $('#horno').innerHTML = PARRILLA;
@@ -308,7 +324,7 @@ function iniciar() {
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();
   if (EN_PORTAL) $('#volver').hidden = true;
-  if (!e.pedido) S.nuevoPedido(e, Math.floor(Math.random() * 1000));
+  if (!e.pedido) nuevoPedido();
   pintarSonido();
   pintarMejoras();
   pintarNumeros();

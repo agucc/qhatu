@@ -9,6 +9,7 @@ import * as B from './botella.js';
 import { recetasDe, YAPA_RECETA, recetasNuevas, botellaReceta, nivelesEn, sumarNivel } from './recetario.js';
 import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
+import { caseritoConHistoria, jugarEnFiesta } from '../shared/album.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
 import { t, aplicarTextos } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
@@ -190,7 +191,7 @@ function pintarPedidos() {
     asientos.push(`<li class="asiento ocupado${nuevo ? ' llega' : ''}" data-id="${c.id}">
       <span class="pedido" style="--c:${s.color}">${svgSimbolo(c.sabor)}</span>
       ${caserito(c.cara, datosPais(PAIS).sombreros)}
-      <span class="solo-lector">${escapar(t('quiere', { sabor: nombreBebida(c.sabor) }))}</span>
+      <span class="solo-lector">${escapar(`${c.nombre ? `${c.nombre}: ` : ''}${t('quiere', { sabor: nombreBebida(c.sabor) })}`)}</span>
     </li>`);
   }
   const fila = $('#fila');
@@ -751,7 +752,12 @@ function reloj(ahora) {
   if (juego.modo === 'pedidos' && e && !e.terminado && !juego.pausas && !document.hidden) {
     juego.restante -= dt;
     if (juego.restante <= 0) {
-      P.llegaCaserito(e, rnd);
+      const esp = caseritoConHistoria(PAIS, 'refresquera', rnd);
+      const c = P.llegaCaserito(e, rnd, esp?.bebida);
+      if (c && esp && c.sabor === esp.bebida) {
+        c.nombre = esp.nombre;
+        aviso(`${esp.nombre}: ${esp.linea}`);
+      }
       if (e.terminado) {
         finPedidos();
       } else {
@@ -773,6 +779,8 @@ function iniciar() {
   window.QHATU_LISTO = true;
   document.body.insertAdjacentHTML('afterbegin', B.definiciones());
   iniciarPlataforma({ esPuesto: true });
+  const fiesta = jugarEnFiesta(PAIS);
+  if (fiesta) setTimeout(() => aviso(fiesta, { tipo: 'exito' }), 1200);
   aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();

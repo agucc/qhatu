@@ -70,6 +70,16 @@ Al entrar por primera vez, el jugador elige su país: será su **mercado de casa
 - **Hitos:** cada vez que tus ventas totales pasan una meta (100, 1.000, 10.000...) ganas yapa.
 - **Hora pico:** todo vende el doble por un minuto (yapa o anuncio).
 
+## Álbum del Mercado, sellos, caseritos y fiestas
+
+La cultura se aprende jugando (`shared/cultura.js` tiene el contenido; `shared/album.js`, las reglas; `album/`, la pantalla):
+
+- **Álbum del Mercado:** cada país tiene 15 láminas (Bolivia 19): la palabra del mercado, sus bebidas, tres frutas, el tejido, la comida y la fiesta. Cada lámina tiene un dibujo y un dato breve, y se gana jugando: las bebidas con los niveles de La Refresquera en ese país (las mismas del recetario), las frutas al hacerlas aparecer en La Frutera, el tejido con 10 franjas en el telar, la comida cocinando 50 veces, la palabra al visitar el país y la fiesta jugando durante su semana. Cada lámina nueva da 5 de yapa.
+- **Sello del pasaporte:** con 6 láminas de un país se puede sellar su pasaporte respondiendo tres preguntas sobre los datos de esas láminas. Con las tres bien: sello en el pasaporte y 50 de yapa. Se puede volver a intentar.
+- **Caseritos con nombre:** en cada país, uno por puesto (por ejemplo, Doña Rosa de El Alto pide api para el frío). Llegan a veces en lugar de un caserito cualquiera y piden lo suyo con una frase que enseña algo; las caseras se dibujan como La Casera de su país.
+- **Fiestas del calendario:** Alasitas (Bolivia), Inti Raymi (Perú), Día de Muertos (México), Feria de las Flores (Colombia), Día de la Tradición (Argentina), Festa Junina (Brasil) y Thanksgiving (Estados Unidos, el cuarto jueves de noviembre). Durante la semana de la fiesta la portada la anuncia, llega un caserito de fiesta y se gana su lámina. Para probar: `?fiesta=us` (o el país) en la dirección.
+- Todo este contenido está **pendiente de validar** con personas de cada país.
+
 ## La tienda (`tienda/`)
 
 - **Yapa gratis:** ver un anuncio da 15 de yapa, hasta 5 veces por día.
@@ -126,6 +136,9 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `compartir.js` | Retar a un amigo (Telegram, menú de Android o portapapeles) |
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
+| `cultura.js` | Contenido cultural: láminas, caseritos con nombre y fiestas de cada país |
+| `album.js` | Reglas del álbum, del sello del pasaporte, de los caseritos con nombre y de las fiestas |
+| `dibujos-fiesta.js` | Dibujo de cada fiesta |
 | `tejidos.js` | Dibujo del tejido de cada país (aguayo, manta, sarape, mochila, poncho, chita, quilt) |
 | `plataforma.js` | Mini app de Telegram |
 | `nativo.js` | Acceso a los complementos de la app Android |
@@ -204,6 +217,7 @@ saltenera/                          cuarto puesto
   logica.js                         mejoras, ventas fuera del juego, hitos y pedidos (puro)
   juego.js                          horno, mejoras y hora pico
 tienda/                             yapa por anuncios, compras y decoración
+album/                              Álbum del Mercado y sello del pasaporte
 nube/                               servidor de partidas en Cloudflare (Worker + D1)
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales

@@ -1,9 +1,9 @@
-// Revisión de pantallas (QA-01, QA-02, QA-10): 7 países × 6 pantallas × 3 anchos de celular.
+// Revisión de pantallas (QA-01, QA-02, QA-10): 7 países × 7 pantallas × 3 anchos de celular.
 // Uso: npm run dev (en otra terminal) y luego: node scripts/revisar-pantallas.cjs
 // Necesita Playwright con Chromium instalado.
 const { chromium } = require('playwright');
 const PAISES = ['bo', 'pe', 'mx', 'co', 'ar', 'br', 'us'];
-const PANTALLAS = ['index.html', 'refresquera/index.html', 'frutera/index.html', 'aguayo/index.html', 'saltenera/index.html', 'tienda/index.html'];
+const PANTALLAS = ['index.html', 'refresquera/index.html', 'frutera/index.html', 'aguayo/index.html', 'saltenera/index.html', 'tienda/index.html', 'album/index.html'];
 const ANCHOS = [320, 360, 412];
 (async () => {
   const b = await chromium.launch();

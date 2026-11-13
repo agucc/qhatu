@@ -44,6 +44,7 @@ const ESTADO = `JSON.stringify({
   mejoras: document.querySelectorAll('.mejora').length,
   productos: document.querySelectorAll('.producto').length,
   decoraciones: document.querySelectorAll('.deco').length,
+  laminas: document.querySelectorAll('.lamina').length,
   pedido: document.querySelector('#pedido-texto')?.textContent || null,
   colorTexto: getComputedStyle(document.body).color,
   hojas: [...document.styleSheets].map(s => { try { return s.href + ' ' + s.cssRules.length } catch (e) { return s.href + ' bloqueada' } }),

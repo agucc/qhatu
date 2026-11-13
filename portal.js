@@ -15,6 +15,8 @@ import { PAISES, pais as datosPais, paisActual, paisesAbiertos, pasajesLibres, p
 import { frutasDe } from './frutera/frutas.js';
 import { svgComida } from './saltenera/comida-portal.js';
 import { dibujoTejido } from './shared/tejidos.js';
+import { visitarPais, progresoAlbum, sellado, fiestaActiva, textoFechas } from './shared/album.js';
+import { dibujoFiesta } from './shared/dibujos-fiesta.js';
 
 // Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
 // ("refresquera/") devuelve la portada en vez del puesto.
@@ -156,8 +158,9 @@ function pintarPasaporte() {
     else if (libres > 0) accion = `<button class="boton" type="button" data-viajar="${p.id}">${escapar(t('viajar'))}</button>`;
     else accion = `<span class="sello cerrado">${escapar(t('cerrado'))}</span>`;
     const casa = p.id === e.pais ? `<small class="casa">${escapar(t('casa'))}</small>` : '';
+    const sello = sellado(p.id, e) ? `<span class="sello-pasaporte" title="${escapar(t('selloListo'))}">${escapar(t('sellado'))}</span>` : '';
     return `<article class="pais${abierto ? ' abierto' : ''}${p.id === aqui ? ' aqui' : ''}">
-      ${bandera(p.id, 26)}
+      ${bandera(p.id, 26)}${sello}
       <h3>${escapar(texto(p.nombre))}${casa}</h3>
       ${abierto ? `<p>${escapar(texto(p.dato))}</p>` : ''}
       ${accion}
@@ -213,7 +216,26 @@ function elegirPaisSiFalta() {
   });
 }
 
+function pintarAlbumYFiesta() {
+  const e = obtener();
+  const aqui = paisActual(e);
+  const { ganadas, total } = progresoAlbum(aqui, e);
+  document.getElementById('album-texto').textContent = `${t('albumDesc')} ${texto(actual().nombre)}: ${t('laminas', { n: ganadas, total })}.`;
+  const zona = document.getElementById('fiesta');
+  const fiesta = fiestaActiva(aqui);
+  zona.hidden = !fiesta;
+  if (fiesta) {
+    zona.innerHTML = `<div class="fiesta-dibujo">${dibujoFiesta(fiesta.id)}</div>
+      <div><h2>${escapar(t('fiestaHoy', { pais: texto(actual().nombre), fiesta: texto(fiesta.nombre) }))}</h2>
+      <p>${escapar(texto(fiesta.dato))}</p>
+      <p class="fiesta-nota">${escapar(textoFechas(fiesta, idioma()))} · ${escapar(t('fiestaJuega'))}</p></div>`;
+  }
+}
+
 function pintarTodo() {
+  // Al llegar a un país se gana la lámina de su palabra del mercado.
+  const palabra = obtener().pais ? visitarPais(paisActual(obtener())) : null;
+  if (palabra) setTimeout(() => aviso(palabra, { tipo: 'exito' }), 900);
   // Al viajar cambian La Casera, el fondo y el toldo del país.
   aplicarDecoracion();
   document.getElementById('casera').innerHTML = casera(paisActual(obtener()));
@@ -222,6 +244,7 @@ function pintarTodo() {
   pintarPuestos();
   pintarPais();
   pintarPasaporte();
+  pintarAlbumYFiesta();
 }
 
 window.QHATU_LISTO = true;
@@ -237,6 +260,7 @@ document.addEventListener('qhatu:idioma', () => {
   pintarPuestos();
   pintarPais();
   pintarPasaporte();
+  pintarAlbumYFiesta();
 });
 alCambiar(() => pintarCasera());
 

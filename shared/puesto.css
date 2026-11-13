@@ -189,7 +189,8 @@ body.juego {
   box-shadow: inset 0 0 0 2px var(--limonada);
 }
 
-.pedido-cara .caserito-cara {
+.pedido-cara .caserito-cara,
+.pedido-cara .casera {
   display: block;
   width: 48px;
   height: 48px;
@@ -210,8 +211,35 @@ body.juego {
   text-overflow: ellipsis;
 }
 
+/* Caserito con nombre: su nombre arriba, chiquito, y lo que dice */
+.pedido-nombre {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--tumbo);
+  letter-spacing: 0.01em;
+}
+
+.pedido-caserito.con-historia .pedido-texto {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
 @media (max-width: 380px) {
   .pedido-texto {
     display: none;
+  }
+
+  /* En pantallas angostas solo se muestra el texto si el caserito tiene nombre e historia */
+  .pedido-caserito.con-historia .pedido-texto {
+    font-size: 11px;
+  }
+
+  .pedido-caserito.con-historia .pedido-nombre {
+    font-size: 10px;
   }
 }
