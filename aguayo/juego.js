@@ -12,6 +12,7 @@ import { caserito, casera } from '../shared/marca.js';
 import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, htmlCaserito, esCasera, anotarFranjas, jugarEnFiesta } from '../shared/album.js';
+import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
@@ -314,6 +315,8 @@ function manoDeRescate() {
 }
 
 async function finPartida() {
+  // En contrarreloj, trabarse o llenar el canasto termina la ronda con lo hecho.
+  if (juego.reloj) return finReloj();
   juego.terminado = true;
   jugar(false);
   sonar.fin();
@@ -502,7 +505,71 @@ $('#reiniciar').addEventListener('click', () => {
     datos.record = juego.puntos;
     guardar();
   }
+  if (juego.reloj) {
+    reloj.detener();
+    empezarReloj();
+    return;
+  }
   empezar();
+});
+
+// ---------- Contrarreloj ----------
+
+const barraReloj = montarBarraReloj();
+const reloj = crearReloj({
+  segundos: SEGUNDOS.aguayo,
+  pausado: () => juego.pausas > 0,
+  alTic: (resta, total) => pintarReloj(barraReloj, resta, total),
+  alTerminar: () => finReloj(),
+});
+
+function empezarReloj() {
+  juego.reloj = true;
+  juego.cerrandoReloj = false;
+  $('#contrarreloj').classList.add('activa');
+  empezar();
+  reloj.empezar();
+}
+
+function salirReloj() {
+  juego.reloj = false;
+  reloj.detener();
+  ocultarReloj(barraReloj);
+  $('#contrarreloj').classList.remove('activa');
+}
+
+/** Se acabó el tiempo (o el juego se trabó): récord, yapa y qué hacer después. */
+async function finReloj() {
+  if (!juego.reloj || juego.cerrandoReloj) return;
+  juego.cerrandoReloj = true;
+  reloj.detener();
+  juego.terminado = true;
+  jugar(false);
+  const puntos = juego.puntos;
+  const nuevoRecord = puntos > 0 && puntos > (datos.relojRecord || 0);
+  if (nuevoRecord) datos.relojRecord = puntos;
+  guardar();
+  const eleccion = await finContrarreloj({ hecho: t('relojPuntos', { n: puntos }), nuevoRecord, yapa: yapaReloj(puntos, 20, nuevoRecord) });
+  if (eleccion === 'otra') return empezarReloj();
+  salirReloj();
+  if (eleccion === 'mercado') {
+    location.href = '../index.html';
+    return;
+  }
+  empezar();
+}
+
+$('#contrarreloj').addEventListener('click', async () => {
+  if (juego.pausas) return;
+  if (juego.reloj) {
+    salirReloj();
+    empezar();
+    return;
+  }
+  juego.pausas++;
+  const si = await preguntarContrarreloj({ segundos: SEGUNDOS.aguayo, que: t('relojQueTelar'), record: datos.relojRecord });
+  juego.pausas--;
+  if (si) empezarReloj();
 });
 
 $('#sonido').addEventListener('click', () => {

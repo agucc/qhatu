@@ -243,3 +243,61 @@ body.juego {
     font-size: 10px;
   }
 }
+
+/* ---------- Contrarreloj ---------- */
+
+.reloj {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 4px;
+}
+
+.reloj[hidden] {
+  display: none;
+}
+
+.reloj-barra {
+  flex: 1;
+  height: 10px;
+  border-radius: 10px;
+  background: var(--puesto-2);
+  overflow: hidden;
+}
+
+.reloj-barra i {
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--hierbabuena), var(--tumbo));
+}
+
+.reloj-segundos {
+  min-width: 42px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--texto);
+}
+
+.reloj.apurado .reloj-barra i {
+  background: var(--frutilla);
+}
+
+.reloj.apurado .reloj-segundos {
+  color: var(--frutilla);
+  animation: late-reloj 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes late-reloj {
+  to {
+    transform: scale(1.15);
+  }
+}
+
+#contrarreloj.activa {
+  box-shadow: inset 0 0 0 2px var(--tumbo);
+}

@@ -208,9 +208,9 @@
   font-size: 13px;
 }
 
-.acciones-una {
-  grid-template-columns: 1fr;
-  max-width: 420px;
+.acciones-dos {
+  grid-template-columns: 2fr 1fr;
+  max-width: 480px;
 }
 
 .accion.activa {

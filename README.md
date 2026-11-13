@@ -80,6 +80,16 @@ La cultura se aprende jugando (`shared/cultura.js` tiene el contenido; `shared/a
 - **Fiestas del calendario:** Alasitas (Bolivia), Inti Raymi (Perú), Día de Muertos (México), Feria de las Flores (Colombia), Día de la Tradición (Argentina), Festa Junina (Brasil) y Thanksgiving (Estados Unidos, el cuarto jueves de noviembre). Durante la semana de la fiesta la portada la anuncia, llega un caserito de fiesta y se gana su lámina. Para probar: `?fiesta=us` (o el país) en la dirección.
 - Todo este contenido está **pendiente de validar** con personas de cada país.
 
+## Contrarreloj (`shared/reloj.js`)
+
+Modo opcional en cada puesto, con su propio récord; el modo normal no cambia:
+
+- **La Refresquera** (pestaña *Contrarreloj*): 90 segundos para ordenar tandas cortas de refrescos, una tras otra. No cuenta para los niveles ni el recetario.
+- **La Frutera** y **el telar** (botón *Contrarreloj*): 90 segundos para hacer puntos; si el canasto se llena o el telar se traba, la ronda termina con lo hecho.
+- **Puesto de comida**: pedido relámpago de 30 segundos para cocinar todo lo posible.
+
+El reloj se detiene con las ventanas abiertas o la pantalla oculta y pita los últimos cinco segundos. Al final: récord, yapa (según lo hecho, hasta 20, y 10 más si es récord) y la opción de jugar otra vez, volver al modo normal o al mercado.
+
 ## La tienda (`tienda/`)
 
 - **Yapa gratis:** ver un anuncio da 15 de yapa, hasta 5 veces por día.
@@ -137,6 +147,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
 | `cultura.js` | Contenido cultural: láminas, caseritos con nombre y fiestas de cada país |
+| `reloj.js` | Contrarreloj de los puestos: cuenta regresiva, barra de tiempo, récord y yapa |
 | `album.js` | Reglas del álbum, del sello del pasaporte, de los caseritos con nombre y de las fiestas |
 | `dibujos-fiesta.js` | Dibujo de cada fiesta |
 | `tejidos.js` | Dibujo del tejido de cada país (aguayo, manta, sarape, mochila, poncho, chita, quilt) |

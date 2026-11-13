@@ -10,6 +10,7 @@ import { recetasDe, YAPA_RECETA, recetasNuevas, botellaReceta, nivelesEn, sumarN
 import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, jugarEnFiesta } from '../shared/album.js';
+import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj as pintarCronometro, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
 import { t, aplicarTextos } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
@@ -23,7 +24,7 @@ import { ganarXp } from '../shared/progreso.js';
 const COSTO_EXTRA = 25;
 const COSTO_PISTA = 10;
 const YAPA_NIVEL = 5;
-const MAX_EXTRA = { niveles: 1, pedidos: 2 };
+const MAX_EXTRA = { niveles: 1, pedidos: 2, reloj: 1 };
 
 const $ = (sel) => document.querySelector(sel);
 const datos = puesto('refresquera');
@@ -84,7 +85,7 @@ async function abrir(opciones) {
 }
 
 function partidaActiva() {
-  return juego.modo === 'niveles' ? !L.estaResuelto(juego.tablero) : juego.pedidos && !juego.pedidos.terminado;
+  return juego.modo === 'pedidos' ? juego.pedidos && !juego.pedidos.terminado : !L.estaResuelto(juego.tablero);
 }
 
 function esperar(ms) {
@@ -206,9 +207,10 @@ function pintarReloj() {
 }
 
 function pintarBarra() {
-  $('#subtitulo').textContent = juego.modo === 'niveles' ? t('nivel', { n: datos.nivel }) : t('pedidos');
+  $('#subtitulo').textContent =
+    juego.modo === 'niveles' ? t('nivel', { n: datos.nivel }) : juego.modo === 'reloj' ? t('relojTandas', { n: juego.tandas || 0 }) : t('pedidos');
   for (const b of document.querySelectorAll('.modo')) b.setAttribute('aria-pressed', String(b.dataset.modo === juego.modo));
-  $('#deshacer').disabled = juego.modo !== 'niveles' || !juego.historial.length;
+  $('#deshacer').disabled = juego.modo === 'pedidos' || !juego.historial.length;
   $('#extra').disabled = juego.extras >= MAX_EXTRA[juego.modo];
   const sonido = $('#sonido');
   sonido.setAttribute('aria-label', activo() ? t('sonidoSi') : t('sonidoNo'));
@@ -280,8 +282,14 @@ function empezarPedidos() {
   }
 }
 
-function cambiarModo(modo) {
-  if (modo === juego.modo && (modo === 'niveles' ? juego.tablero : juego.pedidos)) return;
+async function cambiarModo(modo) {
+  if (modo === juego.modo && (modo === 'pedidos' ? juego.pedidos : juego.tablero)) return;
+  if (modo === 'reloj') {
+    const si = await preguntarContrarreloj({ segundos: SEGUNDOS.refresquera, que: t('relojQueRefresquera'), record: datos.relojRecord });
+    if (si) empezarReloj();
+    return;
+  }
+  if (juego.modo === 'reloj') salirReloj();
   jugar(false);
   datos.modo = modo;
   guardar();
@@ -409,7 +417,7 @@ async function mover(desde, hacia) {
     anim?.chorro.remove();
     return; // la partida cambió mientras se vertía
   }
-  if (juego.modo === 'niveles') juego.historial.push(antes);
+  if (juego.modo !== 'pedidos') juego.historial.push(antes);
   ponerTablero(despues);
   juego.sel = null;
   juego.pista = null;
@@ -422,6 +430,9 @@ async function mover(desde, hacia) {
 
   if (juego.modo === 'niveles') {
     if (L.estaResuelto(despues)) nivelCompleto();
+    else if (L.estaAtascado(despues)) setTimeout(atascado, 450);
+  } else if (juego.modo === 'reloj') {
+    if (L.estaResuelto(despues)) tandaLista();
     else if (L.estaAtascado(despues)) setTimeout(atascado, 450);
   } else {
     intentarServir().then(() => {
@@ -589,6 +600,79 @@ document.addEventListener('click', (ev) => {
   r.classList.add('elegida');
 });
 
+// ---------- Contrarreloj: tandas rápidas ----------
+// Tableros chicos uno tras otro durante unos segundos. No cuenta para los niveles ni el recetario.
+
+const barraCronometro = montarBarraReloj();
+const cronometro = crearReloj({
+  segundos: SEGUNDOS.refresquera,
+  pausado: () => juego.pausas > 0,
+  alTic: (resta, total) => pintarCronometro(barraCronometro, resta, total),
+  alTerminar: () => finReloj(),
+});
+
+function nuevaTanda() {
+  const sabores = Math.min(5, 3 + Math.floor((juego.tandas || 0) / 3));
+  juego.tablero = L.generarTablero({ semilla: Math.floor(rnd() * 1e9), sabores, vacios: 2, ids: IDS_SABORES });
+  juego.inicial = juego.tablero;
+  juego.historial = [];
+  juego.sel = null;
+  juego.extras = 0;
+  juego.pista = null;
+  juego.bloqueado = false;
+  pintar();
+  jugar(true);
+}
+
+function empezarReloj() {
+  juego.modo = 'reloj';
+  juego.tandas = 0;
+  juego.cerrandoReloj = false;
+  nuevaTanda();
+  cronometro.empezar();
+}
+
+function salirReloj() {
+  cronometro.detener();
+  ocultarReloj(barraCronometro);
+  juego.cerrandoReloj = false;
+}
+
+async function tandaLista() {
+  juego.bloqueado = true;
+  juego.tandas++;
+  sonar.servido();
+  confeti({ cantidad: 18 });
+  aviso(t('relojTanda', { n: juego.tandas }), { tipo: 'exito' });
+  celebrarNivel(ganarXp('refresquera', 1));
+  pintarBarra();
+  await esperar(550);
+  if (juego.modo === 'reloj' && cronometro.activo) nuevaTanda();
+}
+
+async function finReloj() {
+  if (juego.modo !== 'reloj' || juego.cerrandoReloj) return;
+  juego.cerrandoReloj = true;
+  cronometro.detener();
+  juego.bloqueado = true;
+  jugar(false);
+  const tandas = juego.tandas;
+  const nuevoRecord = tandas > 0 && tandas > (datos.relojRecord || 0);
+  if (nuevoRecord) datos.relojRecord = tandas;
+  guardar();
+  juego.pausas++;
+  const eleccion = await finContrarreloj({ hecho: t('relojTandas', { n: tandas }), nuevoRecord, yapa: yapaReloj(tandas, 0.5, nuevoRecord) });
+  juego.pausas--;
+  if (eleccion === 'otra') return empezarReloj();
+  salirReloj();
+  if (eleccion === 'mercado') {
+    location.href = '../index.html';
+    return;
+  }
+  juego.modo = null;
+  cambiarModo(datos.modo === 'pedidos' ? 'pedidos' : 'niveles');
+}
+
 // ---------- Ayudas ----------
 
 function agregarVaso() {
@@ -611,7 +695,7 @@ async function pedirVasoExtra({ desdeAtasco = false } = {}) {
     { texto: t('pagarYapa', { n: COSTO_EXTRA }), valor: 'yapa', deshabilitado: obtener().yapa < COSTO_EXTRA },
   ];
   if (anuncios.hayRecompensa) botones.push({ texto: t('verAnuncio'), valor: 'anuncio', clase: 'hierbabuena' });
-  if (desdeAtasco && juego.modo === 'niveles') {
+  if (desdeAtasco && juego.modo !== 'pedidos') {
     if (juego.historial.length) botones.push({ texto: t('deshacer'), valor: 'deshacer', clase: 'secundario' });
     botones.push({ texto: t('reiniciar'), valor: 'reiniciar', clase: 'secundario' });
   } else {
@@ -677,7 +761,7 @@ async function atascado() {
 }
 
 function deshacer() {
-  if (juego.modo !== 'niveles' || !juego.historial.length || juego.bloqueado) {
+  if (juego.modo === 'pedidos' || !juego.historial.length || juego.bloqueado) {
     sonar.no();
     return;
   }

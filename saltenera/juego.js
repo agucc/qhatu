@@ -12,6 +12,7 @@ import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, caseritoGuardado, htmlCaserito, esCasera, anotarCocina, jugarEnFiesta } from '../shared/album.js';
+import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
 import { paisActual, pais as datosPais, texto as enIdioma } from '../shared/paises.js';
 import { svgComida, PARRILLA } from './comidas.js';
 
@@ -181,8 +182,63 @@ function revisarHitos() {
   }
 }
 
-function alTocar(ev) {
+// ---------- Contrarreloj: pedido relámpago ----------
+
+const barraReloj = montarBarraReloj();
+const reloj = crearReloj({
+  segundos: SEGUNDOS.saltenera,
+  pausado: () => juego.pausas > 0,
+  alTic: (resta, total) => pintarReloj(barraReloj, resta, total),
+  alTerminar: () => finReloj(),
+});
+
+function empezarReloj() {
+  juego.reloj = true;
+  juego.cerrandoReloj = false;
+  juego.relojHechas = 0;
+  $('#contrarreloj').classList.add('activa');
+  reloj.empezar();
+}
+
+function salirReloj() {
+  juego.reloj = false;
+  juego.cerrandoReloj = false;
+  reloj.detener();
+  ocultarReloj(barraReloj);
+  $('#contrarreloj').classList.remove('activa');
+}
+
+async function finReloj() {
+  if (!juego.reloj || juego.cerrandoReloj) return;
+  juego.cerrandoReloj = true;
+  reloj.detener();
+  const hechas = juego.relojHechas;
+  const nuevoRecord = hechas > 0 && hechas > (datos.relojRecord || 0);
+  if (nuevoRecord) datos.relojRecord = hechas;
+  guardar();
+  juego.pausas++;
+  const eleccion = await finContrarreloj({ hecho: `${hechas} ${enIdioma(PAIS_DATOS.comida.plural)}`, nuevoRecord, yapa: yapaReloj(hechas, 10, nuevoRecord) });
+  juego.pausas--;
+  if (eleccion === 'otra') return empezarReloj();
+  salirReloj();
+  if (eleccion === 'mercado') location.href = '../index.html';
+}
+
+async function alContrarreloj() {
   if (juego.pausas) return;
+  if (juego.reloj) {
+    salirReloj();
+    return;
+  }
+  juego.pausas++;
+  const si = await preguntarContrarreloj({ segundos: SEGUNDOS.saltenera, que: t('relojQueComida'), record: datos.relojRecord });
+  juego.pausas--;
+  if (si) empezarReloj();
+}
+
+function alTocar(ev) {
+  if (juego.pausas || juego.cerrandoReloj) return;
+  if (juego.reloj) juego.relojHechas++;
   const lamina = anotarCocina(PAIS_DATOS.id);
   if (lamina) aviso(lamina, { tipo: 'exito' });
   const monto = S.toque(e, Date.now());
@@ -348,6 +404,7 @@ function iniciar() {
     if (b) comprarMejora(b.dataset.mejora);
   });
   $('#pico').addEventListener('click', horaPico);
+  $('#contrarreloj').addEventListener('click', alContrarreloj);
   $('#sonido').addEventListener('click', () => {
     alternar();
     pintarSonido();
