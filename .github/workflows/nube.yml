@@ -1,0 +1,60 @@
+name: Publicar la nube
+
+# Publica el servidor de partidas (carpeta nube/) en Cloudflare Workers.
+# Necesita dos secretos del repositorio: CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID.
+# Sin ellos solo corre las pruebas y no publica nada.
+
+on:
+  push:
+    branches: [ccr-aa8f1afe-1yb3hs, main]
+    paths: ['nube/**', 'tests/nube.test.js', '.github/workflows/nube.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: nube
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: nube/package-lock.json
+      - name: Pruebas del servidor
+        run: node --test tests/nube.test.js
+      - name: Instalar wrangler
+        working-directory: nube
+        run: npm ci
+      - name: Revisar la configuración
+        working-directory: nube
+        run: npx wrangler deploy --dry-run --outdir .revision
+      - name: ¿Hay credenciales de Cloudflare?
+        id: cred
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "hay=si" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Faltan los secretos CLOUDFLARE_API_TOKEN y CLOUDFLARE_ACCOUNT_ID; no se publica."
+            echo "hay=no" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Base de datos
+        if: steps.cred.outputs.hay == 'si'
+        working-directory: nube
+        run: node preparar-base.mjs
+      - name: Publicar y comprobar que responde
+        if: steps.cred.outputs.hay == 'si'
+        working-directory: nube
+        run: |
+          npx wrangler deploy | tee despliegue.txt
+          URL=$(grep -o 'https://[^ ]*workers\.dev' despliegue.txt | head -1)
+          echo "### Servidor de la nube: ${URL:-no encontré la dirección}" >> "$GITHUB_STEP_SUMMARY"
+          test -n "$URL"
+          curl -fsS --retry 5 --retry-delay 3 --retry-all-errors "$URL/v1/salud"

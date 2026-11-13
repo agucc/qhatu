@@ -80,6 +80,25 @@ Al entrar por primera vez, el jugador elige su país: será su **mercado de casa
 
 En la portada, **Pasar mi progreso** da un código para copiar en un dispositivo y pegar en otro: lleva la yapa, los puestos y la decoración, sin cuentas ni servidor (`shared/transferir.js`). El código trae una suma de control y no se acepta si está incompleto o alterado.
 
+## Partida en la nube (`nube/` y `shared/nube.js`)
+
+Con la nube activada (`NUBE_URL` en `shared/compilacion.js`), la primera vez que el juego abre con internet se crea una **cuenta anónima**, sin pedir nada al jugador. La partida se sigue guardando en el celular y además se sube sola: como mucho una vez por minuto mientras se juega y al salir del juego. Sin internet todo sigue igual y se sube después.
+
+- **Código de recuperación:** la llave de la cuenta (`QH-XXXXX-XXXXX-XXXXX-XXXXX`, 100 bits). En la portada, **Tu partida en la nube** lo muestra y permite usar uno en otro celular. También acepta los códigos `QHATU1-…` de antes.
+- **Dos celulares con la misma cuenta:** cada guardado lleva versión; si otro celular guardó antes, queda la partida con más experiencia (y, si empatan, la jugada más recientemente).
+- **Vincular con Google:** el servidor ya verifica los tokens de Google (`/v1/google/vincular` y `/v1/google/entrar`); falta el botón en la app, que se activa cuando haya un ID de cliente de Google (`GOOGLE_CLIENT_ID` en `nube/wrangler.toml`).
+- El servidor guarda solo la huella SHA-256 de cada llave, limita los pedidos por IP y rechaza partidas de más de 100 KB.
+
+**Servidor** (`nube/`): un Worker de Cloudflare con una base D1. `esquema.sql` crea las tablas, `src/servidor.js` tiene las rutas (`POST /v1/cuenta`, `GET`/`PUT /v1/partida`, Google y `/v1/salud`) y `src/index.js` es la entrada. Para probarlo en tu computadora: `cd nube && npm install && npx wrangler d1 execute qhatu --local --file esquema.sql && npx wrangler dev`.
+
+**Publicarlo** (gratis hasta 100 000 pedidos por día):
+
+1. Crear una cuenta en Cloudflare y abrir una vez **Workers & Pages** para elegir tu subdominio `workers.dev`.
+2. Crear un token en **My Profile → API Tokens → Create Token → Edit Cloudflare Workers**, y agregarle el permiso **Account · D1 · Edit**.
+3. En GitHub, **Settings → Secrets and variables → Actions**, guardar `CLOUDFLARE_API_TOKEN` (el token) y `CLOUDFLARE_ACCOUNT_ID` (el Account ID que aparece en el panel de Cloudflare).
+4. Ejecutar la acción **Publicar la nube**. Crea la base, aplica el esquema, publica y muestra la dirección del servidor.
+5. Poner esa dirección en `NUBE_URL` y compilar la APK.
+
 ## Nivel de cada puesto
 
 Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y un regalo de yapa. La portada muestra el nivel y el avance de cada puesto (`shared/progreso.js`).
@@ -101,6 +120,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `compilacion.js` | Versión de prueba o de tienda, e identificadores de AdMob |
 | `compartir.js` | Retar a un amigo (Telegram, menú de Android o portapapeles) |
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
+| `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
 | `plataforma.js` | Mini app de Telegram |
 | `nativo.js` | Acceso a los complementos de la app Android |
 | `puesto.css` | Barra de arriba, mesa y botones de abajo de cada puesto |
@@ -173,6 +193,7 @@ saltenera/                          cuarto puesto
   logica.js                         mejoras, ventas fuera del juego, hitos y pedidos (puro)
   juego.js                          horno, mejoras y hora pico
 tienda/                             yapa por anuncios, compras y decoración
+nube/                               servidor de partidas en Cloudflare (Worker + D1)
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales
 scripts/web.mjs                     copia el juego a www/ para la app

@@ -8,6 +8,7 @@ import { sonar } from './shared/sonido.js';
 import { EN_APP } from './shared/config.js';
 import { aplicarDecoracion } from './shared/decoracion.js';
 import { exportar, leerCodigo } from './shared/transferir.js';
+import { nubeActiva, estadoNube, usarCodigo, cargarPartida } from './shared/nube.js';
 import { iniciarPlataforma } from './shared/plataforma.js';
 import { progresoPuesto } from './shared/progreso.js';
 import { PAISES, pais as datosPais, paisActual, paisesAbiertos, pasajesLibres, proximoPasaje, xpTotal, elegirPaisInicial, viajar, irA, bandera, texto } from './shared/paises.js';
@@ -282,7 +283,72 @@ async function copiarTexto(texto) {
   }
 }
 
-document.getElementById('pasar').addEventListener('click', async () => {
+async function pedirCodigo({ titulo, placeholder }) {
+  const valor = await ventana({
+    titulo,
+    texto: t('reemplazaProgreso'),
+    html: `<textarea class="codigo" id="codigo-entrada" rows="3" autocapitalize="characters" spellcheck="false" placeholder="${escapar(placeholder)}"></textarea>`,
+    botones: [
+      { texto: t('cargar'), valor: 'cargar' },
+      { texto: t('cerrar'), valor: null, clase: 'secundario' },
+    ],
+  });
+  const campo = document.getElementById('codigo-entrada');
+  return valor === 'cargar' && campo ? campo.value.trim() : null;
+}
+
+/** Carga un código: de la nube (QH-…) o de "Pasar mi progreso" (QHATU1-…). */
+async function cargarCodigo(codigo) {
+  let resultado = 'malo';
+  if (/^QHATU1-/i.test(codigo)) {
+    const datos = leerCodigo(codigo);
+    if (datos) {
+      await cargarPartida(datos);
+      resultado = 'ok';
+    }
+  } else if (nubeActiva) {
+    resultado = await usarCodigo(codigo);
+  }
+  if (resultado === 'ok') {
+    aviso(t('progresoCargado'), { tipo: 'exito' });
+    setTimeout(() => location.reload(), 900);
+  } else {
+    aviso(t(resultado === 'sin-red' ? 'sinRed' : 'codigoMalo'), { tipo: 'alerta' });
+  }
+}
+
+function cuandoSubida(ms) {
+  const min = Math.floor((Date.now() - ms) / 60000);
+  return min < 1 ? t('recien') : t('hace', { n: min });
+}
+
+async function ventanaNube() {
+  const nube = estadoNube();
+  let html = '';
+  if (nube.codigo) {
+    html += `<p class="codigo-nube" id="codigo-nube">${escapar(nube.codigo)}</p>`;
+    const linea = nube.pendiente ? t('nubePendiente') : nube.subida ? t('nubeGuardada', { cuando: cuandoSubida(nube.subida) }) : '';
+    if (linea) html += `<p class="nube-estado">${escapar(linea)}</p>`;
+  }
+  const botones = [];
+  if (nube.codigo) botones.push({ texto: t('copiarCodigoNube'), valor: 'copiar' });
+  botones.push({ texto: t('usarCodigo'), valor: 'usar', clase: 'secundario' });
+  botones.push({ texto: t('cerrar'), valor: null, clase: 'secundario' });
+  const eleccion = await ventana({
+    titulo: t('tuPartida'),
+    texto: nube.codigo ? t('nubeTexto') : t('nubeSinCuenta'),
+    html,
+    botones,
+  });
+  if (eleccion === 'copiar') {
+    if (await copiarTexto(nube.codigo)) aviso(t('copiado'), { tipo: 'exito' });
+  } else if (eleccion === 'usar') {
+    const codigo = await pedirCodigo({ titulo: t('usarCodigo'), placeholder: t('codigoNubeAqui') });
+    if (codigo) await cargarCodigo(codigo);
+  }
+}
+
+async function ventanaPasar() {
   const eleccion = await ventana({
     titulo: t('pasarProgreso'),
     texto: t('pasarTexto'),
@@ -303,31 +369,16 @@ document.getElementById('pasar').addEventListener('click', async () => {
       botones: [{ texto: t('cerrar') }],
     });
   } else if (eleccion === 'pegar') {
-    const valor = await ventana({
-      titulo: t('pegarCodigo'),
-      texto: t('reemplazaProgreso'),
-      html: `<textarea class="codigo" id="codigo-entrada" rows="5" placeholder="${escapar(t('codigoAqui'))}"></textarea>`,
-      botones: [
-        { texto: t('cargar'), valor: 'cargar' },
-        { texto: t('cerrar'), valor: null, clase: 'secundario' },
-      ],
-    });
-    const campo = document.getElementById('codigo-entrada');
-    if (valor !== 'cargar' || !campo) return;
-    const datos = leerCodigo(campo.value);
-    if (!datos) {
-      aviso(t('codigoMalo'), { tipo: 'alerta' });
-      return;
-    }
-    try {
-      localStorage.setItem('qhatu.v1', JSON.stringify(datos));
-    } catch {
-      aviso(t('codigoMalo'), { tipo: 'alerta' });
-      return;
-    }
-    aviso(t('progresoCargado'), { tipo: 'exito' });
-    setTimeout(() => location.reload(), 900);
+    const codigo = await pedirCodigo({ titulo: t('pegarCodigo'), placeholder: t('codigoAqui') });
+    if (codigo) await cargarCodigo(codigo);
   }
-});
+}
+
+const botonPasar = document.getElementById('pasar');
+if (nubeActiva) {
+  botonPasar.dataset.t = 'tuPartida';
+  botonPasar.textContent = t('tuPartida');
+}
+botonPasar.addEventListener('click', () => (nubeActiva ? ventanaNube() : ventanaPasar()));
 
 elegirPaisSiFalta();

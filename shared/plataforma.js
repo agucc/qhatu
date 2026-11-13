@@ -1,6 +1,8 @@
 // Ajustes según dónde corre el juego. En Telegram (mini app): colores, pantalla completa y botón atrás.
+// También arranca la partida en la nube en todas las pantallas.
 
 import { EN_TELEGRAM } from './config.js';
+import { iniciarNube } from './nube.js';
 
 const SDK_TELEGRAM = 'https://telegram.org/js/telegram-web-app.js';
 
@@ -16,6 +18,7 @@ function cargarScript(src) {
 
 /** `esPuesto`: true en las pantallas de juego, donde el botón atrás de Telegram vuelve al mercado. */
 export async function iniciarPlataforma({ esPuesto = false } = {}) {
+  iniciarNube();
   if (!EN_TELEGRAM) return;
   try {
     if (!window.Telegram?.WebApp) await cargarScript(SDK_TELEGRAM);

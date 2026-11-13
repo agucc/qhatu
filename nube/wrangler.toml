@@ -1,0 +1,21 @@
+# Configuración del servidor de Qhatu en Cloudflare.
+name = "qhatu-nube"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "qhatu"
+# preparar-base.mjs lo completa al publicar (busca la base "qhatu" o la crea).
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# Tope de pedidos por IP y por minuto, para que nadie cree miles de cuentas.
+[[ratelimits]]
+name = "LIMITE"
+namespace_id = "1001"
+simple = { limit = 30, period = 60 }
+
+[vars]
+# ID de cliente web de Google (público) para "Vincular con Google". Vacío = apagado.
+GOOGLE_CLIENT_ID = ""

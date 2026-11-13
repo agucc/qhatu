@@ -97,6 +97,12 @@ export function guardar() {
   for (const fn of oyentes) fn(estado);
 }
 
+/** Cambia toda la partida por otra (código de recuperación o partida de la nube). */
+export function reemplazar(nuevo) {
+  estado = { ...estadoInicial(), ...nuevo };
+  guardar();
+}
+
 export function alCambiar(fn) {
   oyentes.add(fn);
   return () => oyentes.delete(fn);

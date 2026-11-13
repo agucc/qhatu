@@ -1,0 +1,15 @@
+{
+  "name": "qhatu-nube",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Servidor de Qhatu en Cloudflare: cuentas anónimas y partidas en la nube.",
+  "type": "module",
+  "scripts": {
+    "local": "wrangler dev",
+    "revisar": "wrangler deploy --dry-run --outdir .revision",
+    "publicar": "node preparar-base.mjs && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.154.0"
+  }
+}
