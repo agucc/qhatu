@@ -203,3 +203,45 @@
     height: 88px;
   }
 }
+
+/* ---------- Texturas de cada tejido ---------- */
+
+/* Sarape: franjas finas horizontales */
+[data-textura='sarape'] .celda.hilo,
+[data-textura='sarape'] .celda.vista {
+  background:
+    repeating-linear-gradient(0deg, #ffffff30 0 1.5px, transparent 1.5px 5px),
+    repeating-linear-gradient(0deg, #00000025 0 1px, transparent 1px 10px),
+    var(--c);
+}
+
+/* Mochila: tejido en zigzag */
+[data-textura='mochila'] .celda.hilo,
+[data-textura='mochila'] .celda.vista {
+  background:
+    repeating-linear-gradient(45deg, #ffffff26 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(-45deg, #00000020 0 2px, transparent 2px 7px),
+    var(--c);
+}
+
+/* Chita: tela de flores */
+[data-textura='chita'] .celda.hilo,
+[data-textura='chita'] .celda.vista {
+  background:
+    radial-gradient(circle at 30% 30%, #ffffffcc 0 2px, transparent 2.5px),
+    radial-gradient(circle at 70% 70%, #ffffff99 0 1.6px, transparent 2px),
+    radial-gradient(circle at 70% 30%, #00000030 0 2.4px, transparent 3px),
+    var(--c);
+  background-size: 14px 14px, 14px 14px, 14px 14px, auto;
+}
+
+/* Quilt: retazos con costura */
+[data-textura='quilt'] .celda.hilo,
+[data-textura='quilt'] .celda.vista {
+  background:
+    radial-gradient(circle, #ffffff40 0 1px, transparent 1.5px),
+    var(--c);
+  background-size: 6px 6px, auto;
+  outline: 1.5px dashed #ffffffaa;
+  outline-offset: -4px;
+}

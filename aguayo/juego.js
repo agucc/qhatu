@@ -2,7 +2,8 @@
 
 import * as A from './logica.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
-import { t, aplicarTextos, nombreHilo } from '../shared/i18n.js';
+import { t, aplicarTextos } from '../shared/i18n.js';
+import { paisActual, pais as datosPais, texto, NOMBRES_COLORES } from '../shared/paises.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
@@ -60,8 +61,18 @@ async function abrir(opciones) {
   }
 }
 
+// El tejido es el del país donde está el jugador: sus colores y su nombre.
+const PAIS = paisActual(obtener());
+const TELAR = datosPais(PAIS).telar;
+const HILOS = TELAR.paleta.map(([id]) => id);
+const COLOR_HILO = Object.fromEntries(TELAR.paleta);
+
 function colorDe(hilo) {
-  return A.COLOR_HILO[hilo];
+  return COLOR_HILO[hilo] || A.COLOR_HILO[hilo] || '#888';
+}
+
+function nombreHilo(id) {
+  return texto(NOMBRES_COLORES[id]) || id;
 }
 
 // ---------- Pintar ----------
@@ -160,7 +171,7 @@ function pintarDatos() {
 
 function pintarPedido({ nuevo = false } = {}) {
   const p = juego.pedido;
-  $('#pedido-cara').innerHTML = caserito(p.cara);
+  $('#pedido-cara').innerHTML = caserito(p.cara, datosPais(PAIS).sombreros);
   $('#pedido-hilo').style.setProperty('--c', colorDe(p.color));
   const texto = t('quiereFranja', { color: nombreHilo(p.color) });
   $('#pedido-texto').textContent = texto;
@@ -175,7 +186,7 @@ function pintarPedido({ nuevo = false } = {}) {
 }
 
 function nuevoPedido() {
-  const opciones = A.HILOS.filter((h) => !juego.pedido || h !== juego.pedido.color);
+  const opciones = HILOS.filter((h) => !juego.pedido || h !== juego.pedido.color);
   juego.pedido = { color: opciones[Math.floor(rnd() * opciones.length)], cara: Math.floor(rnd() * 1000) };
   pintarPedido({ nuevo: true });
 }
@@ -199,7 +210,7 @@ function pintarTodo() {
 
 function empezar() {
   juego.telar = A.crearTelar();
-  juego.mano = A.nuevaMano(rnd, juego.telar);
+  juego.mano = A.nuevaMano(rnd, juego.telar, HILOS);
   juego.puntos = 0;
   juego.tela = [];
   juego.elegida = null;
@@ -275,7 +286,7 @@ function colocarPieza(i, fila, col) {
 }
 
 function despuesDeJugar() {
-  if (juego.mano.every((m) => m === null)) juego.mano = A.nuevaMano(rnd, juego.telar);
+  if (juego.mano.every((m) => m === null)) juego.mano = A.nuevaMano(rnd, juego.telar, HILOS);
   pintarTelar();
   pintarMano();
   pintarDatos();
@@ -287,9 +298,9 @@ function manoDeRescate() {
   const mano = [];
   for (let intento = 0; intento < 200 && mano.length < 3; intento++) {
     const pz = A.piezaAlAzar(rnd);
-    if (A.hayLugar(juego.telar, pz.celdas)) mano.push({ pieza: pz, color: A.HILOS[Math.floor(rnd() * A.HILOS.length)] });
+    if (A.hayLugar(juego.telar, pz.celdas)) mano.push({ pieza: pz, color: HILOS[Math.floor(rnd() * HILOS.length)] });
   }
-  while (mano.length < 3) mano.push({ pieza: A.pieza('uno'), color: A.HILOS[Math.floor(rnd() * A.HILOS.length)] });
+  while (mano.length < 3) mano.push({ pieza: A.pieza('uno'), color: HILOS[Math.floor(rnd() * HILOS.length)] });
   return mano;
 }
 
@@ -464,7 +475,7 @@ $('#cambiar').addEventListener('click', () => {
     aviso(t('faltaYapa'), { tipo: 'alerta' });
     return;
   }
-  juego.mano = A.nuevaMano(rnd, juego.telar);
+  juego.mano = A.nuevaMano(rnd, juego.telar, HILOS);
   juego.elegida = null;
   sonar.elegir();
   pintarMano();
@@ -489,9 +500,19 @@ $('#sonido').addEventListener('click', () => {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  document.body.dataset.textura = TELAR.textura;
   iniciarPlataforma({ esPuesto: true });
   aplicarDecoracion();
   aplicarTextos();
+  // El nombre del puesto es el del tejido del país (y se mantiene al cambiar de idioma)
+  const titulo = $('.barra-puesto');
+  titulo.removeAttribute('data-t');
+  const ponerNombre = () => {
+    titulo.textContent = texto(TELAR.nombre);
+    document.title = `${texto(TELAR.nombre)} · Qhatu`;
+  };
+  ponerNombre();
+  document.addEventListener('qhatu:idioma', ponerNombre);
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();
   if (EN_PORTAL) $('#volver').hidden = true;

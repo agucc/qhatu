@@ -10,6 +10,9 @@ import { aplicarDecoracion } from './shared/decoracion.js';
 import { exportar, leerCodigo } from './shared/transferir.js';
 import { iniciarPlataforma } from './shared/plataforma.js';
 import { progresoPuesto } from './shared/progreso.js';
+import { PAISES, pais as datosPais, paisActual, paisesAbiertos, pasajesLibres, proximoPasaje, xpTotal, elegirPaisInicial, viajar, irA, bandera, texto } from './shared/paises.js';
+import { frutasDe } from './frutera/frutas.js';
+import { svgComida } from './saltenera/comida-portal.js';
 
 // Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
 // ("refresquera/") devuelve la portada en vez del puesto.
@@ -35,19 +38,24 @@ function dibujoRefresquera() {
     .join('')}</svg>`;
 }
 
+function actual() {
+  return datosPais(paisActual(obtener()));
+}
+
 function dibujoFrutera() {
+  const f = frutasDe(actual().id);
   return `<svg viewBox="0 0 120 80" aria-hidden="true">
     <path d="M14 40h92l-10 36H24z" fill="${COLORES.mocochinchi}"/>
     <path d="M18 48h84M21 58h78M24 68h72" stroke="#00000033" stroke-width="2"/>
-    <circle cx="42" cy="34" r="13" fill="${COLORES.tumbo}"/>
-    <circle cx="70" cy="30" r="17" fill="${COLORES.limonada}"/>
-    <circle cx="92" cy="37" r="8" fill="${COLORES.frutilla}"/>
-    <circle cx="26" cy="38" r="7" fill="${COLORES.api}"/>
+    <circle cx="42" cy="34" r="13" fill="${f[4].color}"/>
+    <circle cx="70" cy="30" r="17" fill="${f[7].color}"/>
+    <circle cx="92" cy="37" r="8" fill="${f[1].color}"/>
+    <circle cx="26" cy="38" r="7" fill="${f[2].color}"/>
   </svg>`;
 }
 
 function dibujoAguayo() {
-  const colores = [COLORES.frutilla, COLORES.tumbo, COLORES.hierbabuena, COLORES.api, COLORES.limonada];
+  const colores = actual().telar.paleta.map(([, c]) => c);
   let celdas = '';
   for (let f = 0; f < 4; f++) {
     for (let c = 0; c < 6; c++) {
@@ -59,18 +67,25 @@ function dibujoAguayo() {
 }
 
 function dibujoSaltenera() {
-  const saltena = (x, y, s) =>
-    `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 6c0-14 10-22 22-22s22 8 22 22c0 4-4 6-22 6s-22-2-22-6z" fill="#d98a2b"/><path d="M-18-6q4-6 8 0t8 0 8 0 8 0 8 0" stroke="#f2b45a" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
+  const comida = actual().comida.dibujo;
+  const una = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})">${svgComida(comida)}</g>`;
   return `<svg viewBox="0 0 120 80" aria-hidden="true">
     <ellipse cx="60" cy="66" rx="48" ry="8" fill="#ffffff22"/>
-    ${saltena(40, 52, 0.9)}${saltena(80, 52, 0.9)}${saltena(60, 40, 1)}
+    ${una(40, 52, 0.9)}${una(80, 52, 0.9)}${una(60, 40, 1)}
   </svg>`;
+}
+
+/** Nombre del puesto: el tejido y la comida cambian con el país. */
+function nombrePuesto(id) {
+  if (id === 'aguayo') return texto(actual().telar.nombre);
+  if (id === 'saltenera') return texto(actual().comida.puesto);
+  return t(id);
 }
 
 function pintarPuestos() {
   const zona = document.getElementById('puestos');
   zona.innerHTML = PUESTOS.map((p) => {
-    const nombre = t(p.id);
+    const nombre = nombrePuesto(p.id);
     const desc = t(`${p.id}Desc`);
     const accion = p.listo
       ? `<a class="boton" href="${p.url}">${escapar(t('jugar'))}</a>`
@@ -117,10 +132,97 @@ function pintarIdiomas() {
   sel.onchange = () => cambiarIdioma(sel.value);
 }
 
+// ---------- Países y pasaporte ----------
+
+function pintarPais() {
+  const a = actual();
+  document.getElementById('pais-chip').innerHTML = `${bandera(a.id, 16)}<span>${escapar(texto(a.nombre))}</span>`;
+  document.getElementById('pais-chip').setAttribute('aria-label', t('mercadoDe', { pais: texto(a.nombre) }));
+}
+
+function pintarPasaporte() {
+  const e = obtener();
+  const abiertos = paisesAbiertos(e);
+  const libres = pasajesLibres(e);
+  const meta = proximoPasaje(e);
+  const xp = xpTotal(e);
+  const estado = document.getElementById('pasaporte-estado');
+  if (libres > 0) estado.textContent = libres === 1 ? t('pasajeUno') : t('pasajesTienes', { n: libres });
+  else if (meta === null) estado.textContent = t('todosPasajes');
+  else estado.textContent = t('sinPasajes', { xp, meta });
+  document.getElementById('barra-pasaje').style.width = `${meta === null ? 100 : Math.round((xp / meta) * 100)}%`;
+  const aqui = paisActual(e);
+  document.getElementById('paises').innerHTML = PAISES.map((p) => {
+    const abierto = abiertos.includes(p.id);
+    let accion;
+    if (p.id === aqui) accion = `<span class="sello">${escapar(t('estasAqui'))}</span>`;
+    else if (abierto) accion = `<button class="boton secundario" type="button" data-ir="${p.id}">${escapar(t('ir'))}</button>`;
+    else if (libres > 0) accion = `<button class="boton" type="button" data-viajar="${p.id}">${escapar(t('viajar'))}</button>`;
+    else accion = `<span class="sello cerrado">${escapar(t('cerrado'))}</span>`;
+    const casa = p.id === e.pais ? `<small class="casa">${escapar(t('casa'))}</small>` : '';
+    return `<article class="pais${abierto ? ' abierto' : ''}${p.id === aqui ? ' aqui' : ''}">
+      ${bandera(p.id, 26)}
+      <h3>${escapar(texto(p.nombre))}${casa}</h3>
+      ${abierto ? `<p>${escapar(texto(p.dato))}</p>` : ''}
+      ${accion}
+    </article>`;
+  }).join('');
+}
+
+document.getElementById('paises').addEventListener('click', async (ev) => {
+  const ir = ev.target.closest('[data-ir]');
+  const nuevo = ev.target.closest('[data-viajar]');
+  const e = obtener();
+  if (ir && irA(e, ir.dataset.ir)) {
+    guardar();
+    sonar.elegir();
+    pintarTodo();
+    aviso(t('bienvenida', { pais: texto(actual().nombre) }), { tipo: 'exito' });
+  } else if (nuevo && viajar(e, nuevo.dataset.viajar)) {
+    guardar();
+    sonar.servido();
+    pintarTodo();
+    const p = actual();
+    await ventana({
+      titulo: t('bienvenida', { pais: texto(p.nombre) }),
+      html: `<div class="bandera-grande">${bandera(p.id, 60)}</div>`,
+      texto: texto(p.dato),
+      conCasera: true,
+      botones: [{ texto: t('entendido') }],
+    });
+  }
+});
+
+/** La primera vez: ¿de dónde eres? Ese país será el mercado de casa. */
+function elegirPaisSiFalta() {
+  if (obtener().pais) return;
+  const capa = document.createElement('div');
+  capa.className = 'ventana-fondo';
+  capa.innerHTML = `<div class="ventana elegir-pais" role="dialog" aria-modal="true" aria-labelledby="t-pais">
+    <h2 id="t-pais">${escapar(t('deDondeEres'))}</h2>
+    <p>${escapar(t('deDondeTexto'))}</p>
+    <div class="paises-elegir">${PAISES.map((p) => `<button type="button" class="pais-opcion" data-pais="${p.id}">${bandera(p.id, 30)}<span>${escapar(texto(p.nombre))}</span></button>`).join('')}</div>
+  </div>`;
+  document.body.appendChild(capa);
+  capa.querySelector('.pais-opcion').focus();
+  capa.addEventListener('click', (ev) => {
+    const b = ev.target.closest('[data-pais]');
+    if (!b) return;
+    elegirPaisInicial(obtener(), b.dataset.pais);
+    guardar();
+    sonar.servido();
+    capa.remove();
+    pintarTodo();
+    aviso(t('bienvenida', { pais: texto(actual().nombre) }), { tipo: 'exito' });
+  });
+}
+
 function pintarTodo() {
   aplicarTextos();
   pintarCasera();
   pintarPuestos();
+  pintarPais();
+  pintarPasaporte();
 }
 
 window.QHATU_LISTO = true;
@@ -135,6 +237,8 @@ pintarTodo();
 document.addEventListener('qhatu:idioma', () => {
   pintarCasera();
   pintarPuestos();
+  pintarPais();
+  pintarPasaporte();
 });
 alCambiar(() => pintarCasera());
 
@@ -225,3 +329,5 @@ document.getElementById('pasar').addEventListener('click', async () => {
     setTimeout(() => location.reload(), 900);
   }
 });
+
+elegirPaisSiFalta();

@@ -4,6 +4,26 @@
 
 Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, sin motor ni dependencias. La portada es el mercado: tocas un puesto y juegas al instante, sin descargar ni registrarte.
 
+## Los mercados de las Américas
+
+Al entrar por primera vez, el jugador elige su país: será su **mercado de casa**. Con la experiencia que gana en los puestos consigue **pasajes** y, con cada uno, elige a qué país viajar después (el pasaporte está en la portada). Cada país cambia los cuatro puestos:
+
+| País | La Refresquera | La Frutera | Telar | Puesto de comida |
+| --- | --- | --- | --- | --- |
+| Bolivia | mocochinchi, api, somó… | achachairú → papaya | El Aguayo | La Salteñera (Bs) |
+| Perú | chicha morada, emoliente, quinua… | aguaymanto → zapallo | La Manta | La Anticuchería (S/) |
+| México | horchata, jamaica, atole… | capulín → sandía | El Sarape | La Taquería ($) |
+| Colombia | lulada, aguapanela, avena… | uchuva → papaya | La Mochila | La Arepería ($) |
+| Argentina | mate, tereré, submarino… | arándano → sandía | El Poncho | Las Empanadas ($) |
+| Brasil | caldo de cana, açaí, guaraná… | jabuticaba → sandía | La Chita | La Padaria (R$) |
+| Estados Unidos | lemonade, root beer, iced tea… | blueberry → pumpkin | The Quilt | The Hot Dog Stand (US$) |
+
+- Las bebidas usan siempre los mismos ocho colores de vaso (para que se distingan) y cada una tiene su propio dibujo (`refresquera/iconos.js`, `refresquera/bebidas.js`).
+- Cada país tiene su **recetario**, que avanza con los niveles jugados allí.
+- Los caseritos llevan sombreros de su lugar y el pasaporte trae un dato cultural de cada país.
+- Datos de los países: `shared/paises.js`. Frutas: `frutera/frutas.js`. Comidas y cocinas: `saltenera/comidas.js`.
+- Conviene que alguien de cada país revise nombres, bebidas y dibujos antes de publicar.
+
 ## Puestos
 
 | Puesto | Género | Estado |

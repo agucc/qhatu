@@ -337,3 +337,166 @@
     font-size: 15px;
   }
 }
+
+/* ---------- País actual y pasaporte ---------- */
+
+.cabecera-derecha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pais-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  background: var(--puesto-2);
+  color: var(--texto);
+  font-weight: 800;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.bandera {
+  display: block;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px #ffffff33;
+  flex: none;
+}
+
+.pasaporte {
+  display: grid;
+  gap: 10px;
+}
+
+.pasaporte .seccion-titulo {
+  margin-bottom: 0;
+}
+
+.pasaporte-estado {
+  margin: 0;
+  color: var(--texto-suave);
+}
+
+.barra-pasaje {
+  height: 10px;
+  border-radius: 10px;
+  background: var(--puesto-2);
+  overflow: hidden;
+}
+
+.barra-pasaje i {
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--hierbabuena), var(--limonada));
+  transition: width 0.5s ease;
+}
+
+.paises {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.pais {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--puesto);
+  box-shadow: inset 0 0 0 2px var(--borde);
+}
+
+.pais:not(.abierto) .bandera {
+  filter: grayscale(1) brightness(0.6);
+}
+
+.pais.aqui {
+  box-shadow: inset 0 0 0 2px var(--tumbo);
+}
+
+.pais h3 {
+  font-size: 17px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pais .casa {
+  font-family: var(--cuerpo);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--tumbo);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pais p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.pais .boton {
+  min-height: 38px;
+  padding: 6px 16px;
+  font-size: 14px;
+}
+
+.pais .sello {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--limonada);
+  color: var(--limonada);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.pais .sello.cerrado {
+  border-color: var(--borde);
+  color: var(--texto-suave);
+}
+
+/* ---------- Elegir país ---------- */
+
+.elegir-pais {
+  width: min(100%, 460px);
+}
+
+.paises-elegir {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.pais-opcion {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--puesto-2);
+  color: var(--texto);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pais-opcion:hover,
+.pais-opcion:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--tumbo);
+}
+
+.bandera-grande {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 12px;
+}

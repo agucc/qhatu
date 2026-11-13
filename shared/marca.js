@@ -59,19 +59,42 @@ export function casera() {
 const PIELES = ['#8d5a3b', '#b9784f', '#d39b72', '#6e4429', '#c48862'];
 const SOMBREROS = [COLORES.frutilla, COLORES.tumbo, COLORES.hierbabuena, COLORES.api, COLORES.limonada];
 
-/** Un caserito distinto según `cara`: chullo o bombín, varios tonos. */
-export function caserito(cara = 0) {
+/**
+ * Un caserito distinto según `cara`. `sombreros` son los que se usan en su país:
+ * bombin, chullo, sombrero (de paja), vueltiao, boina, gorra o gorro (de lana).
+ */
+export function caserito(cara = 0, sombreros = ['chullo', 'bombin']) {
   const piel = PIELES[cara % PIELES.length];
   const color = SOMBREROS[Math.floor(cara / 5) % SOMBREROS.length];
-  const conChullo = Math.floor(cara / 25) % 2 === 0;
-  const sombrero = conChullo
-    ? `<path d="M14 25c0-12 7-19 16-19s16 7 16 19z" fill="${color}"/>
+  const tipo = sombreros[Math.floor(cara / 25) % sombreros.length];
+  const dibujos = {
+    chullo: `<path d="M14 25c0-12 7-19 16-19s16 7 16 19z" fill="${color}"/>
        <path d="M14 22h32" stroke="#ffffff" stroke-opacity=".6" stroke-width="2" stroke-dasharray="3 3"/>
        <circle cx="30" cy="5" r="3.5" fill="${color}"/>
-       <path d="M15 24v10M45 24v10" stroke="${color}" stroke-width="4" stroke-linecap="round"/>`
-    : `<ellipse cx="30" cy="20" rx="20" ry="4" fill="#2b2433"/>
+       <path d="M15 24v10M45 24v10" stroke="${color}" stroke-width="4" stroke-linecap="round"/>`,
+    bombin: `<ellipse cx="30" cy="20" rx="20" ry="4" fill="#2b2433"/>
        <path d="M19 20c0-11 5-16 11-16s11 5 11 16z" fill="#2b2433"/>
-       <path d="M19.5 16h21" stroke="${color}" stroke-width="3"/>`;
+       <path d="M19.5 16h21" stroke="${color}" stroke-width="3"/>`,
+    sombrero: `<ellipse cx="30" cy="21" rx="25" ry="4.5" fill="#e3c27a"/>
+       <path d="M20 21c0-9 4.5-13 10-13s10 4 10 13z" fill="#d9b25f"/>
+       <path d="M20.5 17.5h19" stroke="${color}" stroke-width="2.6"/>
+       <path d="M8 21.5h44" stroke="#b8924a" stroke-width="1" stroke-dasharray="2 2"/>`,
+    vueltiao: `<ellipse cx="30" cy="21" rx="25" ry="4.5" fill="#f3ead2"/>
+       <path d="M8 21h44M11 23h38" stroke="#2b2433" stroke-width="1.4" stroke-dasharray="3 2"/>
+       <path d="M20 21c0-9 4.5-13 10-13s10 4 10 13z" fill="#f3ead2"/>
+       <path d="M21 18h18M22 14h16M24.5 10.5h11" stroke="#2b2433" stroke-width="1.6" stroke-dasharray="3 2"/>`,
+    boina: `<ellipse cx="29" cy="17" rx="17" ry="7" fill="${color}"/>
+       <path d="M14 20h31" stroke="#00000033" stroke-width="2.5"/>
+       <circle cx="29" cy="10.5" r="1.8" fill="${color}"/>`,
+    gorra: `<path d="M16 22c0-9 6-14 14-14s14 5 14 14z" fill="${color}"/>
+       <path d="M40 21.5c6 0 10 1 12 3-4 1-9 .8-13-.2z" fill="${color}"/>
+       <path d="M16 21.5h28" stroke="#00000030" stroke-width="2"/>
+       <circle cx="30" cy="8.5" r="1.6" fill="#ffffff88"/>`,
+    gorro: `<path d="M15 24c0-11 7-17 15-17s15 6 15 17z" fill="${color}"/>
+       <rect x="14" y="20" width="32" height="6" rx="3" fill="#ffffffcc"/>
+       <circle cx="30" cy="6" r="4" fill="#ffffffdd"/>`,
+  };
+  const sombrero = dibujos[tipo] || dibujos.chullo;
   return `<svg class="caserito-cara" viewBox="0 0 60 60" aria-hidden="true">
     <path d="M8 60c1-12 10-18 22-18s21 6 22 18z" fill="${color}"/>
     <circle cx="30" cy="32" r="15" fill="${piel}"/>

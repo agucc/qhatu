@@ -1,9 +1,10 @@
 // La Frutera: el canasto en pantalla, los controles, el caserito con su pedido, la yapa y los anuncios.
 
 import * as F from './fisica.js';
-import { FRUTAS, ULTIMA, frutaAlAzar, dibujarFruta } from './frutas.js';
+import { ULTIMA, frutaAlAzar, dibujarFruta, frutasDe, nombreFruta } from './frutas.js';
+import { paisActual, pais as datosPais } from '../shared/paises.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
-import { t, aplicarTextos, nombreFruta } from '../shared/i18n.js';
+import { t, aplicarTextos } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
@@ -21,6 +22,9 @@ const ESPERA_SOLTAR = 0.45;
 
 const $ = (sel) => document.querySelector(sel);
 const datos = puesto('frutera');
+// Las frutas del canasto son las del país donde está el jugador.
+const PAIS = paisActual(obtener());
+const FRUTAS = frutasDe(PAIS);
 datos.record ??= 0;
 datos.partidas ??= 0;
 
@@ -77,8 +81,8 @@ function pintarMini(canvas, nivel) {
   const c = canvas.getContext('2d');
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
   c.clearRect(0, 0, lado, lado);
-  c.translate(lado / 2, lado / 2 + (FRUTAS[nivel].id === 'pina' ? 4 : 2));
-  dibujarFruta(c, nivel, 13);
+  c.translate(lado / 2, lado / 2 + (FRUTAS[nivel].arriba === 'corona' ? 4 : 2));
+  dibujarFruta(c, FRUTAS[nivel], 13);
 }
 
 // ---------- Pantalla de datos ----------
@@ -91,9 +95,9 @@ function pintarDatos() {
 
 function pintarPedido({ nuevo = false } = {}) {
   const p = juego.pedido;
-  $('#pedido-cara').innerHTML = caserito(p.cara);
+  $('#pedido-cara').innerHTML = caserito(p.cara, datosPais(PAIS).sombreros);
   pintarMini($('#pedido-fruta'), p.nivel);
-  const texto = t('quiereFruta', { fruta: nombreFruta(FRUTAS[p.nivel].id) });
+  const texto = t('quiereFruta', { fruta: nombreFruta(FRUTAS[p.nivel]) });
   $('#pedido-texto').textContent = texto;
   $('#pedido').setAttribute('aria-label', texto);
   const caja = $('#pedido');
@@ -337,7 +341,7 @@ function dibujarEnMano() {
   ctx.restore();
   ctx.save();
   ctx.translate(x, F.CANASTO.soltarY);
-  dibujarFruta(ctx, juego.enMano, r);
+  dibujarFruta(ctx, FRUTAS[juego.enMano], r);
   ctx.restore();
 }
 
@@ -365,7 +369,7 @@ function dibujarEfectos(dt) {
       // La fruta vendida sube y se va
       ctx.globalAlpha = 1 - k;
       ctx.translate(e.x, e.y - k * 120);
-      dibujarFruta(ctx, e.nivel, FRUTAS[e.nivel].r * (1 - k * 0.4));
+      dibujarFruta(ctx, FRUTAS[e.nivel], FRUTAS[e.nivel].r * (1 - k * 0.4));
     }
     ctx.restore();
   }
@@ -380,7 +384,7 @@ function dibujar(dt) {
   for (const f of juego.mundo.frutas) {
     ctx.save();
     ctx.translate(f.x, f.y);
-    dibujarFruta(ctx, f.nivel, f.r, f.ang);
+    dibujarFruta(ctx, FRUTAS[f.nivel], f.r, f.ang);
     ctx.restore();
   }
   dibujarParedes();

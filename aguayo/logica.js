@@ -169,10 +169,10 @@ export function piezaAlAzar(rnd) {
  * Tres piezas nuevas, cada una con su hilo. Se intenta que al menos una quepa,
  * para que la partida no se trabe por pura mala suerte.
  */
-export function nuevaMano(rnd, telar) {
+export function nuevaMano(rnd, telar, hilos = HILOS) {
   let mano = null;
   for (let intento = 0; intento < 30; intento++) {
-    mano = [0, 1, 2].map(() => ({ pieza: piezaAlAzar(rnd), color: HILOS[Math.floor(rnd() * HILOS.length)] }));
+    mano = [0, 1, 2].map(() => ({ pieza: piezaAlAzar(rnd), color: hilos[Math.floor(rnd() * hilos.length)] }));
     if (!telar || mano.some((m) => hayLugar(telar, m.pieza.celdas))) return mano;
   }
   return mano;

@@ -11,6 +11,8 @@ import { caserito } from '../shared/marca.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
+import { paisActual, pais as datosPais, texto as enIdioma } from '../shared/paises.js';
+import { svgComida, PARRILLA } from './comidas.js';
 
 const COSTO_PICO = 15;
 
@@ -30,8 +32,9 @@ const ICONOS = {
   receta: '<path d="M3 16c0-6 4-10 9-10s9 4 9 10c0 1.5-2 2-9 2s-9-.5-9-2z"/><path d="M5 11q2-3 3.500 0t3.500 0 3.500 0 3.500 0"/>',
 };
 
-const SALTENA =
-  '<svg viewBox="-26 -20 52 36" aria-hidden="true"><path d="M-22 6c0-14 10-22 22-22s22 8 22 22c0 4-4 6-22 6s-22-2-22-6z" fill="#d98a2b"/><path d="M-18-6q4-6 8 0t8 0 8 0 8 0 8 0" stroke="#f2b45a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
+// La comida, la moneda y la cocina son las del país donde está el jugador.
+const PAIS_DATOS = datosPais(paisActual(obtener()));
+const COMIDA = svgComida(PAIS_DATOS.comida.dibujo);
 
 // ---------- Ayudas ----------
 
@@ -54,7 +57,7 @@ async function abrir(opciones) {
 }
 
 function bs(n) {
-  return `Bs ${S.formato(n)}`;
+  return `${PAIS_DATOS.moneda} ${S.formato(n)}`;
 }
 
 function recordar() {
@@ -79,7 +82,7 @@ function pintarMejoras(comprada = null) {
       : `<button class="boton" type="button" data-mejora="${m.id}" ${e.ventas < precio ? 'disabled' : ''}>${escapar(bs(precio))}</button>`;
     return `<article class="mejora${comprada === m.id ? ' nueva-compra' : ''}" data-id="${m.id}">
       <span class="mejora-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONOS[m.id]}</svg></span>
-      <div><h3>${escapar(nombreMejora(m.id))}</h3><p>${escapar(efecto(m))} · ${escapar(t('tienes', { n: S.cantidad(e, m.id) }))}</p></div>
+      <div><h3>${escapar(nombreMejora(m.id === 'horno' && PAIS_DATOS.cocina === 'parrilla' ? 'parrilla' : m.id))}</h3><p>${escapar(efecto(m))} · ${escapar(t('tienes', { n: S.cantidad(e, m.id) }))}</p></div>
       ${boton}
     </article>`;
   }).join('');
@@ -98,8 +101,8 @@ function pintarNumeros() {
 function pintarPedido({ nuevo = false } = {}) {
   const p = e.pedido;
   if (!p) return;
-  $('#pedido-cara').innerHTML = caserito(p.cara);
-  const texto = t('quiereSaltenas', { n: p.cantidad });
+  $('#pedido-cara').innerHTML = caserito(p.cara, PAIS_DATOS.sombreros);
+  const texto = t('quiereSaltenas', { n: p.cantidad, comida: enIdioma(PAIS_DATOS.comida.plural) });
   $('#pedido-texto').textContent = texto;
   $('#pedido-avance').style.width = `${Math.min(100, (p.hechas / p.cantidad) * 100)}%`;
   const caja = $('#pedido');
@@ -135,7 +138,7 @@ function salteVuela(x, y, monto) {
   if (!document.body.animate) return;
   const s = document.createElement('div');
   s.className = 'saltena-vuela';
-  s.innerHTML = SALTENA;
+  s.innerHTML = COMIDA;
   s.style.left = `${x - 20}px`;
   s.style.top = `${y - 14}px`;
   document.body.appendChild(s);
@@ -291,6 +294,17 @@ function iniciar() {
   iniciarPlataforma({ esPuesto: true });
   aplicarDecoracion();
   aplicarTextos();
+  if (PAIS_DATOS.cocina === 'parrilla') $('#horno').innerHTML = PARRILLA;
+  $('#moneda').textContent = PAIS_DATOS.moneda;
+  // El nombre del puesto es el de la comida del país (y se mantiene al cambiar de idioma)
+  const titulo = $('.barra-puesto');
+  titulo.removeAttribute('data-t');
+  const ponerNombre = () => {
+    titulo.textContent = enIdioma(PAIS_DATOS.comida.puesto);
+    document.title = `${enIdioma(PAIS_DATOS.comida.puesto)} · Qhatu`;
+  };
+  ponerNombre();
+  document.addEventListener('qhatu:idioma', ponerNombre);
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();
   if (EN_PORTAL) $('#volver').hidden = true;
@@ -345,7 +359,7 @@ function iniciar() {
     if (juego.jugando) anuncios.inicioPartida();
     if (!visto('tuto-saltenera')) {
       e.ultimaVez = Date.now();
-      await abrir({ titulo: t('saltenera'), texto: t('tutoSaltenera'), conCasera: true, botones: [{ texto: t('entendido') }] });
+      await abrir({ titulo: enIdioma(PAIS_DATOS.comida.puesto), texto: t('tutoSaltenera'), conCasera: true, botones: [{ texto: t('entendido') }] });
       marcarVisto('tuto-saltenera');
     } else {
       cobrarLoDeFuera();

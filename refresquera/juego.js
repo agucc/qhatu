@@ -2,13 +2,15 @@
 
 import * as L from './logica.js';
 import * as P from './pedidos.js';
-import { SABORES, IDS_SABORES, svgSimbolo, dibujoSimbolo } from './sabores.js';
+import { svgSimbolo, dibujoSimbolo } from './sabores.js';
+import { saboresDe, nombreBebida, descBebida } from './bebidas.js';
+import { paisActual, pais as datosPais, texto } from '../shared/paises.js';
 import * as B from './botella.js';
-import { RECETAS, YAPA_RECETA, recetasNuevas, botellaReceta } from './recetario.js';
+import { recetasDe, YAPA_RECETA, recetasNuevas, botellaReceta, nivelesEn, sumarNivel } from './recetario.js';
 import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
-import { t, aplicarTextos, nombreSabor, nombreReceta, descReceta } from '../shared/i18n.js';
+import { t, aplicarTextos } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
@@ -24,6 +26,9 @@ const MAX_EXTRA = { niveles: 1, pedidos: 2 };
 
 const $ = (sel) => document.querySelector(sel);
 const datos = puesto('refresquera');
+// Las bebidas del tablero son las del país donde está el jugador.
+const PAIS = paisActual(obtener());
+const { SABORES, IDS_SABORES } = saboresDe(PAIS);
 datos.nivel ??= 1;
 datos.record ??= 0;
 datos.partidasPedidos ??= 0;
@@ -135,9 +140,9 @@ function pintarVasos(opc = {}) {
         terminado: terminado ? SABORES[v[0]].color : null,
       });
       let etiqueta = `${t('vaso', { n: i + 1 })}: ${
-        v.length ? v.map((s, k) => (L.capaOculta(t0, i, k) ? '?' : nombreSabor(s))).join(', ') : t('vacio')
+        v.length ? v.map((s, k) => (L.capaOculta(t0, i, k) ? '?' : nombreBebida(s))).join(', ') : t('vacio')
       }`;
-      if (solo) etiqueta += `, ${t('soloAcepta', { sabor: nombreSabor(t0.solo[i]) })}`;
+      if (solo) etiqueta += `, ${t('soloAcepta', { sabor: nombreBebida(t0.solo[i]) })}`;
       if (terminado) etiqueta += `, ${t('completo')}`;
       if (juego.sel === i) etiqueta += `, ${t('seleccionado')}`;
       const brillo = terminado ? SABORES[v[0]].color : 'transparent';
@@ -184,8 +189,8 @@ function pintarPedidos() {
     yaVistos.add(c.id);
     asientos.push(`<li class="asiento ocupado${nuevo ? ' llega' : ''}" data-id="${c.id}">
       <span class="pedido" style="--c:${s.color}">${svgSimbolo(c.sabor)}</span>
-      ${caserito(c.cara)}
-      <span class="solo-lector">${escapar(t('quiere', { sabor: nombreSabor(c.sabor) }))}</span>
+      ${caserito(c.cara, datosPais(PAIS).sombreros)}
+      <span class="solo-lector">${escapar(t('quiere', { sabor: nombreBebida(c.sabor) }))}</span>
     </li>`);
   }
   const fila = $('#fila');
@@ -312,7 +317,7 @@ function tocarVaso(i) {
   const sabor = L.arriba(t0.vasos[juego.sel]);
   if (t0.solo[i] && t0.solo[i] !== sabor && t0.vasos[i].length < L.capDe(t0, i)) {
     sonar.no();
-    aviso(t('soloAcepta', { sabor: nombreSabor(t0.solo[i]) }));
+    aviso(t('soloAcepta', { sabor: nombreBebida(t0.solo[i]) }));
     pintarVasos({ sacude: i });
     return;
   }
@@ -478,13 +483,14 @@ async function nivelCompleto() {
     cerrable: false,
     botones: [{ texto: t('siguiente'), valor: 'sig' }],
   });
-  const nuevas = recetasNuevas(datos, datos.nivel - 1);
+  sumarNivel(datos, PAIS);
+  const nuevas = recetasNuevas(datos, PAIS);
   if (nuevas.length) {
     const yapa = YAPA_RECETA * nuevas.length;
     sumarYapa(yapa);
     await abrir({
-      titulo: t('recetaNueva', { nombre: nuevas.map((r) => nombreReceta(r.id)).join(', '), n: yapa }),
-      texto: nuevas.length === 1 ? descReceta(nuevas[0].id) : '',
+      titulo: t('recetaNueva', { nombre: nuevas.map((r) => nombreBebida(r.id)).join(', '), n: yapa }),
+      texto: nuevas.length === 1 ? descBebida(nuevas[0].id) : '',
       html: `<div class="recetas-nuevas">${nuevas.map((r, k) => `<div class="ejemplo-vaso">${botellaReceta(r.id, forma(), k)}</div>`).join('')}</div>`,
       botones: [{ texto: t('entendido') }],
     });
@@ -548,18 +554,19 @@ async function finPedidos() {
 /** El recetario: los doce refrescos, los que ya tienes y cuándo llegan los demás. */
 function abrirRecetario() {
   if (juego.pausas) return;
-  const hechos = datos.nivel - 1;
-  const tienes = RECETAS.filter((r) => hechos >= r.niveles).length;
-  const tarjetas = RECETAS.map((r, n) => {
+  const hechos = nivelesEn(datos, PAIS);
+  const recetas = recetasDe(PAIS);
+  const tienes = recetas.filter((r) => hechos >= r.niveles).length;
+  const tarjetas = recetas.map((r, n) => {
     const abierta = hechos >= r.niveles;
     return `<button type="button" class="receta${abierta ? '' : ' cerrada'}" data-receta="${r.id}" ${abierta ? '' : 'disabled'}>
       ${botellaReceta(r.id, forma(), n)}
-      <span>${escapar(abierta ? nombreReceta(r.id) : t('recetaBloqueada', { n: r.niveles }))}</span>
+      <span>${escapar(abierta ? nombreBebida(r.id) : t('recetaBloqueada', { n: r.niveles }))}</span>
     </button>`;
   }).join('');
   abrir({
-    titulo: t('recetario'),
-    texto: t('recetasTienes', { n: tienes, total: RECETAS.length }),
+    titulo: `${t('recetario')} · ${texto(datosPais(PAIS).nombre)}`,
+    texto: t('recetasTienes', { n: tienes, total: recetas.length }),
     html: `<div class="recetario">${tarjetas}</div><p class="receta-detalle" id="receta-detalle"></p>`,
     botones: [{ texto: t('cerrar') }],
   });
@@ -569,7 +576,7 @@ document.addEventListener('click', (ev) => {
   const r = ev.target.closest('[data-receta]');
   if (!r) return;
   const detalle = document.getElementById('receta-detalle');
-  if (detalle) detalle.textContent = `${nombreReceta(r.dataset.receta)}: ${descReceta(r.dataset.receta)}`;
+  if (detalle) detalle.textContent = `${nombreBebida(r.dataset.receta)}: ${descBebida(r.dataset.receta)}`;
   for (const x of document.querySelectorAll('.receta.elegida')) x.classList.remove('elegida');
   r.classList.add('elegida');
 });
