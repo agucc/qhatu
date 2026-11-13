@@ -6,8 +6,10 @@ import { t, aplicarTextos, nombreHilo } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
-import { chipYapa, contadorYapa, aviso, flotante, ventana } from '../shared/ui.js';
+import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNivel } from '../shared/ui.js';
 import { caserito } from '../shared/marca.js';
+import { aplicarDecoracion } from '../shared/decoracion.js';
+import { ganarXp } from '../shared/progreso.js';
 
 const COSTO_CAMBIAR = 10;
 const COSTO_SEGUIR = 20;
@@ -241,6 +243,7 @@ function colocarPieza(i, fila, col) {
     if (r.franjas.length >= 2) {
       const extra = r.franjas.length - 1;
       sumarYapa(extra);
+      confeti({ cantidad: 24 });
       aviso(`${t('variasFranjas', { n: r.franjas.length })} ${t('masYapa', { n: extra })}`, { tipo: 'exito' });
       anuncios.celebrar();
     } else {
@@ -249,6 +252,7 @@ function colocarPieza(i, fila, col) {
     // ¿El caserito quería una franja de ese color?
     if (r.franjas.some((fr) => fr.dominante === juego.pedido.color)) {
       sumarYapa(YAPA_PEDIDO);
+      celebrarNivel(ganarXp('aguayo', 1));
       sonar.servido();
       $('#pedido').classList.add('atendido');
       flotante(`+${YAPA_PEDIDO}`, $('#pedido'));
@@ -476,6 +480,7 @@ $('#sonido').addEventListener('click', () => {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();

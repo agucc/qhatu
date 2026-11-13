@@ -1,5 +1,7 @@
 // Dibujos de la marca en SVG: el toldo, el logo, La Casera y los caseritos.
 
+import { coloresToldo } from './decoracion.js';
+
 export const COLORES = {
   api: '#9a48b8',
   tumbo: '#ffb520',
@@ -11,11 +13,10 @@ export const COLORES = {
   noche: '#17131f',
 };
 
-const FRANJAS = [COLORES.frutilla, COLORES.tumbo, COLORES.hierbabuena, COLORES.api, COLORES.limonada, COLORES.tumbo];
 
 /** El toldo del puesto. `barra` es el color del palo de arriba. */
 export function toldo({ barra = '#ffffff', alto = 40 } = {}) {
-  const franjas = FRANJAS.map(
+  const franjas = coloresToldo().map(
     (c, i) => `<path d="M${4 + i * 16} 6h14v18a7 7 0 0 1-14 0z" fill="${c}"/>`
   ).join('');
   return `<svg class="toldo" viewBox="0 0 104 34" height="${alto}" aria-hidden="true"><rect x="0" y="0" width="104" height="5" rx="1" fill="${barra}"/>${franjas}</svg>`;

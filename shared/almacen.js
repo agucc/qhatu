@@ -14,6 +14,9 @@ export function estadoInicial() {
     sonido: true,
     vistos: {},
     puestos: {},
+    decoracion: { fondo: 'noche', toldo: 'mercado', vaso: 'redondo', mios: [] },
+    sinAnuncios: false,
+    anunciosYapa: { dia: null, n: 0 }, // anuncios con yapa vistos hoy
   };
 }
 
@@ -144,4 +147,23 @@ export function visto(clave) {
 export function marcarVisto(clave) {
   obtener().vistos[clave] = true;
   guardar();
+}
+
+// ---------- Yapa por ver anuncios (con tope diario) ----------
+
+export const ANUNCIOS_YAPA_POR_DIA = 5;
+export const YAPA_POR_ANUNCIO = 15;
+
+export function anunciosYapaRestantes(estado, hoy) {
+  const a = estado.anunciosYapa;
+  return a && a.dia === hoy ? Math.max(0, ANUNCIOS_YAPA_POR_DIA - a.n) : ANUNCIOS_YAPA_POR_DIA;
+}
+
+/** Anota un anuncio visto y da la yapa. Devuelve la yapa entregada (0 si ya no quedan hoy). */
+export function cobrarAnuncioYapa(estado, hoy) {
+  if (anunciosYapaRestantes(estado, hoy) <= 0) return 0;
+  if (!estado.anunciosYapa || estado.anunciosYapa.dia !== hoy) estado.anunciosYapa = { dia: hoy, n: 0 };
+  estado.anunciosYapa.n++;
+  estado.yapa += YAPA_POR_ANUNCIO;
+  return YAPA_POR_ANUNCIO;
 }

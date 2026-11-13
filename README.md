@@ -11,7 +11,7 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 | La Refresquera | ordenar colores | v2 jugable |
 | La Frutera | merge | jugable |
 | El Aguayo | bloques | jugable |
-| La Salteñera | idle | pronto |
+| La Salteñera | idle | jugable |
 
 ### La Refresquera v2
 
@@ -36,6 +36,25 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 - También se juega tocando: eliges una pieza y tocas la celda donde va.
 - **Ayudas:** cambiar las tres piezas y, una vez por partida, piezas nuevas que quepan cuando se traba el telar.
 
+### La Salteñera
+
+- Tocas el horno para sacar salteñas y con lo que vendes compras mejoras: mano rápida, horno, ayudante, carrito, local y receta jugosa.
+- **Sigue vendiendo mientras no juegas** (a medio ritmo, hasta 8 horas). Al volver cobras lo vendido, o el doble si eliges ver un anuncio.
+- **Caserito con pedido:** quiere salteñas recién hechas; se completan con tus toques y deja propina y yapa.
+- **Hitos:** cada vez que tus ventas totales pasan una meta (100, 1.000, 10.000...) ganas yapa.
+- **Hora pico:** todo vende el doble por un minuto (yapa o anuncio).
+
+## La tienda (`tienda/`)
+
+- **Yapa gratis:** ver un anuncio da 15 de yapa, hasta 5 veces por día. El anuncio siempre lo elige el jugador.
+- **Packs de yapa** (0,99 / 2,99 / 4,99 USD) y **quitar anuncios** (2,99 USD), como en el plan. La compra real pasa por Google Play (`shared/compras.js` espera un complemento `QhatuCompras`); mientras la app no esté publicada, la versión de prueba simula la compra sin cobrar y lo dice en pantalla. En el sitio y los portales no se vende.
+- **Decoración con yapa:** fondos, toldos y vasos. Solo cambia cómo se ve; nadie paga para ganar.
+- Sin premios en dinero, sin cajas al azar y sin contadores falsos.
+
+## Nivel de cada puesto
+
+Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y un regalo de yapa. La portada muestra el nivel y el avance de cada puesto (`shared/progreso.js`).
+
 ## Lo que comparten todos los puestos (`shared/`)
 
 | Archivo | Qué hace |
@@ -47,6 +66,9 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 | `marca.js` | Toldo, logo, La Casera y caseritos en SVG |
 | `ui.js` | Avisos, ventanas y contador de yapa |
 | `qhatu.css` | Colores de la marca (los refrescos del mercado) y componentes |
+| `progreso.js` | Nivel y experiencia de cada puesto |
+| `decoracion.js` | Fondos, toldos y vasos que se compran con yapa |
+| `compras.js` | Packs de yapa y quitar anuncios |
 | `puesto.css` | Barra de arriba, mesa y botones de abajo de cada puesto |
 
 Reglas del mercado que el código respeta:
@@ -104,6 +126,10 @@ frutera/                            segundo puesto
 aguayo/                             tercer puesto
   logica.js                         piezas, telar y franjas (puro)
   juego.js                          telar, arrastrar piezas y pedidos
+saltenera/                          cuarto puesto
+  logica.js                         mejoras, ventas fuera del juego, hitos y pedidos (puro)
+  juego.js                          horno, mejoras y hora pico
+tienda/                             yapa por anuncios, compras y decoración
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales
 scripts/web.mjs                     copia el juego a www/ para la app

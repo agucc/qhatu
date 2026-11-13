@@ -1,0 +1,192 @@
+/* La tienda */
+
+.tienda-cuerpo {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 16px 40px;
+  display: grid;
+  gap: 28px;
+}
+
+.bloque {
+  display: grid;
+  gap: 12px;
+}
+
+.bloque h2 {
+  font-size: 24px;
+  color: var(--tumbo);
+}
+
+.bloque h3 {
+  font-family: var(--cuerpo);
+  font-weight: 800;
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.nota {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.gratis {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+/* ---------- Productos ---------- */
+
+.productos {
+  display: grid;
+  gap: 10px;
+}
+
+.producto {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--puesto);
+  box-shadow: inset 0 0 0 2px var(--borde);
+}
+
+.producto h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.producto p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.pila {
+  position: relative;
+  width: 56px;
+  height: 48px;
+}
+
+.pila i {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe08a, var(--tumbo) 55%, #d98a00);
+  box-shadow: inset 0 0 0 2px #fff3, 0 2px 0 #0004;
+}
+
+.pila i:nth-child(1) { width: 26px; height: 26px; left: 15px; top: 16px; }
+.pila i:nth-child(2) { width: 20px; height: 20px; left: 2px; top: 22px; display: none; }
+.pila i:nth-child(3) { width: 22px; height: 22px; left: 32px; top: 4px; display: none; }
+.pila-500 i:nth-child(2),
+.pila-1000 i:nth-child(2),
+.pila-1000 i:nth-child(3) { display: block; }
+.pila-1000 i:nth-child(1) { width: 32px; height: 32px; left: 10px; top: 14px; }
+
+.sin-anuncios {
+  width: 44px;
+  height: 44px;
+  margin: 0 6px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 4px var(--frutilla);
+  background: linear-gradient(45deg, transparent 46%, var(--frutilla) 46% 54%, transparent 54%);
+}
+
+.sello {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--limonada);
+  color: var(--limonada);
+  font-weight: 800;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* ---------- Decoración ---------- */
+
+.decos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.deco {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  border-radius: 18px;
+  background: var(--puesto);
+  box-shadow: inset 0 0 0 2px var(--borde);
+}
+
+.deco.puesta {
+  box-shadow: inset 0 0 0 2px var(--limonada);
+}
+
+.deco h4 {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.deco .boton {
+  min-height: 40px;
+  padding: 6px 16px;
+  font-size: 15px;
+}
+
+.muestra {
+  display: grid;
+  width: 84px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.muestra-fondo {
+  place-items: center;
+  box-shadow: 0 0 0 2px #ffffff22;
+}
+
+.muestra-fondo i {
+  width: 52px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.muestra-toldo {
+  grid-template-columns: repeat(6, 1fr);
+  border-top: 8px solid #fff;
+  border-radius: 4px 4px 12px 12px;
+}
+
+.muestra-toldo i {
+  border-radius: 0 0 8px 8px;
+}
+
+.muestra-vaso {
+  place-items: center;
+  overflow: visible;
+}
+
+.muestra-vaso i {
+  width: 26px;
+  height: 54px;
+  border-radius: 11px;
+  box-shadow: inset 0 0 0 2.5px #8a7f9c;
+  background: linear-gradient(0deg, var(--api) 0 25%, var(--tumbo) 25% 50%, var(--frutilla) 50% 75%, transparent 75%);
+}
+
+.muestra-vaso[data-forma='recto'] i {
+  border-radius: 4px;
+}
+
+.muestra-vaso[data-forma='copa'] i {
+  border-radius: 4px 4px 13px 13px / 4px 4px 26px 26px;
+}

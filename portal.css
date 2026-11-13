@@ -111,7 +111,7 @@
 .puesto {
   position: relative;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: auto auto auto auto 1fr auto;
   gap: 8px;
   padding: 0 18px 18px;
   border-radius: 20px;
@@ -177,6 +177,108 @@
   color: var(--texto-suave);
   font-weight: 800;
   font-size: 14px;
+}
+
+/* ---------- Nivel del puesto ---------- */
+
+.puesto-nivel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--texto);
+}
+
+.barra-xp {
+  flex: 1;
+  height: 8px;
+  border-radius: 8px;
+  background: var(--puesto-2);
+  overflow: hidden;
+}
+
+.barra-xp i {
+  display: block;
+  height: 100%;
+  border-radius: 8px;
+  background: var(--acento);
+  transition: width 0.4s ease;
+}
+
+/* ---------- Tienda ---------- */
+
+.tienda-tarjeta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #3a2a12, var(--puesto) 70%);
+  box-shadow: inset 0 0 0 2px var(--borde);
+  text-decoration: none;
+  color: var(--texto);
+}
+
+.tienda-tarjeta h2 {
+  font-size: 22px;
+  color: var(--tumbo);
+}
+
+.tienda-tarjeta p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--texto-suave);
+}
+
+/* ---------- Movimiento ---------- */
+
+.puesto {
+  animation: llega-puesto 0.5s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+.puesto:nth-child(2) { animation-delay: 0.07s; }
+.puesto:nth-child(3) { animation-delay: 0.14s; }
+.puesto:nth-child(4) { animation-delay: 0.21s; }
+
+@keyframes llega-puesto {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+.puesto-toldo svg {
+  transform-origin: top center;
+  animation: toldo-viento 4s ease-in-out infinite;
+}
+
+@keyframes toldo-viento {
+  50% {
+    transform: skewX(-3deg) scaleY(1.04);
+  }
+}
+
+.casera-dibujo svg {
+  transform-origin: bottom center;
+  animation: casera-saluda 3.2s ease-in-out infinite;
+}
+
+@keyframes casera-saluda {
+  50% {
+    transform: rotate(-2.5deg) translateY(-2px);
+  }
+}
+
+.puesto .boton {
+  animation: late-boton 2.4s ease-in-out infinite;
+}
+
+@keyframes late-boton {
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* ---------- Pie ---------- */

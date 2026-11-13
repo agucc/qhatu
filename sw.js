@@ -1,5 +1,5 @@
 // Guarda el mercado para jugar sin conexión. Sube VERSION al publicar cambios.
-const VERSION = 'qhatu-4';
+const VERSION = 'qhatu-5';
 const ARCHIVOS = [
   './',
   'index.html',
@@ -40,6 +40,16 @@ const ARCHIVOS = [
   'aguayo/aguayo.css',
   'aguayo/juego.js',
   'aguayo/logica.js',
+  'saltenera/index.html',
+  'saltenera/saltenera.css',
+  'saltenera/juego.js',
+  'saltenera/logica.js',
+  'tienda/index.html',
+  'tienda/tienda.css',
+  'tienda/tienda.js',
+  'shared/progreso.js',
+  'shared/decoracion.js',
+  'shared/compras.js',
 ];
 
 self.addEventListener('install', (e) => {

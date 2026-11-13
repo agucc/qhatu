@@ -7,8 +7,10 @@ import { t, aplicarTextos, nombreFruta } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
-import { chipYapa, contadorYapa, aviso, flotante, ventana } from '../shared/ui.js';
+import { chipYapa, contadorYapa, aviso, flotante, ventana, confeti, celebrarNivel } from '../shared/ui.js';
 import { caserito } from '../shared/marca.js';
+import { aplicarDecoracion } from '../shared/decoracion.js';
+import { ganarXp } from '../shared/progreso.js';
 
 const COSTO_CAMBIAR = 5;
 const COSTO_SEGUIR = 20;
@@ -161,6 +163,8 @@ function alEvento(e) {
   if (e.tipo === 'papayas') {
     sonar.servido();
     sumarYapa(YAPA_PAPAYAS);
+    confeti();
+    celebrarNivel(ganarXp('frutera', 3));
     aviso(`${t('papayas')} ${t('masYapa', { n: YAPA_PAPAYAS })}`, { tipo: 'exito' });
     juego.efectos.push({ tipo: 'estallido', x: e.x, y: e.y, color: FRUTAS[ULTIMA].color, r: 80, vida: 0 });
     anuncios.celebrar();
@@ -173,6 +177,7 @@ function alEvento(e) {
     F.quitarFruta(m, e.id);
     const yapa = yapaPorVenta(e.nivel);
     sumarYapa(yapa);
+    celebrarNivel(ganarXp('frutera', 1));
     juego.ventas++;
     sonar.servido();
     juego.efectos.push({ tipo: 'venta', nivel: e.nivel, x: e.x, y: e.y, vida: 0 });
@@ -469,6 +474,7 @@ $('#sonido').addEventListener('click', () => {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();

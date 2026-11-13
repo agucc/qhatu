@@ -1,0 +1,225 @@
+/* La Salteñera (lo común de los puestos está en shared/puesto.css) */
+
+.saltenera .tablero-datos {
+  grid-template-columns: auto 1fr;
+}
+
+.dato-ventas {
+  min-width: 110px;
+  justify-items: start;
+  padding: 6px 14px;
+}
+
+.dato-ventas strong {
+  font-size: 26px;
+  color: var(--tumbo);
+}
+
+.dato-ventas small {
+  font-family: var(--cuerpo);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.pedido-columna {
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+}
+
+.pedido-avance {
+  height: 8px;
+  border-radius: 8px;
+  background: var(--puesto-2);
+  overflow: hidden;
+}
+
+.pedido-avance i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 8px;
+  background: var(--limonada);
+  transition: width 0.15s ease;
+}
+
+.saltenera .pedido-texto {
+  display: block;
+}
+
+/* ---------- Horno ---------- */
+
+.saltenera .mesa {
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.horno-zona {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  position: relative;
+}
+
+.horno {
+  width: min(62vw, 250px, 30vh);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s ease;
+}
+
+.horno svg {
+  display: block;
+  width: 100%;
+}
+
+.horno:active,
+.horno.golpe {
+  transform: scale(0.94);
+}
+
+.fuego {
+  transform-origin: 110px 150px;
+  animation: llama 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes llama {
+  to {
+    transform: scaleY(1.14) scaleX(0.94);
+  }
+}
+
+.pico .fuego {
+  animation-duration: 0.25s;
+}
+
+.pico .horno {
+  filter: drop-shadow(0 0 18px #ffb52099);
+}
+
+.horno-toque {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.saltena-vuela {
+  position: fixed;
+  width: 40px;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* ---------- Mejoras ---------- */
+
+.mejoras {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mejoras h2 {
+  font-size: 18px;
+  flex: none;
+}
+
+.mejoras-lista {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mejora {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--puesto);
+}
+
+.mejora-icono {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--puesto-2);
+  font-family: var(--titulo);
+  font-size: 18px;
+  color: var(--tumbo);
+}
+
+.mejora-icono svg {
+  width: 28px;
+  height: 28px;
+}
+
+.mejora h3 {
+  font-family: var(--cuerpo);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.mejora p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--texto-suave);
+}
+
+.mejora .boton {
+  min-height: 40px;
+  min-width: 86px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.mejora.nueva-compra {
+  animation: compra 0.35s ease;
+}
+
+@keyframes compra {
+  40% {
+    transform: scale(1.03);
+    background: #3a3015;
+  }
+}
+
+.sello-tope {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--borde);
+  color: var(--texto-suave);
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.acciones-una {
+  grid-template-columns: 1fr;
+  max-width: 420px;
+}
+
+.accion.activa {
+  background: #4a3b16;
+  color: var(--tumbo);
+}
+
+@media (max-height: 640px) {
+  .horno {
+    width: min(48vw, 24vh);
+  }
+}

@@ -6,6 +6,8 @@ import { logo, casera, toldo, COLORES } from './shared/marca.js';
 import { chipYapa, contadorYapa, flotante, aviso, escapar } from './shared/ui.js';
 import { sonar } from './shared/sonido.js';
 import { EN_APP } from './shared/config.js';
+import { aplicarDecoracion } from './shared/decoracion.js';
+import { progresoPuesto } from './shared/progreso.js';
 
 // Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
 // ("refresquera/") devuelve la portada en vez del puesto.
@@ -13,7 +15,7 @@ const PUESTOS = [
   { id: 'refresquera', url: 'refresquera/index.html', listo: true, color: COLORES.api, dibujo: dibujoRefresquera },
   { id: 'frutera', url: 'frutera/index.html', listo: true, color: COLORES.frutilla, dibujo: dibujoFrutera },
   { id: 'aguayo', url: 'aguayo/index.html', listo: true, color: COLORES.hierbabuena, dibujo: dibujoAguayo },
-  { id: 'saltenera', listo: false, color: COLORES.tumbo, dibujo: dibujoSaltenera },
+  { id: 'saltenera', url: 'saltenera/index.html', listo: true, color: COLORES.tumbo, dibujo: dibujoSaltenera },
 ];
 
 function dibujoRefresquera() {
@@ -71,10 +73,15 @@ function pintarPuestos() {
     const accion = p.listo
       ? `<a class="boton" href="${p.url}">${escapar(t('jugar'))}</a>`
       : `<span class="sello-pronto">${escapar(t('pronto'))}</span>`;
+    const pr = p.listo ? progresoPuesto(p.id) : null;
+    const nivel = pr
+      ? `<div class="puesto-nivel"><span>${escapar(t('nivelCorto', { n: pr.nivel }))}</span><div class="barra-xp"><i style="width:${Math.round((pr.resto / pr.falta) * 100)}%"></i></div></div>`
+      : '';
     return `<article class="puesto ${p.listo ? '' : 'cerrado'}" style="--acento:${p.color}">
       <div class="puesto-toldo">${toldo({ barra: '#ffffff', alto: 30 })}</div>
       <div class="puesto-dibujo">${p.dibujo()}</div>
       <h3>${escapar(nombre)}</h3>
+      ${nivel}
       <p>${escapar(desc)}</p>
       ${accion}
     </article>`;
@@ -115,6 +122,7 @@ function pintarTodo() {
 }
 
 window.QHATU_LISTO = true;
+aplicarDecoracion();
 document.getElementById('logo').innerHTML = logo();
 document.getElementById('casera').innerHTML = casera();
 document.getElementById('chip-yapa').innerHTML = chipYapa();

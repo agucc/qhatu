@@ -8,7 +8,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
-const JUEGOS = ['refresquera', 'frutera', 'aguayo'];
+const JUEGOS = ['refresquera', 'frutera', 'aguayo', 'saltenera'];
 const PORTALES = ['crazygames', 'poki'];
 
 const [juegoPedido, portalPedido] = process.argv.slice(2);

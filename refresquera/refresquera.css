@@ -274,3 +274,21 @@
     height: 38px;
   }
 }
+
+/* ---------- Formas de vaso (decoración) ---------- */
+
+[data-vaso='recto'] .vaso::before {
+  border-radius: 8px;
+}
+
+[data-vaso='recto'] .vaso-interior {
+  border-radius: 5px;
+}
+
+[data-vaso='copa'] .vaso::before {
+  border-radius: 8px 8px 50% 50% / 8px 8px 22% 22%;
+}
+
+[data-vaso='copa'] .vaso-interior {
+  border-radius: 5px 5px 50% 50% / 5px 5px 20% 20%;
+}

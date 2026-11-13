@@ -2,7 +2,8 @@
 // Reglas: nunca en medio de una partida, uno obligatorio como máximo cada tres niveles,
 // y el anuncio con recompensa siempre lo elige el jugador.
 
-import { PORTAL, ANUNCIOS_DEMO } from './config.js';
+import { PORTAL, ANUNCIOS_DEMO, EN_APP } from './config.js';
+import { obtener } from './almacen.js';
 import { pausar } from './sonido.js';
 
 const SDK_CRAZYGAMES = 'https://sdk.crazygames.com/crazygames-sdk-v3.js';
@@ -41,7 +42,7 @@ const demo = {
     return new Promise((ok) => {
       const capa = document.createElement('div');
       capa.className = 'anuncio-demo';
-      capa.innerHTML = '<div><strong>Ad</strong><span>2</span></div>';
+      capa.innerHTML = '<div><strong>Anuncio de prueba · Test ad</strong><span>2</span></div>';
       document.body.appendChild(capa);
       pausar(true);
       let s = 2;
@@ -121,7 +122,8 @@ export async function iniciarAnuncios() {
       await window.PokiSDK.init();
       proveedor = poki();
     } else {
-      proveedor = ANUNCIOS_DEMO ? demo : sinAnuncios;
+      // En la app todavía no hay red de anuncios: se simulan para probar el flujo.
+      proveedor = ANUNCIOS_DEMO || EN_APP ? demo : sinAnuncios;
     }
   } catch {
     proveedor = sinAnuncios;
@@ -138,7 +140,8 @@ export const anuncios = {
     return p().recompensa;
   },
   verRecompensa: () => p().verRecompensa(),
-  pausaEntreNiveles: () => p().pausaEntreNiveles(),
+  /** Quien compró "quitar anuncios" no ve anuncios obligatorios. */
+  pausaEntreNiveles: () => (obtener().sinAnuncios ? Promise.resolve() : p().pausaEntreNiveles()),
   inicioPartida: () => p().inicioPartida(),
   finPartida: () => p().finPartida(),
   celebrar: () => p().celebrar(),

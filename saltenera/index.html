@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>La Salteñera · Qhatu</title>
+  <meta name="description" content="Hornea y vende salteñas, compra mejoras y tu puesto sigue vendiendo aunque no juegues. Un puesto del mercado Qhatu.">
+  <meta name="theme-color" content="#17131f">
+  <script>
+    // Si el juego no arranca en unos segundos, muestra qué falló (sirve para depurar en celulares).
+    (function () {
+      var errores = [];
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (t && t !== window && (t.src || t.href)) errores.push('No cargó: ' + (t.src || t.href));
+        else errores.push((e.message || 'Error') + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        errores.push('Promesa: ' + ((e.reason && e.reason.message) || e.reason));
+      });
+      setTimeout(function () {
+        if (window.QHATU_LISTO) return;
+        var hojas = [];
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var s = document.styleSheets[i];
+          var n;
+          try { n = s.cssRules.length; } catch (x) { n = 'bloqueada'; }
+          hojas.push((s.href || 'interna') + ' -> ' + n + ' reglas');
+        }
+        var d = document.createElement('pre');
+        d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:70%;overflow:auto;margin:0;padding:12px;background:#fff;color:#000;font:12px monospace;white-space:pre-wrap;z-index:99999;border-radius:8px';
+        d.textContent = 'Qhatu no pudo arrancar. Manda una captura de esto.\n\n' +
+          location.href + '\n' + navigator.userAgent +
+          '\n\nEstilos:\n' + (hojas.join('\n') || 'ninguno') +
+          '\n\nErrores:\n' + (errores.join('\n') || 'ninguno') +
+          '\n\nMódulos JS: ' + ('noModule' in document.createElement('script'));
+        document.body.appendChild(d);
+      }, 4000);
+    })();
+  </script>
+  <link rel="icon" href="../icono.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../shared/qhatu.css">
+  <link rel="stylesheet" href="../shared/puesto.css">
+  <link rel="stylesheet" href="saltenera.css">
+</head>
+<body class="juego saltenera">
+  <div class="franja-aguayo"></div>
+  <header class="barra">
+    <a class="boton-icono" id="volver" href="../index.html" data-t-aria="mercado" aria-label="Mercado">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="barra-titulo">
+      <span class="barra-puesto" data-t="saltenera">La Salteñera</span>
+      <span class="barra-sub" id="ritmo"></span>
+    </div>
+    <div id="chip-yapa"></div>
+    <button class="boton-icono" id="sonido" type="button"></button>
+  </header>
+
+  <section class="tablero-datos" aria-live="off">
+    <div class="dato dato-ventas">
+      <span class="dato-titulo" data-t="ventas">Ventas</span>
+      <strong><small>Bs</small> <span id="ventas">0</span></strong>
+    </div>
+    <div class="pedido-caserito" id="pedido">
+      <span class="pedido-cara" id="pedido-cara"></span>
+      <span class="pedido-burbuja pedido-columna">
+        <span class="pedido-texto" id="pedido-texto"></span>
+        <span class="pedido-avance"><i id="pedido-avance"></i></span>
+      </span>
+    </div>
+  </section>
+
+  <main class="mesa">
+    <div class="horno-zona">
+      <button type="button" class="horno" id="horno" data-t-aria="horno" aria-label="Horno de salteñas">
+        <svg viewBox="0 0 220 170" aria-hidden="true">
+          <ellipse cx="110" cy="158" rx="100" ry="10" fill="#00000055"/>
+          <path d="M22 150V98a88 80 0 0 1 176 0v52z" fill="#b5653a"/>
+          <path d="M22 150V98a88 80 0 0 1 176 0v52z" fill="none" stroke="#8f4a26" stroke-width="4"/>
+          <path d="M40 70h46M134 70h46M30 96h30M160 96h30M26 124h34M160 124h34M70 44h80" stroke="#8f4a26" stroke-width="3" stroke-linecap="round"/>
+          <path d="M66 150v-36a44 40 0 0 1 88 0v36z" fill="#1d1016"/>
+          <path d="M66 150v-36a44 40 0 0 1 88 0v36z" fill="none" stroke="#6e3a1d" stroke-width="6"/>
+          <g class="fuego">
+            <path d="M84 150c-8-16 2-26 8-34 0 10 6 12 10 14-2-14 4-24 12-32 6 12 10 20 6 32 6-2 8-8 8-14 10 12 10 24 4 34z" fill="#ef476f"/>
+            <path d="M94 150c-4-10 2-16 6-20 0 6 4 8 8 8-2-8 2-14 6-18 4 8 6 12 4 20 4-2 4-4 6-8 4 8 4 12 0 18z" fill="#ffb520"/>
+          </g>
+          <rect x="8" y="148" width="204" height="14" rx="6" fill="#6e3a1d"/>
+        </svg>
+      </button>
+      <p class="horno-toque" id="por-toque"></p>
+    </div>
+
+    <section class="mejoras" aria-labelledby="titulo-mejoras">
+      <h2 id="titulo-mejoras" data-t="mejoras">Mejoras</h2>
+      <div class="mejoras-lista" id="mejoras"></div>
+    </section>
+  </main>
+
+  <footer class="acciones acciones-una">
+    <button type="button" class="accion" id="pico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
+      <span id="pico-texto"></span>
+    </button>
+  </footer>
+
+  <script type="module" src="juego.js"></script>
+</body>
+</html>

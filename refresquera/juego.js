@@ -8,8 +8,10 @@ import { t, aplicarTextos, nombreSabor } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios, tocaAnuncio } from '../shared/anuncios.js';
 import { EN_PORTAL } from '../shared/config.js';
-import { chipYapa, contadorYapa, aviso, flotante, ventana, escapar } from '../shared/ui.js';
+import { chipYapa, contadorYapa, aviso, flotante, ventana, escapar, confeti, celebrarNivel } from '../shared/ui.js';
 import { caserito } from '../shared/marca.js';
+import { aplicarDecoracion } from '../shared/decoracion.js';
+import { ganarXp } from '../shared/progreso.js';
 
 const COSTO_EXTRA = 25;
 const COSTO_PISTA = 10;
@@ -269,10 +271,31 @@ function tocarVaso(i) {
   }
 }
 
-function mover(desde, hacia) {
+/** Inclina el vaso de origen sobre el de destino, como al servir. Devuelve la pose para volver. */
+async function animarVertido(desde, hacia) {
+  const a = document.querySelector(`.vaso[data-i="${desde}"]`);
+  const b = document.querySelector(`.vaso[data-i="${hacia}"]`);
+  if (!a || !b || !a.animate || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return null;
+  const ra = a.getBoundingClientRect();
+  const rb = b.getBoundingClientRect();
+  const aLaIzquierda = rb.left < ra.left;
+  const dx = rb.left - ra.left + (aLaIzquierda ? ra.width * 0.95 : -ra.width * 0.95);
+  const dy = rb.top - ra.top - ra.height * 0.5 + 16;
+  const pose = `translate(${dx}px, ${dy}px) rotate(${aLaIzquierda ? -58 : 58}deg)`;
+  a.style.zIndex = '5';
+  a.animate([{ transform: 'translateY(-16px)' }, { transform: pose }], { duration: 170, easing: 'ease-out', fill: 'forwards' });
+  await esperar(250);
+  return pose;
+}
+
+async function mover(desde, hacia) {
   const antes = tablero();
   const { tablero: despues, cantidad } = L.verter(antes, desde, hacia);
   if (!cantidad) return;
+  juego.bloqueado = true;
+  const pose = await animarVertido(desde, hacia);
+  juego.bloqueado = false;
+  if (tablero() !== antes) return; // la partida cambió mientras se vertía
   if (juego.modo === 'niveles') juego.historial.push(antes);
   ponerTablero(despues);
   juego.sel = null;
@@ -281,6 +304,15 @@ function mover(desde, hacia) {
   if (marcarJuego() && obtener().racha > 1) aviso(t('rachaSube', { n: obtener().racha }), { tipo: 'exito' });
   pintarBarra();
   pintarVasos({ llega: { vaso: hacia, n: cantidad } });
+  if (pose) {
+    const vuelve = document.querySelector(`.vaso[data-i="${desde}"]`);
+    if (vuelve) {
+      vuelve.style.zIndex = '5';
+      vuelve.animate([{ transform: pose }, { transform: 'none' }], { duration: 190, easing: 'ease-in' }).onfinish = () => {
+        vuelve.style.zIndex = '';
+      };
+    }
+  }
   if (L.estaCompleto(despues.vasos[hacia], despues.cap)) setTimeout(() => sonar.listo(), 120);
 
   if (juego.modo === 'niveles') {
@@ -311,6 +343,7 @@ async function intentarServir() {
       if (asiento) flotante(`+${P.YAPA_POR_PEDIDO}`, asiento);
     }
     sumarYapa(P.YAPA_POR_PEDIDO * servidos.length);
+    celebrarNivel(ganarXp('refresquera', servidos.length));
     sonar.servido();
     aviso(t('servido'), { tipo: 'exito' });
     if (e.atendidos > datos.record) {
@@ -332,6 +365,11 @@ async function nivelCompleto() {
   datos.nivel++;
   guardar();
   sumarYapa(YAPA_NIVEL);
+  const subida = ganarXp('refresquera', 2);
+  setTimeout(() => {
+    confeti();
+    celebrarNivel(subida);
+  }, 450);
   anuncios.celebrar();
   await esperar(500);
   sonar.servido();
@@ -546,6 +584,7 @@ function reloj(ahora) {
 
 function iniciar() {
   window.QHATU_LISTO = true;
+  aplicarDecoracion();
   aplicarTextos();
   $('#chip-yapa').innerHTML = chipYapa();
   contadorYapa();

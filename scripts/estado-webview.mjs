@@ -33,11 +33,13 @@ const ESTADO = `JSON.stringify({
   canasto: !!document.querySelector('#canasto'),
   celdasTelar: document.querySelectorAll('#telar .celda').length,
   piezas: document.querySelectorAll('.ranura[data-i]').length,
+  mejoras: document.querySelectorAll('.mejora').length,
+  productos: document.querySelectorAll('.producto').length,
+  decoraciones: document.querySelectorAll('.deco').length,
   pedido: document.querySelector('#pedido-texto')?.textContent || null,
   colorTexto: getComputedStyle(document.body).color,
   hojas: [...document.styleSheets].map(s => { try { return s.href + ' ' + s.cssRules.length } catch (e) { return s.href + ' bloqueada' } }),
-  diagnostico: document.querySelector('pre')?.textContent || null,
-  ua: navigator.userAgent
+  diagnostico: document.querySelector('pre')?.textContent || null
 }, null, 2)`;
 
 let { ws, evaluar } = await conectar();
