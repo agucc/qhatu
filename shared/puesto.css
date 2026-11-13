@@ -31,11 +31,32 @@ body.juego {
 
 .barra-puesto {
   font-family: var(--titulo);
-  font-size: 20px;
+  font-size: var(--tam-titulo, 20px);
   color: var(--tumbo);
-  white-space: nowrap;
+  /* Nombres largos ("La Anticuchería", "El Puesto de Hot Dogs"): hasta dos líneas y letra
+     más chica (plataforma.js la ajusta), nunca cortados con puntos suspensivos. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.05;
+}
+
+.barra.dos-filas {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.barra.dos-filas .barra-titulo {
+  order: 10;
+  flex: 1 0 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.barra.dos-filas .barra-sub {
+  flex: none;
 }
 
 .barra-sub {

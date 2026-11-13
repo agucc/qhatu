@@ -92,11 +92,11 @@
   --titulo: 'Chango', 'Figtree', system-ui, sans-serif;
   --cuerpo: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --aguayo: repeating-linear-gradient(90deg,
-      var(--f1, var(--frutilla)) 0 26px, var(--noche) 26px 32px,
-      var(--f2, var(--tumbo)) 32px 44px, var(--noche) 44px 50px,
-      var(--f3, var(--hierbabuena)) 50px 76px, var(--noche) 76px 82px,
-      var(--f4, var(--api)) 82px 94px, var(--noche) 94px 100px,
-      var(--f5, var(--limonada)) 100px 112px, var(--noche) 112px 118px);
+      var(--t1, var(--frutilla)) 0 26px, var(--noche) 26px 32px,
+      var(--t2, var(--tumbo)) 32px 44px, var(--noche) 44px 50px,
+      var(--t3, var(--hierbabuena)) 50px 76px, var(--noche) 76px 82px,
+      var(--t4, var(--api)) 82px 94px, var(--noche) 94px 100px,
+      var(--t5, var(--limonada)) 100px 112px, var(--noche) 112px 118px);
   color-scheme: dark;
 }
 

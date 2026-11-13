@@ -521,3 +521,19 @@
   font-size: 14px;
   color: var(--texto-suave);
 }
+
+/* Celulares muy angostos: el chip del país queda solo con la bandera (el nombre completo
+   está en la etiqueta accesible y en el pasaporte) para que la cabecera no se salga. */
+@media (max-width: 360px) {
+  .cabecera {
+    gap: 8px;
+  }
+
+  .pais-chip {
+    padding: 6px 8px;
+  }
+
+  .pais-chip span {
+    display: none;
+  }
+}
