@@ -2,13 +2,13 @@
 // Uso: node scripts/empaquetar.mjs [refresquera] [crazygames|poki]
 // Sin argumentos arma todos los juegos listos para todos los portales.
 
-import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), '..');
-const JUEGOS = ['refresquera'];
+const JUEGOS = ['refresquera', 'frutera'];
 const PORTALES = ['crazygames', 'poki'];
 
 const [juegoPedido, portalPedido] = process.argv.slice(2);
@@ -35,7 +35,7 @@ for (const juego of juegos) {
     writeFileSync(archivoHtml, html);
 
     // Los módulos del juego importan ../shared/; en el zip, shared/ queda al lado.
-    for (const archivo of ['juego.js']) {
+    for (const archivo of readdirSync(destino).filter((a) => a.endsWith('.js'))) {
       const ruta = join(destino, archivo);
       writeFileSync(ruta, readFileSync(ruta, 'utf8').replaceAll("'../shared/", "'./shared/"));
     }

@@ -1,5 +1,5 @@
 // Guarda el mercado para jugar sin conexión. Sube VERSION al publicar cambios.
-const VERSION = 'qhatu-2';
+const VERSION = 'qhatu-3';
 const ARCHIVOS = [
   './',
   'index.html',
@@ -30,6 +30,12 @@ const ARCHIVOS = [
   'refresquera/logica.js',
   'refresquera/pedidos.js',
   'refresquera/sabores.js',
+  'shared/puesto.css',
+  'frutera/index.html',
+  'frutera/frutera.css',
+  'frutera/juego.js',
+  'frutera/fisica.js',
+  'frutera/frutas.js',
 ];
 
 self.addEventListener('install', (e) => {

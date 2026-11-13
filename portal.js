@@ -11,7 +11,7 @@ import { EN_APP } from './shared/config.js';
 // ("refresquera/") devuelve la portada en vez del puesto.
 const PUESTOS = [
   { id: 'refresquera', url: 'refresquera/index.html', listo: true, color: COLORES.api, dibujo: dibujoRefresquera },
-  { id: 'frutera', listo: false, color: COLORES.frutilla, dibujo: dibujoFrutera },
+  { id: 'frutera', url: 'frutera/index.html', listo: true, color: COLORES.frutilla, dibujo: dibujoFrutera },
   { id: 'aguayo', listo: false, color: COLORES.hierbabuena, dibujo: dibujoAguayo },
   { id: 'saltenera', listo: false, color: COLORES.tumbo, dibujo: dibujoSaltenera },
 ];

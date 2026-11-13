@@ -1,0 +1,115 @@
+/* Lo común de la pantalla de cada puesto: barra de arriba, mesa y botones de abajo */
+
+body.juego {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- Barra de arriba ---------- */
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 16px 6px;
+}
+
+.barra-titulo {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  line-height: 1.1;
+}
+
+.barra-puesto {
+  font-family: var(--titulo);
+  font-size: 20px;
+  color: var(--tumbo);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barra-sub {
+  font-size: 14px;
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+/* ---------- Mesa ---------- */
+
+.mesa {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 16px 0;
+}
+
+/* ---------- Acciones ---------- */
+
+.acciones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 16px 14px;
+}
+
+.accion {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 58px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--puesto);
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.accion svg {
+  width: 24px;
+  height: 24px;
+}
+
+.accion:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.accion .costo {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--tumbo);
+  color: var(--noche);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+@media (max-height: 640px) {
+  .accion {
+    min-height: 48px;
+    font-size: 12px;
+  }
+}

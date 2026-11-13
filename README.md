@@ -9,7 +9,7 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 | Puesto | Género | Estado |
 | --- | --- | --- |
 | La Refresquera | ordenar colores | v2 jugable |
-| La Frutera | merge | pronto |
+| La Frutera | merge | jugable |
 | El Aguayo | bloques | pronto |
 | La Salteñera | idle | pronto |
 
@@ -20,6 +20,13 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 - **Vaso extra:** se paga con yapa o viendo un anuncio con recompensa.
 - **Pistas, deshacer y reiniciar.**
 - **Símbolos por sabor:** cada refresco tiene un ícono además del color.
+
+### La Frutera
+
+- Sueltas frutas en el canasto; dos iguales se juntan en una más grande: achachairú, frutilla, limón, tuna, mandarina, durazno, chirimoya, mango, piña y papaya. Dos papayas se venden juntas.
+- **Caserito con pedido:** pide una fruta; cuando la formas, se la lleva, te da yapa y deja espacio en el canasto.
+- Física propia (`frutera/fisica.js`), sin motor.
+- **Ayudas:** cambiar la fruta que vas a soltar y, una vez por partida, despejar el borde para seguir jugando.
 
 ## Lo que comparten todos los puestos (`shared/`)
 
@@ -32,6 +39,7 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 | `marca.js` | Toldo, logo, La Casera y caseritos en SVG |
 | `ui.js` | Avisos, ventanas y contador de yapa |
 | `qhatu.css` | Colores de la marca (los refrescos del mercado) y componentes |
+| `puesto.css` | Barra de arriba, mesa y botones de abajo de cada puesto |
 
 Reglas del mercado que el código respeta:
 
@@ -81,6 +89,10 @@ refresquera/                        primer puesto
   pedidos.js                        modo pedidos (puro)
   sabores.js                        colores y símbolos
   juego.js                          pantalla, yapa y anuncios
+frutera/                            segundo puesto
+  fisica.js                         caída, choques y uniones (puro)
+  frutas.js                         las diez frutas y cómo se dibujan
+  juego.js                          canasto, controles y pedidos
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales
 scripts/web.mjs                     copia el juego a www/ para la app

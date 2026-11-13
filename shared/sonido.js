@@ -66,4 +66,11 @@ export const sonar = {
   yapa: () => [880, 1320].forEach((f, i) => tono({ f, dur: 0.08, vol: 0.12, retraso: i * 0.07 })),
   llega: () => tono({ f: 700, f2: 760, dur: 0.08, vol: 0.06 }),
   fin: () => [523, 440, 349].forEach((f, i) => tono({ f, dur: 0.2, tipo: 'triangle', vol: 0.12, retraso: i * 0.14 })),
+  caer: () => tono({ f: 180, f2: 110, dur: 0.08, tipo: 'sine', vol: 0.1 }),
+  /** Cuanto más grande la fruta, más grave el sonido. */
+  union: (nivel = 0) => {
+    const base = 880 / Math.pow(1.12, nivel);
+    tono({ f: base, f2: base * 1.5, dur: 0.12, tipo: 'triangle', vol: 0.13 });
+    tono({ f: base * 1.5, dur: 0.1, tipo: 'sine', vol: 0.08, retraso: 0.06 });
+  },
 };

@@ -30,6 +30,8 @@ const ESTADO = `JSON.stringify({
   titulo: document.title,
   puestos: document.querySelectorAll('.puesto').length,
   vasos: document.querySelectorAll('.vaso').length,
+  canasto: !!document.querySelector('#canasto'),
+  pedido: document.querySelector('#pedido-texto')?.textContent || null,
   colorTexto: getComputedStyle(document.body).color,
   hojas: [...document.styleSheets].map(s => { try { return s.href + ' ' + s.cssRules.length } catch (e) { return s.href + ' bloqueada' } }),
   diagnostico: document.querySelector('pre')?.textContent || null,
