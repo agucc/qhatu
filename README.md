@@ -21,6 +21,10 @@ Al entrar por primera vez, el jugador elige su país: será su **mercado de casa
 - Las bebidas usan siempre los mismos ocho colores de vaso (para que se distingan) y cada una tiene su propio dibujo (`refresquera/iconos.js`, `refresquera/bebidas.js`).
 - Cada país tiene su **recetario**, que avanza con los niveles jugados allí.
 - Los caseritos llevan sombreros de su lugar y el pasaporte trae un dato cultural de cada país.
+- **La Casera** es la misma anfitriona en todos los países, pero se viste como las caseras de cada lugar: bombín y aguayo (Bolivia), montera y lliclla (Perú), trenzas con listones y rebozo (México), sombrero vueltiao (Colombia), poncho salteño (Argentina), lenço de chita (Brasil) y gorra con delantal (Estados Unidos) (`shared/marca.js`).
+- **Fondos y toldos por país:** Noche, Mercado y Carnaval son de todos; cada país tiene tres fondos con sus paisajes y un toldo propio, y solo se ven y se compran estando allí. Lo comprado en otro país se conserva y vuelve a verse al regresar (`shared/decoracion.js`).
+- Cada tejido dice de dónde viene (`telar.origen` en `shared/paises.js`): por ejemplo, el sarape es de Saltillo (Coahuila) y la mochila es wayuu de La Guajira.
+- Las franjas de arriba y abajo de cada pantalla usan los colores del tejido del país, en otro orden en cada puesto.
 - Datos de los países: `shared/paises.js`. Frutas: `frutera/frutas.js`. Comidas y cocinas: `saltenera/comidas.js`.
 - Conviene que alguien de cada país revise nombres, bebidas y dibujos antes de publicar.
 
@@ -137,7 +141,10 @@ Reglas del mercado que el código respeta:
 ```bash
 npm run dev     # sirve el sitio en http://localhost:8080
 npm test        # pruebas de la lógica (node:test, sin dependencias)
+node scripts/revisar-pantallas.cjs   # con npm run dev abierto: 7 países × 6 pantallas × 3 anchos
 ```
+
+En pantallas angostas, el nombre del puesto achica la letra y, si no alcanza, pasa a su propia fila: nunca se corta con puntos suspensivos.
 
 Parámetros útiles en la URL:
 

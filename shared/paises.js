@@ -24,6 +24,7 @@ export const PAISES = [
     telar: {
       nombre: ['El Aguayo', 'El Aguayo', 'El Aguayo'],
       textura: 'aguayo',
+      origen: ['Tejido andino de Bolivia: franjas y rombos.', 'Andean weaving from Bolivia: stripes and diamonds.', 'Tecido andino da Bolívia: faixas e losangos.'],
       paleta: [['rosado', '#ef476f'], ['amarillo', '#ffb520'], ['turquesa', '#1fb5a5'], ['morado', '#9a48b8'], ['verde', '#a6d63a']],
     },
     sombreros: ['bombin', 'chullo'],
@@ -42,6 +43,7 @@ export const PAISES = [
     telar: {
       nombre: ['La Manta', 'The Manta', 'A Manta'],
       textura: 'manta',
+      origen: ['Manta de Cusco, con los ñawi del pallay.', 'Cusco manta, with the ñawi of the pallay.', 'Manta de Cusco, com os ñawi do pallay.'],
       paleta: [['rojo', '#d7263d'], ['naranja', '#f77f00'], ['rosado', '#e0457b'], ['verde', '#2a9d63'], ['azul', '#4a6cb3']],
     },
     sombreros: ['chullo', 'sombrero'],
@@ -60,6 +62,7 @@ export const PAISES = [
     telar: {
       nombre: ['El Sarape', 'The Sarape', 'O Sarape'],
       textura: 'sarape',
+      origen: ['Sarape de Saltillo, Coahuila.', 'Sarape from Saltillo, Coahuila.', 'Sarape de Saltillo, Coahuila.'],
       paleta: [['rosado', '#ff3d7f'], ['naranja', '#ff8a00'], ['amarillo', '#ffd100'], ['turquesa', '#00b3a6'], ['morado', '#8a4bb5']],
     },
     sombreros: ['sombrero', 'gorra'],
@@ -74,6 +77,7 @@ export const PAISES = [
     telar: {
       nombre: ['La Mochila', 'The Mochila', 'A Mochila'],
       textura: 'mochila',
+      origen: ['Mochila wayuu de La Guajira.', 'Wayuu mochila from La Guajira.', 'Mochila wayuu de La Guajira.'],
       paleta: [['amarillo', '#f2c200'], ['rojo', '#d7263d'], ['verde', '#1b998b'], ['azul', '#2e86ab'], ['naranja', '#f77f00']],
     },
     sombreros: ['vueltiao', 'gorra'],
@@ -88,6 +92,7 @@ export const PAISES = [
     telar: {
       nombre: ['El Poncho', 'The Poncho', 'O Poncho'],
       textura: 'poncho',
+      origen: ['Poncho salteño de Salta, rojo con guarda negra.', 'Salta poncho, red with a black border.', 'Poncho salteño de Salta, vermelho com barra preta.'],
       paleta: [['rojo', '#d0202f'], ['vino', '#93204a'], ['crema', '#f3e3c3'], ['celeste', '#74acdf'], ['cafe', '#a0632d']],
     },
     sombreros: ['boina', 'gorra'],
@@ -106,6 +111,7 @@ export const PAISES = [
     telar: {
       nombre: ['La Chita', 'The Chita', 'A Chita'],
       textura: 'chita',
+      origen: ['Chita: algodón estampado con flores.', 'Chita: flower-printed cotton.', 'Chita: algodão estampado com flores.'],
       paleta: [['rojo', '#e63946'], ['amarillo', '#ffbe0b'], ['azul', '#3a86ff'], ['verde', '#2a9d8f'], ['rosado', '#ff70a6']],
     },
     sombreros: ['gorra', 'sombrero'],
@@ -114,12 +120,14 @@ export const PAISES = [
   {
     id: 'us',
     nombre: ['Estados Unidos', 'United States', 'Estados Unidos'],
+    corto: ['EE. UU.', 'USA', 'EUA'],
     moneda: 'US$',
     cocina: 'parrilla',
     comida: { puesto: ['El Puesto de Hot Dogs', 'The Hot Dog Stand', 'A Barraca de Cachorro-Quente'], plural: ['hot dogs', 'hot dogs', 'cachorros-quentes'], dibujo: 'hotdog' },
     telar: {
       nombre: ['El Quilt', 'The Quilt', 'A Colcha de Retalhos'],
       textura: 'quilt',
+      origen: ['Quilt: colcha de retazos cosidos a mano.', 'Quilt: hand-sewn patchwork.', 'Quilt: colcha de retalhos costurados à mão.'],
       paleta: [['rojo', '#c0392b'], ['azul', '#3657a8'], ['crema', '#f2e6c9'], ['amarillo', '#e1a730'], ['verde', '#7fa37b']],
     },
     sombreros: ['gorra', 'gorro'],

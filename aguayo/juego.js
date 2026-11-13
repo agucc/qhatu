@@ -223,7 +223,7 @@ function empezar() {
   pintarTodo();
   jugar(true);
   if (!visto('tuto-aguayo')) {
-    abrir({ titulo: t('aguayo'), texto: t('tutoAguayo'), conCasera: true, botones: [{ texto: t('entendido') }] }).then(() =>
+    abrir({ titulo: texto(TELAR.nombre), texto: `${texto(TELAR.origen)} ${t('tutoAguayo')}`, conCasera: true, botones: [{ texto: t('entendido') }] }).then(() =>
       marcarVisto('tuto-aguayo')
     );
   }
@@ -339,7 +339,7 @@ async function finPartida() {
     return;
   }
   if (eleccion === 'retar') {
-    const r = await compartir(t('retoAguayo', { n: juego.puntos }));
+    const r = await compartir(t('retoAguayo', { n: juego.puntos, tejido: texto(TELAR.nombre) }));
     if (r === 'copiado') aviso(t('copiado'), { tipo: 'exito' });
     juego.terminado = true;
     finPartida();

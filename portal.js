@@ -81,7 +81,7 @@ function pintarPuestos() {
   const zona = document.getElementById('puestos');
   zona.innerHTML = PUESTOS.map((p) => {
     const nombre = nombrePuesto(p.id);
-    const desc = t(`${p.id}Desc`);
+    const desc = p.id === 'aguayo' ? `${texto(actual().telar.origen)} ${t('aguayoDesc')}` : t(`${p.id}Desc`);
     const accion = p.listo
       ? `<a class="boton" href="${p.url}">${escapar(t('jugar'))}</a>`
       : `<span class="sello-pronto">${escapar(t('pronto'))}</span>`;
@@ -131,7 +131,7 @@ function pintarIdiomas() {
 
 function pintarPais() {
   const a = actual();
-  document.getElementById('pais-chip').innerHTML = `${bandera(a.id, 16)}<span>${escapar(texto(a.nombre))}</span>`;
+  document.getElementById('pais-chip').innerHTML = `${bandera(a.id, 16)}<span>${escapar(texto(a.corto || a.nombre))}</span>`;
   document.getElementById('pais-chip').setAttribute('aria-label', t('mercadoDe', { pais: texto(a.nombre) }));
 }
 
@@ -213,6 +213,9 @@ function elegirPaisSiFalta() {
 }
 
 function pintarTodo() {
+  // Al viajar cambian La Casera, el fondo y el toldo del país.
+  aplicarDecoracion();
+  document.getElementById('casera').innerHTML = casera(paisActual(obtener()));
   aplicarTextos();
   pintarCasera();
   pintarPuestos();
@@ -224,7 +227,6 @@ window.QHATU_LISTO = true;
 aplicarDecoracion();
 iniciarPlataforma();
 document.getElementById('logo').innerHTML = logo();
-document.getElementById('casera').innerHTML = casera();
 document.getElementById('chip-yapa').innerHTML = chipYapa();
 contadorYapa();
 pintarIdiomas();

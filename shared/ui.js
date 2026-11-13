@@ -3,6 +3,7 @@
 import { obtener, alCambiar } from './almacen.js';
 import { t } from './i18n.js';
 import { casera } from './marca.js';
+import { paisActual } from './paises.js';
 
 export function el(html) {
   const tpl = document.createElement('template');
@@ -46,7 +47,7 @@ export function ventana({ titulo, texto = '', html = '', botones = [], conCasera
   return new Promise((resolver) => {
     const fondo = el(`<div class="ventana-fondo">
       <div class="ventana" role="dialog" aria-modal="true" aria-labelledby="ventana-titulo">
-        ${conCasera ? `<div class="ventana-casera">${casera()}</div>` : ''}
+        ${conCasera ? `<div class="ventana-casera">${casera(paisActual(obtener()))}</div>` : ''}
         <h2 id="ventana-titulo">${escapar(titulo)}</h2>
         ${texto ? `<p>${escapar(texto)}</p>` : ''}
         ${html}

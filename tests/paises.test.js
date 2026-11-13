@@ -112,3 +112,35 @@ test('no hay toldo wiphala; quien lo tenía recibe la kantuta', async () => {
   assert.ok(!TOLDOS.some((t) => t.id === 'wiphala'));
   assert.ok(TOLDOS.some((t) => t.id === 'kantuta'));
 });
+
+test('fondos y toldos: cada país ve los suyos y los de todos; lo de otro país no se muestra', async () => {
+  const { disponibles, FONDOS, TOLDOS } = await import('../shared/decoracion.js');
+  for (const id of IDS) {
+    const fondos = disponibles('fondo', id);
+    assert.ok(fondos.some((f) => f.id === 'noche'));
+    assert.equal(fondos.filter((f) => f.pais === id).length, 3, `${id}: tres fondos propios`);
+    assert.ok(fondos.every((f) => !f.pais || f.pais === id));
+    assert.ok(disponibles('toldo', id).some((t) => t.pais === id), `${id}: un toldo propio`);
+  }
+  // Titicaca, Cerro Rico y Yungas solo en Bolivia
+  for (const id of ['lago', 'cerro', 'yungas']) assert.equal(FONDOS.find((f) => f.id === id).pais, 'bo');
+  assert.equal(new Set(FONDOS.map((f) => f.id)).size, FONDOS.length);
+  assert.equal(new Set(TOLDOS.map((t) => t.id)).size, TOLDOS.length);
+});
+
+test('La Casera se viste distinto en cada país', async () => {
+  const { casera } = await import('../shared/marca.js');
+  const dibujos = IDS.map((id) => casera(id));
+  assert.equal(new Set(dibujos).size, IDS.length);
+  assert.equal(casera(), casera('bo'));
+});
+
+test('Bolivia sirve chicha camba (sin alcohol) y conserva el id de la bebida', () => {
+  const chicha = BEBIDAS.bo.find(([id]) => id === 'chicha');
+  assert.equal(chicha[2][0], 'Chicha camba');
+  assert.ok(!BEBIDAS.bo.some(([, , n]) => n[0] === 'Chicha morada'));
+});
+
+test('cada tejido dice de dónde viene', () => {
+  for (const p of P.PAISES) assert.equal(p.telar.origen?.length, 3, p.id);
+});

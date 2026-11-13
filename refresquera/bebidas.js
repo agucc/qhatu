@@ -27,7 +27,8 @@ export const BEBIDAS = {
     ['hierbabuena', 'mate', ['Mate de hierbabuena', 'Mint tea', 'Chá de hortelã'], ['Para después del almuerzo, caliente o frío.', 'For after lunch, hot or cold.', 'Para depois do almoço, quente ou frio.']],
     ['somo', 'grano', ['Somó', 'Somó', 'Somó'], ['Maíz blanco con canela. Típico de Chuquisaca.', 'White corn with cinnamon. Typical of Chuquisaca.', 'Milho branco com canela. Típico de Chuquisaca.']],
     ['mocochinchi', 'durazno', ['Mocochinchi', 'Mocochinchi', 'Mocochinchi'], ['Durazno deshidratado hervido con canela y clavo. El refresco del mercado.', 'Dried peach boiled with cinnamon and cloves. The market classic.', 'Pêssego seco fervido com canela e cravo. O clássico do mercado.']],
-    ['chicha', 'pina', ['Chicha morada', 'Chicha morada', 'Chicha morada'], ['Maíz morado con piña, canela y clavo.', 'Purple corn with pineapple, cinnamon and cloves.', 'Milho roxo com abacaxi, canela e cravo.']],
+    // id 'chicha' se mantiene para no tocar partidas guardadas; desde la revisión cultural es la chicha camba.
+    ['chicha', 'jarra', ['Chicha camba', 'Chicha camba', 'Chicha camba'], ['Maíz molido hervido con canela y clavo, dulce y fría, sin alcohol. Típica de Santa Cruz.', 'Ground corn boiled with cinnamon and cloves, sweet and cold, no alcohol. Typical of Santa Cruz.', 'Milho moído fervido com canela e cravo, doce e gelado, sem álcool. Típico de Santa Cruz.']],
   ],
   pe: [
     ['pe-chicha', 'mazorca', ['Chicha morada', 'Chicha morada', 'Chicha morada'], ['Maíz morado hervido con piña, canela y clavo.', 'Purple corn boiled with pineapple, cinnamon and cloves.', 'Milho roxo fervido com abacaxi, canela e cravo.']],

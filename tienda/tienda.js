@@ -5,7 +5,7 @@ import { t, aplicarTextos, nombreDeco } from '../shared/i18n.js';
 import { sonar } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
 import { PRODUCTOS, modoCompras, comprar, precio, sinAnuncios, iniciarCompras } from '../shared/compras.js';
-import { GRUPOS, aplicarDecoracion, enUso, esMio, usar } from '../shared/decoracion.js';
+import { GRUPOS, aplicarDecoracion, enUso, esMio, usar, disponibles } from '../shared/decoracion.js';
 import { chipYapa, contadorYapa, aviso, confeti, escapar } from '../shared/ui.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { svgVaso, definiciones } from '../refresquera/botella.js';
@@ -94,8 +94,8 @@ function muestra(grupo, item) {
 }
 
 function pintarDecoracion() {
-  for (const [grupo, items] of Object.entries(GRUPOS)) {
-    $(`#deco-${grupo}`).innerHTML = items
+  for (const grupo of Object.keys(GRUPOS)) {
+    $(`#deco-${grupo}`).innerHTML = disponibles(grupo)
       .map((item) => {
         const puesto = enUso(grupo) === item.id;
         const mio = esMio(grupo, item.id);
