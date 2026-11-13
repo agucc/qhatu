@@ -1,0 +1,184 @@
+/* Álbum del Mercado */
+
+body.album {
+  min-height: 100dvh;
+}
+
+.album-cuerpo {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 4px 16px 40px;
+  display: grid;
+  gap: 16px;
+}
+
+.album-paises {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 6px;
+  scrollbar-width: none;
+}
+
+.album-paises button {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 64px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--puesto);
+  color: var(--texto-suave);
+  font: 800 11px/1.1 var(--cuerpo);
+  cursor: pointer;
+}
+
+.album-paises button[aria-pressed='true'] {
+  background: var(--puesto-2);
+  color: var(--texto);
+  box-shadow: inset 0 0 0 2px var(--tumbo);
+}
+
+.album-paises button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.album-paises button:disabled .bandera {
+  filter: grayscale(1);
+}
+
+.album-paises .sello-mini {
+  color: var(--limonada);
+}
+
+.album-cabecera {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.album-cabecera h1 {
+  font-size: 24px;
+  color: var(--tumbo);
+}
+
+.album-progreso {
+  margin: 2px 0 6px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.album-sello .boton {
+  min-height: 40px;
+  font-size: 14px;
+}
+
+.album-sello .sello-hecho {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px double var(--limonada);
+  color: var(--limonada);
+  font: 800 11px/1.1 var(--cuerpo);
+  text-align: center;
+  transform: rotate(-12deg);
+}
+
+.album-sello .falta {
+  max-width: 120px;
+  font-size: 12px;
+  color: var(--texto-suave);
+  text-align: right;
+}
+
+.laminas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.lamina {
+  display: grid;
+  grid-template-rows: 96px auto auto;
+  gap: 6px;
+  padding: 10px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--puesto);
+  box-shadow: inset 0 0 0 2px var(--borde);
+  color: var(--texto);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.lamina.ganada {
+  background: linear-gradient(160deg, var(--puesto-2), var(--puesto));
+  box-shadow: inset 0 0 0 2px #ffffff22;
+}
+
+.lamina-dibujo {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #00000026;
+}
+
+.lamina-dibujo svg,
+.lamina-dibujo img {
+  max-width: 100%;
+  max-height: 88px;
+}
+
+.lamina:not(.ganada) .lamina-dibujo > * {
+  filter: brightness(0) invert(1);
+  opacity: 0.12;
+}
+
+.lamina h3 {
+  font-family: var(--cuerpo);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.lamina p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--texto-suave);
+  line-height: 1.3;
+}
+
+.lamina .tipo {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tumbo);
+}
+
+.lamina-grande {
+  display: grid;
+  place-items: center;
+  margin: 4px 0 10px;
+}
+
+.lamina-grande svg,
+.lamina-grande img {
+  max-width: 180px;
+  max-height: 150px;
+}
+
+@media (max-width: 360px) {
+  .laminas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

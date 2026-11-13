@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Álbum del Mercado · Qhatu</title>
+  <meta name="description" content="Álbum del Mercado de Qhatu: láminas de la comida, las frutas, los tejidos y las fiestas de cada país.">
+  <meta name="theme-color" content="#17131f">
+  <script>
+    // Si el juego no arranca en unos segundos, muestra qué falló (sirve para depurar en celulares).
+    (function () {
+      var errores = [];
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (t && t !== window && (t.src || t.href)) errores.push('No cargó: ' + (t.src || t.href));
+        else errores.push((e.message || 'Error') + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        errores.push('Promesa: ' + ((e.reason && e.reason.message) || e.reason));
+      });
+      setTimeout(function () {
+        if (window.QHATU_LISTO) return;
+        var hojas = [];
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var s = document.styleSheets[i];
+          var n;
+          try { n = s.cssRules.length; } catch (x) { n = 'bloqueada'; }
+          hojas.push((s.href || 'interna') + ' -> ' + n + ' reglas');
+        }
+        var d = document.createElement('pre');
+        d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:70%;overflow:auto;margin:0;padding:12px;background:#fff;color:#000;font:12px monospace;white-space:pre-wrap;z-index:99999;border-radius:8px';
+        d.textContent = 'Qhatu no pudo arrancar. Manda una captura de esto.\n\n' +
+          location.href + '\n' + navigator.userAgent +
+          '\n\nEstilos:\n' + (hojas.join('\n') || 'ninguno') +
+          '\n\nErrores:\n' + (errores.join('\n') || 'ninguno') +
+          '\n\nMódulos JS: ' + ('noModule' in document.createElement('script'));
+        document.body.appendChild(d);
+      }, 4000);
+    })();
+  </script>
+  <link rel="icon" href="../icono.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../shared/qhatu.css">
+  <link rel="stylesheet" href="../shared/puesto.css">
+  <link rel="stylesheet" href="album.css">
+</head>
+<body class="album">
+  <div class="franja-aguayo"></div>
+  <header class="barra">
+    <a class="boton-icono" id="volver" href="../index.html" data-t-aria="mercado" aria-label="Mercado">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="barra-titulo">
+      <span class="barra-puesto" data-t="album">Álbum del Mercado</span>
+    </div>
+    <div id="chip-yapa"></div>
+  </header>
+
+  <main class="album-cuerpo">
+    <nav class="album-paises" id="paises" aria-label="Países"></nav>
+    <section class="album-cabecera">
+      <div>
+        <h1 id="album-pais"></h1>
+        <p class="album-progreso" id="album-progreso"></p>
+        <div class="barra-pasaje" aria-hidden="true"><i id="album-barra"></i></div>
+      </div>
+      <div class="album-sello" id="album-sello"></div>
+    </section>
+    <div class="laminas" id="laminas"></div>
+  </main>
+  <div class="franja-aguayo"></div>
+
+  <script type="module" src="album.js"></script>
+</body>
+</html>
