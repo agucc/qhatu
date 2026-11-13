@@ -10,13 +10,13 @@ Al entrar por primera vez, el jugador elige su país: será su **mercado de casa
 
 | País | La Refresquera | La Frutera | Telar | Puesto de comida |
 | --- | --- | --- | --- | --- |
-| Bolivia | mocochinchi, api, somó… | achachairú → papaya | El Aguayo | La Salteñera (Bs) |
-| Perú | chicha morada, emoliente, quinua… | aguaymanto → zapallo | La Manta | La Anticuchería (S/) |
-| México | horchata, jamaica, atole… | capulín → sandía | El Sarape | La Taquería ($) |
-| Colombia | lulada, aguapanela, avena… | uchuva → papaya | La Mochila | La Arepería ($) |
-| Argentina | mate, tereré, submarino… | arándano → sandía | El Poncho | Las Empanadas ($) |
-| Brasil | caldo de cana, açaí, guaraná… | jabuticaba → sandía | La Chita | La Padaria (R$) |
-| Estados Unidos | lemonade, root beer, iced tea… | blueberry → pumpkin | The Quilt | The Hot Dog Stand (US$) |
+| Bolivia | mocochinchi, api, somó… | achachairú → papaya | El Aguayo (franjas y rombos) | La Salteñera (Bs) |
+| Perú | chicha morada, emoliente, quinua… | aguaymanto → zapallo | La Manta cusqueña (ñawi) | La Anticuchería (S/) |
+| México | horchata, jamaica, atole… | capulín → sandía | El Sarape de Saltillo | La Taquería ($) |
+| Colombia | lulada, aguapanela, avena… | uchuva → papaya | La Mochila wayuu (zigzag) | La Arepería ($) |
+| Argentina | mate, tereré, submarino… | arándano → sandía | El Poncho salteño (guarda) | Las Empanadas ($) |
+| Brasil | caldo de cana, açaí, guaraná… | jabuticaba → sandía | La Chita (flores) | La Padaria (R$) |
+| Estados Unidos | lemonade, root beer, iced tea… | blueberry → pumpkin | The Quilt (retazos) | The Hot Dog Stand (US$) |
 
 - Las bebidas usan siempre los mismos ocho colores de vaso (para que se distingan) y cada una tiene su propio dibujo (`refresquera/iconos.js`, `refresquera/bebidas.js`).
 - Cada país tiene su **recetario**, que avanza con los niveles jugados allí.
