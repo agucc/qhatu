@@ -56,6 +56,22 @@ Parámetros útiles en la URL:
 - **Sitio Qhatu:** la raíz del repositorio es un sitio estático. Se sube tal cual a Cloudflare Pages o Vercel. Se instala en el celular como app web (`manifest.webmanifest` y `sw.js`). Al publicar cambios, sube `VERSION` en `sw.js`.
 - **Portales:** `npm run empaquetar` arma `dist/refresquera-crazygames.zip` y `dist/refresquera-poki.zip`, con `index.html` en la raíz y el SDK de cada portal activado.
 
+## App Android (APK)
+
+La app es el mismo código web empaquetado con Capacitor; no se reescribe nada.
+
+- **Desde GitHub:** cada push compila la APK en GitHub Actions (`.github/workflows/apk.yml`). Se descarga en la pestaña **Actions** → la última ejecución → **Artifacts** → `qhatu-apk`.
+- **En tu computadora** (con Android Studio o el SDK de Android instalado):
+
+```bash
+npm install
+npm run android:apk   # deja la APK en android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+`npm run android:sync` copia los cambios del juego a la app sin compilar; después se puede abrir `android/` en Android Studio.
+
+El identificador de la app es `bo.qhatu.mercado` (en `capacitor.config.json`). Se puede cambiar hasta que se publique en Google Play; después queda fijo.
+
 ## Estructura
 
 ```
@@ -67,5 +83,8 @@ refresquera/                        primer puesto
   juego.js                          pantalla, yapa y anuncios
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales
+scripts/web.mjs                     copia el juego a www/ para la app
+android/                            proyecto Android (Capacitor)
+shared/fuentes/                     Chango y Figtree incluidas (licencia OFL)
 tests/                              pruebas
 ```

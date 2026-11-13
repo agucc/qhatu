@@ -1,0 +1,9 @@
+{
+  "appId": "bo.qhatu.mercado",
+  "appName": "Qhatu",
+  "webDir": "www",
+  "backgroundColor": "#17131f",
+  "android": {
+    "backgroundColor": "#17131f"
+  }
+}

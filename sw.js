@@ -1,5 +1,5 @@
 // Guarda el mercado para jugar sin conexión. Sube VERSION al publicar cambios.
-const VERSION = 'qhatu-1';
+const VERSION = 'qhatu-2';
 const ARCHIVOS = [
   './',
   'index.html',
@@ -15,6 +15,14 @@ const ARCHIVOS = [
   'shared/marca.js',
   'shared/sonido.js',
   'shared/ui.js',
+  'shared/fuentes/chango-latin-400-normal.woff2',
+  'shared/fuentes/chango-latin-ext-400-normal.woff2',
+  'shared/fuentes/figtree-latin-400-normal.woff2',
+  'shared/fuentes/figtree-latin-600-normal.woff2',
+  'shared/fuentes/figtree-latin-800-normal.woff2',
+  'shared/fuentes/figtree-latin-ext-400-normal.woff2',
+  'shared/fuentes/figtree-latin-ext-600-normal.woff2',
+  'shared/fuentes/figtree-latin-ext-800-normal.woff2',
   'refresquera/',
   'refresquera/index.html',
   'refresquera/refresquera.css',
@@ -43,7 +51,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((r) => {
-        if (r.ok && (mismoSitio || e.request.url.includes('fonts.g'))) {
+        if (r.ok && mismoSitio) {
           const copia = r.clone();
           caches.open(VERSION).then((c) => c.put(e.request, copia));
         }

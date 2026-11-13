@@ -5,6 +5,7 @@ import { t, aplicarTextos, IDIOMAS, idioma, cambiarIdioma } from './shared/i18n.
 import { logo, casera, toldo, COLORES } from './shared/marca.js';
 import { chipYapa, contadorYapa, flotante, aviso, escapar } from './shared/ui.js';
 import { sonar } from './shared/sonido.js';
+import { EN_APP } from './shared/config.js';
 
 const PUESTOS = [
   { id: 'refresquera', url: 'refresquera/', listo: true, color: COLORES.api, dibujo: dibujoRefresquera },
@@ -147,6 +148,7 @@ document.getElementById('instalar').addEventListener('click', async () => {
   document.getElementById('instalar').hidden = true;
 });
 
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+// En la app Android los archivos ya vienen dentro, no hace falta el service worker.
+if (!EN_APP && 'serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }

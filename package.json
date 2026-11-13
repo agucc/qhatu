@@ -7,6 +7,16 @@
   "scripts": {
     "dev": "python3 -m http.server 8080",
     "test": "node --test tests/*.test.js",
-    "empaquetar": "node scripts/empaquetar.mjs"
+    "empaquetar": "node scripts/empaquetar.mjs",
+    "web": "node scripts/web.mjs",
+    "android:sync": "node scripts/web.mjs && npx cap sync android",
+    "android:apk": "node scripts/web.mjs && npx cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@fontsource/chango": "^5.3.0",
+    "@fontsource/figtree": "^5.3.0"
   }
 }
