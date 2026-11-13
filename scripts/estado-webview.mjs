@@ -1,6 +1,12 @@
 // Lee el estado de la página dentro de la app (por las herramientas de depuración de la WebView).
 // Uso: node scripts/estado-webview.mjs http://localhost:9222 ["js a ejecutar antes de leer"]
 const base = process.argv[2] || 'http://localhost:9222';
+
+// Nunca quedarse esperando: si la app no responde en 20 segundos, se avisa y se sigue.
+setTimeout(() => {
+  console.log('sin respuesta de la página en 20 s');
+  process.exit(2);
+}, 20000).unref();
 const accion = process.argv[3];
 
 async function conectar() {
