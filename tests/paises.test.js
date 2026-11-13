@@ -144,3 +144,9 @@ test('Bolivia sirve chicha camba (sin alcohol) y conserva el id de la bebida', (
 test('cada tejido dice de dónde viene', () => {
   for (const p of P.PAISES) assert.equal(p.telar.origen?.length, 3, p.id);
 });
+
+test('La Casera saluda en la jerga de cada país', () => {
+  const saludos = P.PAISES.map((p) => p.saludo?.[0]);
+  assert.ok(saludos.every(Boolean));
+  assert.equal(new Set(saludos).size, P.PAISES.length);
+});

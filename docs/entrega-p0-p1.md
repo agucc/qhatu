@@ -48,3 +48,9 @@ Base: versión `32458e6` y la especificación del 13/11/2026. Regla seguida: no 
 - Nombres de los fondos y toldos nuevos.
 - Bebidas y frutas repetidas entre países: se mantienen mientras sean auténticas (la especificación prioriza autenticidad sobre exclusividad).
 - Poncho salteño: el dibujo es rojo y negro; en el telar se juega con cinco colores por legibilidad.
+
+## Después de la entrega
+
+- Saludo de la portada en la jerga de cada país (pendiente de validar con personas de cada país).
+- Botón **Volver al mercado** al completar un nivel de La Refresquera, al terminar los pedidos y al terminar una partida de La Frutera y El Aguayo. El avance se guarda antes de salir.
+- Arreglado: el botón "Retar" al terminar una partida de El Aguayo fallaba.

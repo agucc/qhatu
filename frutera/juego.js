@@ -212,8 +212,9 @@ async function finPartida() {
   }
   botones.push({ texto: t('otraVez'), valor: 'otra', clase: juego.seguirUsado ? '' : 'secundario' });
   if (m.puntos > 0) botones.push({ texto: t('retar'), valor: 'retar', clase: 'secundario' });
-  const texto = `${t('hiciste', { n: m.puntos })}${record ? ` ${t('nuevoRecord')}` : ''}${juego.seguirUsado ? '' : ` ${t('seguirTexto')}`}`;
-  const eleccion = await abrir({ titulo: t('canastoLleno'), texto, conCasera: true, cerrable: false, botones });
+  botones.push({ texto: t('volverMercado'), valor: 'mercado', clase: 'secundario' });
+  const resumen = `${t('hiciste', { n: m.puntos })}${record ? ` ${t('nuevoRecord')}` : ''}${juego.seguirUsado ? '' : ` ${t('seguirTexto')}`}`;
+  const eleccion = await abrir({ titulo: t('canastoLleno'), texto: resumen, conCasera: true, cerrable: false, botones });
 
   let sigue = false;
   if (eleccion === 'yapa' && gastarYapa(COSTO_SEGUIR)) sigue = true;
@@ -243,6 +244,10 @@ async function finPartida() {
   }
   datos.partidas++;
   guardar();
+  if (eleccion === 'mercado') {
+    location.href = '../index.html';
+    return;
+  }
   empezar();
 }
 

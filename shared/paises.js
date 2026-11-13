@@ -17,6 +17,8 @@ const banderas = {
 export const PAISES = [
   {
     id: 'bo',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['¡Hola, caserito!', 'Hi there, caserito!', 'Olá, caserito!'],
     nombre: ['Bolivia', 'Bolivia', 'Bolívia'],
     moneda: 'Bs',
     cocina: 'horno',
@@ -36,6 +38,8 @@ export const PAISES = [
   },
   {
     id: 'pe',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['¡Pase, casero!', 'Come on in, casero!', 'Entre, casero!'],
     nombre: ['Perú', 'Peru', 'Peru'],
     moneda: 'S/',
     cocina: 'parrilla',
@@ -55,6 +59,8 @@ export const PAISES = [
   },
   {
     id: 'mx',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['¡Pásele, marchante!', 'Come on in, marchante!', 'Pode entrar, marchante!'],
     nombre: ['México', 'Mexico', 'México'],
     moneda: '$',
     cocina: 'parrilla',
@@ -70,6 +76,8 @@ export const PAISES = [
   },
   {
     id: 'co',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['¡A la orden, veci!', 'At your service, veci!', 'Às ordens, veci!'],
     nombre: ['Colombia', 'Colombia', 'Colômbia'],
     moneda: '$',
     cocina: 'parrilla',
@@ -85,6 +93,8 @@ export const PAISES = [
   },
   {
     id: 'ar',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['¡Buenas, che!', 'Hey there, che!', 'E aí, che!'],
     nombre: ['Argentina', 'Argentina', 'Argentina'],
     moneda: '$',
     cocina: 'horno',
@@ -104,6 +114,8 @@ export const PAISES = [
   },
   {
     id: 'br',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['E aí, freguês!', 'E aí, freguês!', 'E aí, freguês!'],
     nombre: ['Brasil', 'Brazil', 'Brasil'],
     moneda: 'R$',
     cocina: 'horno',
@@ -119,6 +131,8 @@ export const PAISES = [
   },
   {
     id: 'us',
+    // Cómo saluda La Casera en el mercado de este país
+    saludo: ['Hey there, neighbor!', 'Hey there, neighbor!', 'Hey there, neighbor!'],
     nombre: ['Estados Unidos', 'United States', 'Estados Unidos'],
     corto: ['EE. UU.', 'USA', 'EUA'],
     moneda: 'US$',

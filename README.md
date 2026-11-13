@@ -21,6 +21,7 @@ Al entrar por primera vez, el jugador elige su país: será su **mercado de casa
 - Las bebidas usan siempre los mismos ocho colores de vaso (para que se distingan) y cada una tiene su propio dibujo (`refresquera/iconos.js`, `refresquera/bebidas.js`).
 - Cada país tiene su **recetario**, que avanza con los niveles jugados allí.
 - Los caseritos llevan sombreros de su lugar y el pasaporte trae un dato cultural de cada país.
+- **El saludo** de la portada va en la jerga de cada país: ¡Hola, caserito! (Bolivia), ¡Pase, casero! (Perú), ¡Pásele, marchante! (México), ¡A la orden, veci! (Colombia), ¡Buenas, che! (Argentina), E aí, freguês! (Brasil) y Hey there, neighbor! (Estados Unidos) (`saludo` en `shared/paises.js`).
 - **La Casera** es la misma anfitriona en todos los países, pero se viste como las caseras de cada lugar: bombín y aguayo (Bolivia), montera y lliclla (Perú), trenzas con listones y rebozo (México), sombrero vueltiao (Colombia), poncho salteño (Argentina), lenço de chita (Brasil) y gorra con delantal (Estados Unidos) (`shared/marca.js`).
 - **Fondos y toldos por país:** Noche, Mercado y Carnaval son de todos; cada país tiene tres fondos con sus paisajes y un toldo propio, y solo se ven y se compran estando allí. Lo comprado en otro país se conserva y vuelve a verse al regresar (`shared/decoracion.js`).
 - Cada tejido dice de dónde viene (`telar.origen` en `shared/paises.js`): por ejemplo, el sarape es de Saltillo (Coahuila) y la mochila es wayuu de La Guajira.

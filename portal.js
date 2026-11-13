@@ -102,15 +102,16 @@ function pintarPuestos() {
 
 function pintarCasera() {
   const e = obtener();
+  document.getElementById('saludo').textContent = texto(actual().saludo);
   const hoy = diaLocal();
   const racha = rachaVigente(e, hoy);
-  const texto = document.getElementById('regalo-texto');
+  const regalo = document.getElementById('regalo-texto');
   const boton = document.getElementById('regalo-boton');
   if (regaloDisponible(e, hoy)) {
-    texto.textContent = `${t('regaloHoy', { n: montoRegalo(racha) })}. ${t('regaloCrece')}`;
+    regalo.textContent = `${t('regaloHoy', { n: montoRegalo(racha) })}. ${t('regaloCrece')}`;
     boton.hidden = false;
   } else {
-    texto.textContent = t('regaloListo');
+    regalo.textContent = t('regaloListo');
     boton.hidden = true;
   }
   const dias = document.getElementById('racha-dias');

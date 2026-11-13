@@ -476,12 +476,12 @@ async function nivelCompleto() {
   anuncios.celebrar();
   await esperar(500);
   sonar.servido();
-  await abrir({
+  const eleccion = await abrir({
     titulo: t('servido'),
     texto: `${t('nivelListo')} ${t('masYapa', { n: YAPA_NIVEL })}`,
     conCasera: true,
     cerrable: false,
-    botones: [{ texto: t('siguiente'), valor: 'sig' }],
+    botones: [{ texto: t('siguiente'), valor: 'sig' }, { texto: t('volverMercado'), valor: 'mercado', clase: 'secundario' }],
   });
   sumarNivel(datos, PAIS);
   const nuevas = recetasNuevas(datos, PAIS);
@@ -497,6 +497,11 @@ async function nivelCompleto() {
   }
   guardar();
   jugar(false);
+  // El nivel ya quedó guardado (yapa, recetas y avance): volver al mercado no pierde nada.
+  if (eleccion === 'mercado') {
+    location.href = '../index.html';
+    return;
+  }
   empezarNiveles();
 }
 
@@ -540,6 +545,7 @@ async function finPedidos() {
         { texto: t('otraVez'), valor: 'otra' },
         ...(e.atendidos > 0 ? [{ texto: t('retar'), valor: 'retar', clase: 'hierbabuena' }] : []),
         { texto: t('irNiveles'), valor: 'niveles', clase: 'secundario' },
+        { texto: t('volverMercado'), valor: 'mercado', clase: 'secundario' },
       ],
     });
     if (eleccion === 'retar') {
@@ -547,7 +553,8 @@ async function finPedidos() {
       if (r === 'copiado') aviso(t('copiado'), { tipo: 'exito' });
     }
   }
-  if (eleccion === 'niveles') cambiarModo('niveles');
+  if (eleccion === 'mercado') location.href = '../index.html';
+  else if (eleccion === 'niveles') cambiarModo('niveles');
   else empezarPedidos();
 }
 
