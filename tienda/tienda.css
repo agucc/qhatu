@@ -181,3 +181,60 @@
   height: auto;
   overflow: visible;
 }
+
+/* ---------- Pago con cripto ---------- */
+
+.cripto {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.cripto p {
+  margin: 0;
+}
+
+.ventana .cripto-monto {
+  font: 800 32px/1 var(--cuerpo);
+  color: var(--tumbo);
+  text-align: center;
+}
+
+.cripto-monto small {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.cripto-direccion {
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--noche);
+  font: 700 13px/1.4 ui-monospace, monospace;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.cripto-aviso {
+  font-size: 13px;
+  color: var(--frutilla);
+}
+
+.cripto-hash {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.cripto-hash input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 2px solid var(--borde);
+  background: var(--noche);
+  color: var(--texto);
+  font: 12px ui-monospace, monospace;
+}

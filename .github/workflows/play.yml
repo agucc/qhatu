@@ -1,0 +1,63 @@
+name: Compilar para Google Play
+
+# Genera el paquete AAB para subir a Google Play Console (prueba interna, cerrada o producción).
+# Usa la llave de firma fija (secretos QHATU_KEYSTORE_BASE64 y QHATU_KEYSTORE_PASSWORD) como llave de subida,
+# compras con Google Play y sin la versión de prueba. Se ejecuta a mano desde la pestaña Actions.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Dependencias
+        run: npm ci
+
+      - name: Pruebas
+        run: npm test
+
+      - name: Copiar el juego a la app (canal Google Play)
+        env:
+          QHATU_CANAL: play
+        run: npm run android:sync
+
+      - name: Llave de firma
+        env:
+          LLAVE: ${{ secrets.QHATU_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$LLAVE" ]; then
+            echo "::error::Falta el secreto QHATU_KEYSTORE_BASE64: Google Play necesita la llave fija."
+            exit 1
+          fi
+          echo "$LLAVE" | base64 -d > "$RUNNER_TEMP/qhatu.jks"
+          echo "QHATU_KEYSTORE=$RUNNER_TEMP/qhatu.jks" >> "$GITHUB_ENV"
+
+      - name: Compilar AAB
+        working-directory: android
+        env:
+          QHATU_KEYSTORE_PASSWORD: ${{ secrets.QHATU_KEYSTORE_PASSWORD }}
+          # Las versiones de Play empiezan en 1000 para no chocar con las APK de prueba.
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          export GITHUB_RUN_NUMBER=$((1000 + GITHUB_RUN_NUMBER))
+          ./gradlew bundleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qhatu-google-play
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error

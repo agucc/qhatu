@@ -21,3 +21,15 @@ CREATE TABLE IF NOT EXISTS partidas (
   version INTEGER NOT NULL,
   actualizada INTEGER NOT NULL
 );
+
+-- Compras verificadas (Google Play y cripto). El id evita usar dos veces la misma compra:
+-- "google:<token de compra>" o "cripto:<red>:<hash de la transacción>".
+CREATE TABLE IF NOT EXISTS compras (
+  id TEXT PRIMARY KEY,
+  jugador TEXT NOT NULL REFERENCES jugadores(id),
+  producto TEXT NOT NULL,
+  metodo TEXT NOT NULL,
+  detalle TEXT,
+  creada INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS compras_jugador ON compras(jugador);

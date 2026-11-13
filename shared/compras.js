@@ -1,12 +1,15 @@
 // Compras con dinero real: packs de yapa y el pase sin anuncios.
 // Precios claros, sin ofertas que presionan ni premios al azar.
-// En la app publicada en Google Play la compra pasa por Google Play Billing.
-// En la APK de prueba se simula sin cobrar y la tienda lo dice en pantalla.
+//  - Versión de Google Play (CANAL 'play'): Google Play Billing, verificada en el servidor.
+//  - APK directa (CANAL 'directo'): pago con cripto directo a la billetera del dueño (20 % más barato),
+//    verificado en la blockchain por el servidor. La tarjeta se suma cuando haya cuenta de pagos.
+//  - Versión de prueba: además se puede simular la compra sin cobrar.
 
 import { obtener, guardar, sumarYapa } from './almacen.js';
 import { EN_APP } from './config.js';
 import { complementoNativo } from './nativo.js';
-import { VERSION_DE_PRUEBA } from './compilacion.js';
+import { VERSION_DE_PRUEBA, CANAL, NUBE_URL } from './compilacion.js';
+import { llaveNube } from './nube.js';
 
 /** Los identificadores deben existir igual en Google Play Console (productos integrados en la app). */
 export const PRODUCTOS = [
@@ -18,37 +21,62 @@ export const PRODUCTOS = [
 
 const demo = typeof location !== 'undefined' && new URLSearchParams(location.search).get('compras') === 'demo';
 
-let modo = null; // 'play' | 'prueba' | 'no'
+let modo = null; // 'play' | 'directo' | 'prueba' | 'no'
+let cripto = null; // { red, nombreRed, direccion, tokens, descuento, precios } si el servidor la tiene activa
 const preciosPlay = {};
 
 function billing() {
   return complementoNativo('NativePurchases');
 }
 
-/**
- * Averigua cómo se puede comprar aquí. En la app intenta Google Play: si los productos existen
- * en Play Console, se usa la compra real; si no, la APK de prueba simula.
- */
+async function servidor(metodo, ruta, cuerpo) {
+  const llave = await llaveNube();
+  const r = await fetch(`${NUBE_URL.replace(/\/+$/, '')}${ruta}`, {
+    method: metodo,
+    headers: { 'Content-Type': 'application/json', ...(llave ? { Authorization: `Bearer ${llave}` } : {}) },
+    body: cuerpo ? JSON.stringify(cuerpo) : undefined,
+  });
+  let datos = null;
+  try {
+    datos = await r.json();
+  } catch {
+    /* sin cuerpo */
+  }
+  return { estado: r.status, datos: datos || {} };
+}
+
+/** Averigua cómo se puede comprar aquí. */
 export async function iniciarCompras() {
   if (modo) return modo;
-  const plugin = EN_APP ? billing() : null;
-  if (plugin) {
-    try {
-      const { isBillingSupported } = await plugin.isBillingSupported();
-      if (isBillingSupported) {
-        const { products } = await plugin.getProducts({ productIdentifiers: PRODUCTOS.map((p) => p.id), productType: 'inapp' });
-        for (const p of products || []) preciosPlay[p.identifier] = p.priceString;
-        if (Object.keys(preciosPlay).length) {
-          modo = 'play';
-          await restaurar(plugin);
-          return modo;
+  if (CANAL === 'play' || EN_APP) {
+    const plugin = EN_APP ? billing() : null;
+    if (plugin && CANAL === 'play') {
+      try {
+        const { isBillingSupported } = await plugin.isBillingSupported();
+        if (isBillingSupported) {
+          const { products } = await plugin.getProducts({ productIdentifiers: PRODUCTOS.map((p) => p.id), productType: 'inapp' });
+          for (const p of products || []) preciosPlay[p.identifier] = p.priceString;
+          if (Object.keys(preciosPlay).length) {
+            modo = 'play';
+            await restaurar(plugin);
+            return modo;
+          }
         }
+      } catch {
+        /* Play no responde: se decide abajo */
       }
-    } catch {
-      /* Play no responde: se decide abajo */
     }
   }
-  modo = (EN_APP && VERSION_DE_PRUEBA) || demo ? 'prueba' : 'no';
+  if (CANAL === 'directo' && NUBE_URL) {
+    try {
+      const r = await fetch(`${NUBE_URL.replace(/\/+$/, '')}/v1/compras`);
+      cripto = (await r.json()).cripto || null;
+    } catch {
+      cripto = null;
+    }
+  }
+  if (cripto) modo = 'directo';
+  else modo = (EN_APP && VERSION_DE_PRUEBA) || demo ? 'prueba' : 'no';
   return modo;
 }
 
@@ -65,13 +93,27 @@ async function restaurar(plugin) {
   }
 }
 
-/** 'play' (Google Play), 'prueba' (simulada, no cobra) o 'no' (no se puede comprar aquí). */
+/** 'play' (Google Play), 'directo' (cripto), 'prueba' (simulada, no cobra) o 'no'. */
 export function modoCompras() {
   return modo || 'no';
 }
 
+/** En la APK directa de prueba también se puede simular la compra. */
+export function sePuedeSimular() {
+  return (EN_APP && VERSION_DE_PRUEBA) || demo;
+}
+
+export function datosCripto() {
+  return cripto;
+}
+
 export function precio(producto) {
   return preciosPlay[producto.id] || `${producto.usd.toFixed(2)} USD`;
+}
+
+export function precioCripto(producto) {
+  const p = cripto?.precios?.[producto.id];
+  return p ? p.toFixed(2) : null;
 }
 
 export function sinAnuncios() {
@@ -87,27 +129,62 @@ export function entregar(producto) {
   }
 }
 
-/** Devuelve true si la compra se completó. */
-export async function comprar(id) {
+/** Compra con Google Play (o simulada en la versión de prueba). Devuelve true si se entregó. */
+export async function comprar(id, { simular = false } = {}) {
   const producto = PRODUCTOS.find((p) => p.id === id);
   if (!producto) return false;
   if (producto.tipo === 'sin_anuncios' && sinAnuncios()) return false;
   const m = await iniciarCompras();
-  if (m === 'no') return false;
-  if (m === 'play') {
+  if (simular || m === 'prueba') {
+    if (!sePuedeSimular()) return false;
+    entregar(producto);
+    return true;
+  }
+  if (m !== 'play') return false;
+  let transaccion;
+  try {
+    transaccion = await billing().purchaseProduct({
+      productIdentifier: id,
+      productType: 'inapp',
+      quantity: 1,
+      // La yapa se puede volver a comprar; el pase sin anuncios queda para siempre.
+      isConsumable: producto.tipo === 'yapa',
+    });
+    if (!transaccion || String(transaccion.purchaseState ?? '1') !== '1') return false;
+  } catch {
+    return false;
+  }
+  // El servidor confirma con Google que la compra es real. Si el servidor no está configurado
+  // o no hay conexión, se confía en lo que dijo Google Play en el celular.
+  const token = transaccion.purchaseToken || transaccion.transactionId;
+  if (token) {
     try {
-      const transaccion = await billing().purchaseProduct({
-        productIdentifier: id,
-        productType: 'inapp',
-        quantity: 1,
-        // La yapa se puede volver a comprar; el pase sin anuncios queda para siempre.
-        isConsumable: producto.tipo === 'yapa',
-      });
-      if (!transaccion || String(transaccion.purchaseState ?? '1') !== '1') return false;
+      const r = await servidor('POST', '/v1/compras/google', { producto: id, token });
+      if (r.estado === 402 || r.estado === 409) return false;
     } catch {
-      return false;
+      /* sin conexión: se entrega igual */
     }
   }
   entregar(producto);
   return true;
+}
+
+/**
+ * Pago con cripto: el jugador envió el monto a la billetera y pega el hash de la transacción.
+ * Devuelve { ok } o { error }: 'pendiente' y 'no-encontrada' (esperar y reintentar), 'monto',
+ * 'destino', 'fallida', 'usada', 'hash' o 'sin-red'.
+ */
+export async function comprarConCripto(id, hash) {
+  const producto = PRODUCTOS.find((p) => p.id === id);
+  if (!producto || !cripto) return { error: 'sin-red' };
+  try {
+    const r = await servidor('POST', '/v1/compras/cripto', { producto: id, hash: String(hash || '').trim() });
+    if (r.estado === 200 && r.datos.ok) {
+      entregar(producto);
+      return { ok: true };
+    }
+    return { error: r.datos.error || 'sin-red' };
+  } catch {
+    return { error: 'sin-red' };
+  }
 }

@@ -240,6 +240,19 @@ export async function iniciarNube() {
   }
 }
 
+/** La llave de la cuenta en la nube (para las compras verificadas). Crea la cuenta si hace falta. */
+export async function llaveNube() {
+  if (!nubeActiva) return null;
+  if (!meta.llave) {
+    try {
+      await crearCuenta();
+    } catch {
+      return null;
+    }
+  }
+  return meta.llave || null;
+}
+
 // ---------- Para la ventana "Tu partida en la nube" ----------
 
 export function estadoNube() {

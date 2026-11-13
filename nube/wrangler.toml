@@ -28,3 +28,9 @@ new_sqlite_classes = ["Sala"]
 [vars]
 # ID de cliente web de Google (público) para "Vincular con Google". Vacío = apagado.
 GOOGLE_CLIENT_ID = ""
+# Pagos con cripto directo a tu billetera (vacío = apagado). Red: "polygon" o "base".
+# La dirección es pública (0x…); nunca va aquí la frase secreta ni la llave privada.
+CRIPTO_RED = ""
+CRIPTO_DIRECCION = ""
+# Verificación de compras de Google Play: el JSON de la cuenta de servicio va como SECRETO
+# (wrangler secret put GOOGLE_PLAY_CUENTA o en el panel de Cloudflare), nunca aquí.

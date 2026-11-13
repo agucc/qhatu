@@ -103,6 +103,18 @@ El reloj se detiene con las ventanas abiertas o la pantalla oculta y pita los ú
 - **Packs de yapa** (0,99 / 2,99 / 4,99 USD) y **pase sin anuncios** (2,99 USD): quien lo compra recibe la yapa de los anuncios sin verlos.
 - **Decoración con yapa:** fondos, toldos y formas de vaso. Solo cambia cómo se ve; nadie paga para ganar.
 
+### Métodos de pago
+
+| Versión | Cómo se paga | Qué falta para activarlo |
+| --- | --- | --- |
+| Google Play (`CANAL = 'play'`, acción *Compilar para Google Play*) | Google Play Billing, verificado en el servidor | Cuenta de Play Console, la app en prueba interna, los 4 productos (`yapa_150`, `yapa_500`, `yapa_1000`, `sin_anuncios`) y la cuenta de servicio como secreto `GOOGLE_PLAY_CUENTA` en Cloudflare |
+| APK directa (`CANAL = 'directo'`) | Cripto directo a tu billetera, 20 % más barato: USDT, USDC o DAI por Polygon (o USDC y DAI por Base) | Poner `CRIPTO_RED` y `CRIPTO_DIRECCION` (dirección pública) en `nube/wrangler.toml` |
+| APK directa | Tarjeta | Una cuenta de Polar o Lemon Squeezy (por hacer) |
+
+- **Cripto:** el jugador envía el monto exacto a tu billetera y pega el hash de la transacción. El servidor revisa en la blockchain que sea el token aceptado, a tu dirección, por el monto correcto, con 5 confirmaciones, y que ese pago no se haya usado antes (tabla `compras`). Nada pasa por intermediarios. DAI no tiene función para congelar direcciones; USDT y USDC sí. Es solo para mayores de edad, y la tienda lo dice.
+- **Google Play:** después de comprar, el servidor pregunta a la API de Google Play si el token es real y lo anota para que no se use en otra cuenta. Si el servidor no está configurado o no hay conexión, se confía en lo que dijo Google Play en el celular.
+- La compilación para Play (`.github/workflows/play.yml`) genera el AAB firmado con la llave fija (llave de subida), con `VERSION_DE_PRUEBA = false` y compras con Google Play.
+
 ### Reglas de dinero
 
 - **Los anuncios solo sirven para ganar yapa y siempre los elige el jugador.** No hay anuncios obligatorios.

@@ -13,9 +13,13 @@
 //   POST /v1/salas               ← { puesto }                      → { codigo } crea una sala en vivo
 //   GET  /v1/salas/CODIGO        → estado público de la sala
 //   GET  /v1/salas/CODIGO/ws     (WebSocket) entra a la sala: ?jugador=&nombre=&pais=
+//   GET  /v1/compras             → métodos de pago activos (cripto: red, dirección y precios)
+//   POST /v1/compras/cripto      ← { producto, hash }  (con llave) verifica el pago en la blockchain
+//   POST /v1/compras/google      ← { producto, token } (con llave) verifica la compra con Google Play
 //   GET  /v1/salud               → { ok: true }
 
 import { nuevoCodigo, normalizarCodigo, SEGUNDOS as SEGUNDOS_SALA } from './sala-logica.js';
+import { configCompras, comprarConCripto, comprarConGoogle } from './compras.js';
 
 export const MAX_PARTIDA = 100_000; // bytes del JSON de la partida
 const ALFABETO = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // sin 0, 1, I ni O para no confundirse al copiar
@@ -235,7 +239,7 @@ function irASala(req, env, codigo) {
   return env.SALAS.get(env.SALAS.idFromName(codigo)).fetch(req);
 }
 
-export function crearServidor({ clavesGoogle = clavesGoogleReales, reloj = () => Date.now() } = {}) {
+export function crearServidor({ clavesGoogle = clavesGoogleReales, reloj = () => Date.now(), pedir = (...a) => fetch(...a) } = {}) {
   return async function manejar(req, env) {
     const url = new URL(req.url);
     const ruta = `${req.method} ${url.pathname.replace(/\/+$/, '')}`;
@@ -249,6 +253,8 @@ export function crearServidor({ clavesGoogle = clavesGoogleReales, reloj = () =>
         if (!(await limitar(env, req, 'cuenta'))) return error(429, 'espera');
         return await crearCuenta(env, ahora);
       }
+
+      if (ruta === 'GET /v1/compras') return respuesta(configCompras(env));
 
       if (ruta === 'POST /v1/salas') {
         if (!env.SALAS) return error(501, 'salas-apagadas');
@@ -272,6 +278,15 @@ export function crearServidor({ clavesGoogle = clavesGoogleReales, reloj = () =>
         const { cuerpo, demasiado } = await leerJson(req);
         if (demasiado) return error(413, 'grande');
         return await entrarConGoogle(env, cuerpo, clavesGoogle, ahora);
+      }
+
+      if (ruta === 'POST /v1/compras/cripto' || ruta === 'POST /v1/compras/google') {
+        const jugador = await jugadorDe(req, env);
+        if (!jugador) return error(401, 'llave');
+        if (!(await limitar(env, req, 'compra'))) return error(429, 'espera');
+        const { cuerpo } = await leerJson(req);
+        const r = ruta.endsWith('cripto') ? await comprarConCripto(env, jugador, cuerpo, ahora, pedir) : await comprarConGoogle(env, jugador, cuerpo, ahora, pedir);
+        return respuesta(r.cuerpo, r.estado);
       }
 
       if (ruta === 'GET /v1/partida' || ruta === 'PUT /v1/partida' || ruta === 'POST /v1/google/vincular') {
