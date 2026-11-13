@@ -107,7 +107,7 @@ function pintarCasera() {
   const texto = document.getElementById('regalo-texto');
   const boton = document.getElementById('regalo-boton');
   if (regaloDisponible(e, hoy)) {
-    texto.textContent = `${t('regaloHoy', { n: montoRegalo(racha) })} ${t('regaloCrece')}`;
+    texto.textContent = `${t('regaloHoy', { n: montoRegalo(racha) })}. ${t('regaloCrece')}`;
     boton.hidden = false;
   } else {
     texto.textContent = t('regaloListo');
