@@ -53,7 +53,8 @@ jobs:
         if: steps.cred.outputs.hay == 'si'
         working-directory: nube
         run: |
-          npx wrangler deploy | tee despliegue.txt
+          # El registro es público: se tapan los correos que wrangler imprime.
+          npx wrangler deploy 2>&1 | sed -E 's/[[:alnum:]._%+-]+@[[:alnum:].-]+/<correo>/g' | tee despliegue.txt
           URL=$(grep -o 'https://[^ ]*workers\.dev' despliegue.txt | head -1)
           echo "### Servidor de la nube: ${URL:-no encontré la dirección}" >> "$GITHUB_STEP_SUMMARY"
           test -n "$URL"

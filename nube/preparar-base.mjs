@@ -10,12 +10,24 @@ import { fileURLToPath } from 'node:url';
 const aqui = dirname(fileURLToPath(import.meta.url));
 const NOMBRE = 'qhatu';
 
+// El registro de GitHub Actions es público: nunca se muestra el correo de la cuenta de Cloudflare.
+const sinCorreos = (texto) => String(texto || '').replace(/[\w.%+-]+@[\w.-]+/g, '<correo>');
+
 function wrangler(...args) {
-  return execFileSync('npx', ['wrangler', ...args], {
-    cwd: aqui,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'inherit'],
-  });
+  try {
+    return execFileSync('npx', ['wrangler', ...args], {
+      cwd: aqui,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+  } catch (e) {
+    console.error(sinCorreos(e.stderr));
+    if (/Authentication error|code: 10000/.test(e.stderr || '')) {
+      console.error('El token de Cloudflare no tiene permiso para D1: agrégale "Account · D1 · Edit".');
+    }
+    console.error(`Falló: wrangler ${args.join(' ')}`);
+    process.exit(1);
+  }
 }
 
 function buscar() {
