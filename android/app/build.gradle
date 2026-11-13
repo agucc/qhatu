@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+// Llave de firma fija (secretos QHATU_KEYSTORE_BASE64 y QHATU_KEYSTORE_PASSWORD en GitHub).
+// Con la misma llave, cada APK nueva se instala encima de la anterior sin borrar nada.
+def llaveQhatu = System.getenv('QHATU_KEYSTORE')
+def claveQhatu = System.getenv('QHATU_KEYSTORE_PASSWORD')
+def firmaFija = llaveQhatu && claveQhatu && file(llaveQhatu).exists()
+
 android {
     namespace = "bo.qhatu.mercado"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,7 +13,8 @@ android {
         applicationId "bo.qhatu.mercado"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        // Cada compilación en GitHub sube el número, para que Android acepte la actualización.
+        versionCode((System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger())
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -16,10 +23,24 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        qhatu {
+            if (firmaFija) {
+                storeFile file(llaveQhatu)
+                storePassword claveQhatu
+                keyAlias 'qhatu'
+                keyPassword claveQhatu
+            }
+        }
+    }
     buildTypes {
+        debug {
+            if (firmaFija) signingConfig signingConfigs.qhatu
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (firmaFija) signingConfig signingConfigs.qhatu
         }
     }
 }

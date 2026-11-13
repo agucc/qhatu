@@ -23,8 +23,23 @@ jobs:
       - run: npm ci
       - run: npm run android:sync
 
+      # Llave de firma fija: sin ella cada APK sale con una llave distinta y no se instala encima.
+      - name: Llave de firma
+        env:
+          LLAVE: ${{ secrets.QHATU_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$LLAVE" ]; then
+            echo "$LLAVE" | base64 -d > "$RUNNER_TEMP/qhatu.jks"
+            echo "QHATU_KEYSTORE=$RUNNER_TEMP/qhatu.jks" >> "$GITHUB_ENV"
+            echo "Firma fija activada."
+          else
+            echo "::warning::Falta el secreto QHATU_KEYSTORE_BASE64: la APK sale con una llave temporal y no se instala encima de la anterior."
+          fi
+
       - name: Compilar APK
         working-directory: android
+        env:
+          QHATU_KEYSTORE_PASSWORD: ${{ secrets.QHATU_KEYSTORE_PASSWORD }}
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Habilitar KVM

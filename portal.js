@@ -14,6 +14,7 @@ import { progresoPuesto } from './shared/progreso.js';
 import { PAISES, pais as datosPais, paisActual, paisesAbiertos, pasajesLibres, proximoPasaje, xpTotal, elegirPaisInicial, viajar, irA, bandera, texto } from './shared/paises.js';
 import { frutasDe } from './frutera/frutas.js';
 import { svgComida } from './saltenera/comida-portal.js';
+import { dibujoTejido } from './shared/tejidos.js';
 
 // Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
 // ("refresquera/") devuelve la portada en vez del puesto.
@@ -56,15 +57,8 @@ function dibujoFrutera() {
 }
 
 function dibujoAguayo() {
-  const colores = actual().telar.paleta.map(([, c]) => c);
-  let celdas = '';
-  for (let f = 0; f < 4; f++) {
-    for (let c = 0; c < 6; c++) {
-      if (f === 0 && (c === 1 || c === 4)) continue;
-      celdas += `<rect x="${24 + c * 12.5}" y="${12 + f * 15}" width="11" height="13" rx="2" fill="${colores[(f + (f === 3 ? 0 : c)) % 5]}"/>`;
-    }
-  }
-  return `<svg viewBox="0 0 120 80" aria-hidden="true">${celdas}</svg>`;
+  const { textura, paleta } = actual().telar;
+  return dibujoTejido(textura, paleta.map(([, c]) => c));
 }
 
 function dibujoSaltenera() {

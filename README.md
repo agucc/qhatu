@@ -121,6 +121,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `compartir.js` | Retar a un amigo (Telegram, menú de Android o portapapeles) |
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
+| `tejidos.js` | Dibujo del tejido de cada país (aguayo, manta, sarape, mochila, poncho, chita, quilt) |
 | `plataforma.js` | Mini app de Telegram |
 | `nativo.js` | Acceso a los complementos de la app Android |
 | `puesto.css` | Barra de arriba, mesa y botones de abajo de cada puesto |
@@ -159,6 +160,8 @@ La app es el mismo código web empaquetado con Capacitor; no se reescribe nada.
 - **En tu computadora** (con el SDK de Android): `npm install` y `npm run android:apk`.
 
 El identificador de la app es `bo.qhatu.mercado` (en `capacitor.config.json`). Se puede cambiar hasta que se publique en Google Play; después queda fijo.
+
+**Firma fija:** con los secretos `QHATU_KEYSTORE_BASE64` (la llave `.jks` en base64) y `QHATU_KEYSTORE_PASSWORD`, todas las APK se firman con la misma llave (alias `qhatu`) y cada versión nueva se instala encima de la anterior sin borrar la partida. El número de versión sube solo en cada compilación. La misma llave sirve como llave de subida para Google Play. La llave nunca va en el repositorio (`*.jks` está en `.gitignore`); si se pierde, Google Play permite cambiar la llave de subida, pero las APK ya instaladas fuera de Play habría que desinstalarlas.
 
 ### Antes de publicar en Google Play
 

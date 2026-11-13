@@ -40,8 +40,8 @@ export const PAISES = [
     cocina: 'parrilla',
     comida: { puesto: ['La Anticuchería', 'The Anticucho Stand', 'A Anticucheria'], plural: ['anticuchos', 'anticuchos', 'anticuchos'], dibujo: 'anticucho' },
     telar: {
-      nombre: ['La Manta', 'The Andean Blanket', 'A Manta Andina'],
-      textura: 'aguayo',
+      nombre: ['La Manta', 'The Manta', 'A Manta'],
+      textura: 'manta',
       paleta: [['rojo', '#d7263d'], ['naranja', '#f77f00'], ['rosado', '#e0457b'], ['verde', '#2a9d63'], ['azul', '#4a6cb3']],
     },
     sombreros: ['chullo', 'sombrero'],
@@ -87,7 +87,7 @@ export const PAISES = [
     comida: { puesto: ['Las Empanadas', 'The Empanada Stand', 'As Empanadas'], plural: ['empanadas', 'empanadas', 'empanadas'], dibujo: 'empanada' },
     telar: {
       nombre: ['El Poncho', 'The Poncho', 'O Poncho'],
-      textura: 'aguayo',
+      textura: 'poncho',
       paleta: [['rojo', '#d0202f'], ['vino', '#93204a'], ['crema', '#f3e3c3'], ['celeste', '#74acdf'], ['cafe', '#a0632d']],
     },
     sombreros: ['boina', 'gorra'],

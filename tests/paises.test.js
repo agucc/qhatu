@@ -95,3 +95,20 @@ test('el recetario avanza por separado en cada país', () => {
   assert.equal(recetasDe('bo').length, 12);
   assert.equal(recetasDe('us').length, 8);
 });
+
+test('cada país tiene su propio tejido, con nombre, textura y dibujo únicos', async () => {
+  const { TEXTURAS, dibujoTejido } = await import('../shared/tejidos.js');
+  const PAISES = P.PAISES;
+  const texturas = PAISES.map((p) => p.telar.textura);
+  assert.equal(new Set(texturas).size, PAISES.length);
+  assert.equal(new Set(PAISES.map((p) => p.telar.nombre[0])).size, PAISES.length);
+  for (const t of texturas) assert.ok(TEXTURAS.includes(t), `falta el dibujo de ${t}`);
+  const dibujos = PAISES.map((p) => dibujoTejido(p.telar.textura, p.telar.paleta.map(([, c]) => c)));
+  assert.equal(new Set(dibujos).size, PAISES.length);
+});
+
+test('no hay toldo wiphala; quien lo tenía recibe la kantuta', async () => {
+  const { TOLDOS } = await import('../shared/decoracion.js');
+  assert.ok(!TOLDOS.some((t) => t.id === 'wiphala'));
+  assert.ok(TOLDOS.some((t) => t.id === 'kantuta'));
+});

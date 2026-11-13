@@ -1,7 +1,15 @@
 /* El Aguayo (lo común de los puestos está en shared/puesto.css) */
 
 .aguayo .tablero-datos {
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(72px, 1fr) minmax(0, 2.4fr);
+}
+
+.aguayo .tablero-datos .pedido-caserito {
+  min-width: 0;
+}
+
+.tela .dato-titulo {
+  white-space: nowrap;
 }
 
 /* ---------- Tu aguayo: las franjas tejidas ---------- */
@@ -205,6 +213,40 @@
 }
 
 /* ---------- Texturas de cada tejido ---------- */
+
+/* Aguayo (Bolivia): listas finas de la urdimbre y un rombo (k'isa) en cada celda */
+[data-textura='aguayo'] .celda.hilo,
+[data-textura='aguayo'] .celda.vista,
+[data-textura='aguayo'] .pieza span.hilo {
+  background:
+    linear-gradient(45deg, transparent 36%, #ffffff66 36% 42%, transparent 42% 58%, #ffffff66 58% 64%, transparent 64%),
+    linear-gradient(-45deg, transparent 36%, #ffffff66 36% 42%, transparent 42% 58%, #ffffff66 58% 64%, transparent 64%),
+    repeating-linear-gradient(90deg, #00000026 0 1px, transparent 1px 4px),
+    var(--c);
+}
+
+/* Manta cusqueña (Perú): ñawi, los "ojos" del pallay, y bordes de color */
+[data-textura='manta'] .celda.hilo,
+[data-textura='manta'] .celda.vista,
+[data-textura='manta'] .pieza span.hilo {
+  background:
+    radial-gradient(circle, #1d1720 0 1.5px, #fff8e7e0 1.8px 3.4px, transparent 3.8px),
+    linear-gradient(0deg, #00000045 0 3px, transparent 3px calc(100% - 3px), #00000045 calc(100% - 3px)),
+    repeating-linear-gradient(90deg, #ffffff1c 0 1px, transparent 1px 3px),
+    var(--c);
+  background-size: 50% 50%, auto, auto, auto;
+}
+
+/* Poncho salteño (Argentina): lana cruzada y guarda escalonada oscura abajo */
+[data-textura='poncho'] .celda.hilo,
+[data-textura='poncho'] .celda.vista,
+[data-textura='poncho'] .pieza span.hilo {
+  background:
+    linear-gradient(90deg, #1d1720 0 50%, transparent 50%) left bottom 3px / 8px 4px repeat-x,
+    linear-gradient(#1d1720, #1d1720) left bottom / 100% 3px no-repeat,
+    repeating-linear-gradient(135deg, #ffffff1f 0 1px, transparent 1px 4px),
+    var(--c);
+}
 
 /* Sarape: franjas finas horizontales */
 [data-textura='sarape'] .celda.hilo,

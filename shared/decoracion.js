@@ -13,7 +13,8 @@ export const TOLDOS = [
   { id: 'mercado', precio: 0, colores: ['#ef476f', '#ffb520', '#1fb5a5', '#9a48b8', '#a6d63a', '#ffb520'] },
   { id: 'carnaval', precio: 100, colores: ['#ff5d8f', '#ffd23f', '#3bceac', '#7b2cbf', '#ff7b00', '#0ead69'] },
   { id: 'salar', precio: 100, colores: ['#f3ead2', '#8ecae6', '#f3ead2', '#219ebc', '#f3ead2', '#8ecae6'] },
-  { id: 'wiphala', precio: 100, colores: ['#e4002b', '#ff8200', '#ffd100', '#ffffff', '#009a44', '#0057b8'] },
+  // La kantuta, flor de los Andes: pétalos rojos, garganta amarilla y hojas verdes.
+  { id: 'kantuta', precio: 100, colores: ['#c8102e', '#ffd23f', '#e4572e', '#2e8b57', '#c8102e', '#ffd23f'] },
 ];
 
 export const VASOS = [
@@ -31,6 +32,9 @@ function estado() {
   e.decoracion.toldo ??= 'mercado';
   e.decoracion.vaso ??= 'redondo';
   e.decoracion.mios ??= [];
+  // El toldo "wiphala" ya no existe: quien lo tenía recibe la kantuta.
+  if (e.decoracion.toldo === 'wiphala') e.decoracion.toldo = 'kantuta';
+  e.decoracion.mios = e.decoracion.mios.map((m) => (m === 'toldo:wiphala' ? 'toldo:kantuta' : m));
   return e.decoracion;
 }
 
