@@ -5,5 +5,10 @@
   "backgroundColor": "#17131f",
   "android": {
     "backgroundColor": "#17131f"
+  },
+  "plugins": {
+    "SystemBars": {
+      "style": "DARK"
+    }
   }
 }
