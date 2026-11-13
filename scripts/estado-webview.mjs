@@ -1,20 +1,48 @@
 // Lee el estado de la página dentro de la app (por las herramientas de depuración de la WebView).
-// Uso: node scripts/estado-webview.mjs http://localhost:9222
+// Uso: node scripts/estado-webview.mjs http://localhost:9222 ["js a ejecutar antes de leer"]
 const base = process.argv[2] || 'http://localhost:9222';
-const paginas = await (await fetch(`${base}/json`)).json();
-const pagina = paginas.find((p) => p.type === 'page') || paginas[0];
-console.log('URL:', pagina?.url);
-const ws = new WebSocket(pagina.webSocketDebuggerUrl);
-await new Promise((ok) => ws.addEventListener('open', ok));
-const expr = `JSON.stringify({
+const accion = process.argv[3];
+
+async function conectar() {
+  const paginas = await (await fetch(`${base}/json`)).json();
+  const pagina = paginas.find((p) => p.type === 'page') || paginas[0];
+  const ws = new WebSocket(pagina.webSocketDebuggerUrl);
+  await new Promise((ok) => ws.addEventListener('open', ok));
+  let id = 0;
+  const evaluar = (expression) =>
+    new Promise((ok) => {
+      const mio = ++id;
+      const oir = (m) => {
+        const r = JSON.parse(m.data);
+        if (r.id !== mio) return;
+        ws.removeEventListener('message', oir);
+        ok(r.result?.result?.value);
+      };
+      ws.addEventListener('message', oir);
+      ws.send(JSON.stringify({ id: mio, method: 'Runtime.evaluate', params: { expression, returnByValue: true } }));
+    });
+  return { ws, evaluar };
+}
+
+const ESTADO = `JSON.stringify({
+  url: location.href,
   listo: !!window.QHATU_LISTO,
+  titulo: document.title,
   puestos: document.querySelectorAll('.puesto').length,
+  vasos: document.querySelectorAll('.vaso').length,
   colorTexto: getComputedStyle(document.body).color,
   hojas: [...document.styleSheets].map(s => { try { return s.href + ' ' + s.cssRules.length } catch (e) { return s.href + ' bloqueada' } }),
   diagnostico: document.querySelector('pre')?.textContent || null,
   ua: navigator.userAgent
 }, null, 2)`;
-ws.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression: expr, returnByValue: true } }));
-const r = await new Promise((ok) => ws.addEventListener('message', (m) => ok(JSON.parse(m.data))));
-console.log(r.result?.result?.value ?? JSON.stringify(r));
+
+let { ws, evaluar } = await conectar();
+if (accion) {
+  console.log('Acción:', accion);
+  await evaluar(accion);
+  ws.close();
+  await new Promise((ok) => setTimeout(ok, 6000));
+  ({ ws, evaluar } = await conectar());
+}
+console.log(await evaluar(ESTADO));
 ws.close();

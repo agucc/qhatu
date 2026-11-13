@@ -7,8 +7,10 @@ import { chipYapa, contadorYapa, flotante, aviso, escapar } from './shared/ui.js
 import { sonar } from './shared/sonido.js';
 import { EN_APP } from './shared/config.js';
 
+// Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
+// ("refresquera/") devuelve la portada en vez del puesto.
 const PUESTOS = [
-  { id: 'refresquera', url: 'refresquera/', listo: true, color: COLORES.api, dibujo: dibujoRefresquera },
+  { id: 'refresquera', url: 'refresquera/index.html', listo: true, color: COLORES.api, dibujo: dibujoRefresquera },
   { id: 'frutera', listo: false, color: COLORES.frutilla, dibujo: dibujoFrutera },
   { id: 'aguayo', listo: false, color: COLORES.hierbabuena, dibujo: dibujoAguayo },
   { id: 'saltenera', listo: false, color: COLORES.tumbo, dibujo: dibujoSaltenera },

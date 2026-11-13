@@ -26,3 +26,9 @@ echo "== Estado de la página =="
 PID=$(adb shell pidof bo.qhatu.mercado | tr -d '\r')
 adb forward tcp:9222 localabstract:webview_devtools_remote_$PID
 node scripts/estado-webview.mjs http://localhost:9222 || echo "no se pudo leer la página"
+
+echo "== Tocar Jugar y abrir La Refresquera =="
+node scripts/estado-webview.mjs http://localhost:9222 "document.querySelector('.puesto a.boton').click()" || echo "no se pudo abrir el puesto"
+
+echo "== Volver al mercado =="
+node scripts/estado-webview.mjs http://localhost:9222 "document.getElementById('volver').click()" || echo "no se pudo volver"
