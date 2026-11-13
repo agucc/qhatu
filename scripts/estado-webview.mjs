@@ -31,6 +31,8 @@ const ESTADO = `JSON.stringify({
   puestos: document.querySelectorAll('.puesto').length,
   vasos: document.querySelectorAll('.vaso').length,
   canasto: !!document.querySelector('#canasto'),
+  celdasTelar: document.querySelectorAll('#telar .celda').length,
+  piezas: document.querySelectorAll('.ranura[data-i]').length,
   pedido: document.querySelector('#pedido-texto')?.textContent || null,
   colorTexto: getComputedStyle(document.body).color,
   hojas: [...document.styleSheets].map(s => { try { return s.href + ' ' + s.cssRules.length } catch (e) { return s.href + ' bloqueada' } }),

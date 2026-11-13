@@ -12,7 +12,7 @@ import { EN_APP } from './shared/config.js';
 const PUESTOS = [
   { id: 'refresquera', url: 'refresquera/index.html', listo: true, color: COLORES.api, dibujo: dibujoRefresquera },
   { id: 'frutera', url: 'frutera/index.html', listo: true, color: COLORES.frutilla, dibujo: dibujoFrutera },
-  { id: 'aguayo', listo: false, color: COLORES.hierbabuena, dibujo: dibujoAguayo },
+  { id: 'aguayo', url: 'aguayo/index.html', listo: true, color: COLORES.hierbabuena, dibujo: dibujoAguayo },
   { id: 'saltenera', listo: false, color: COLORES.tumbo, dibujo: dibujoSaltenera },
 ];
 

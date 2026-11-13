@@ -89,6 +89,24 @@ const TEXTOS = {
     terminar: 'Terminar',
     canasto: 'Canasto de frutas',
     ventas: 'Ventas',
+    tutoAguayo: "Arrastra cada pieza al telar. Cuando completas una fila o una columna, se teje una franja de aguayo y se libera espacio. Si el caserito pide una franja de un color, téjela con al menos la mitad de ese color.",
+    quiereFranja: "Quiere una franja {color}",
+    tejido: "¡Tejido!",
+    variasFranjas: "¡{n} franjas juntas!",
+    telarTrabado: "Se trabó el telar",
+    piezasNuevas: "Piezas nuevas · {n} yapa",
+    piezasNuevasTexto: "Cambia tus piezas por otras que quepan y sigue tejiendo.",
+    tuAguayo: "Tu aguayo",
+    telar: "Telar",
+    piezas: "Piezas",
+    franjas: "Franjas",
+    hilos: {
+      frutilla: 'rosada',
+      tumbo: 'amarilla',
+      hierbabuena: 'turquesa',
+      api: 'morada',
+      limonada: 'verde',
+    },
     frutas: {
       achachairu: 'achachairú',
       frutilla: 'frutilla',
@@ -196,6 +214,24 @@ const TEXTOS = {
     terminar: 'Finish',
     canasto: 'Fruit basket',
     ventas: 'Sales',
+    tutoAguayo: "Drag each piece onto the loom. When you complete a row or a column, an aguayo stripe is woven and the space clears. If the caserito asks for a stripe of a color, weave it with at least half of that color.",
+    quiereFranja: "Wants a {color} stripe",
+    tejido: "Woven!",
+    variasFranjas: "{n} stripes at once!",
+    telarTrabado: "The loom is stuck",
+    piezasNuevas: "New pieces · {n} yapa",
+    piezasNuevasTexto: "Swap your pieces for ones that fit and keep weaving.",
+    tuAguayo: "Your aguayo",
+    telar: "Loom",
+    piezas: "Pieces",
+    franjas: "Stripes",
+    hilos: {
+      frutilla: 'pink',
+      tumbo: 'yellow',
+      hierbabuena: 'teal',
+      api: 'purple',
+      limonada: 'green',
+    },
     frutas: {
       achachairu: 'achachairú',
       frutilla: 'strawberry',
@@ -303,6 +339,24 @@ const TEXTOS = {
     terminar: 'Terminar',
     canasto: 'Cesta de frutas',
     ventas: 'Vendas',
+    tutoAguayo: "Arraste cada peça para o tear. Quando você completa uma linha ou coluna, tece-se uma faixa de aguayo e o espaço fica livre. Se o caserito pedir uma faixa de uma cor, teça com pelo menos metade dessa cor.",
+    quiereFranja: "Quer uma faixa {color}",
+    tejido: "Tecido!",
+    variasFranjas: "{n} faixas de uma vez!",
+    telarTrabado: "O tear travou",
+    piezasNuevas: "Peças novas · {n} yapa",
+    piezasNuevasTexto: "Troque suas peças por outras que caibam e continue tecendo.",
+    tuAguayo: "Seu aguayo",
+    telar: "Tear",
+    piezas: "Peças",
+    franjas: "Faixas",
+    hilos: {
+      frutilla: 'rosa',
+      tumbo: 'amarela',
+      hierbabuena: 'turquesa',
+      api: 'roxa',
+      limonada: 'verde',
+    },
     frutas: {
       achachairu: 'achachairú',
       frutilla: 'morango',
@@ -358,6 +412,10 @@ export function t(clave, vars = {}) {
 
 export function nombreSabor(id) {
   return TEXTOS[idioma()].sabores[id] ?? id;
+}
+
+export function nombreHilo(id) {
+  return TEXTOS[idioma()].hilos[id] ?? id;
 }
 
 export function nombreFruta(id) {

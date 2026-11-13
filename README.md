@@ -10,7 +10,7 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 | --- | --- | --- |
 | La Refresquera | ordenar colores | v2 jugable |
 | La Frutera | merge | jugable |
-| El Aguayo | bloques | pronto |
+| El Aguayo | bloques | jugable |
 | La Salteñera | idle | pronto |
 
 ### La Refresquera v2
@@ -27,6 +27,14 @@ Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, si
 - **Caserito con pedido:** pide una fruta; cuando la formas, se la lleva, te da yapa y deja espacio en el canasto.
 - Física propia (`frutera/fisica.js`), sin motor.
 - **Ayudas:** cambiar la fruta que vas a soltar y, una vez por partida, despejar el borde para seguir jugando.
+
+### El Aguayo
+
+- Arrastras piezas a un telar de 8×8. Cada fila o columna completa se teje como una franja de aguayo y libera espacio; varias a la vez valen más.
+- **Tu aguayo:** las franjas tejidas se van sumando en una tela arriba del telar.
+- **Caserito con pedido:** pide una franja de un color; si tejes una línea con al menos la mitad de ese color, se la lleva y te da yapa.
+- También se juega tocando: eliges una pieza y tocas la celda donde va.
+- **Ayudas:** cambiar las tres piezas y, una vez por partida, piezas nuevas que quepan cuando se traba el telar.
 
 ## Lo que comparten todos los puestos (`shared/`)
 
@@ -93,6 +101,9 @@ frutera/                            segundo puesto
   fisica.js                         caída, choques y uniones (puro)
   frutas.js                         las diez frutas y cómo se dibujan
   juego.js                          canasto, controles y pedidos
+aguayo/                             tercer puesto
+  logica.js                         piezas, telar y franjas (puro)
+  juego.js                          telar, arrastrar piezas y pedidos
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales
 scripts/web.mjs                     copia el juego a www/ para la app

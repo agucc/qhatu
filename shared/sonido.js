@@ -67,6 +67,13 @@ export const sonar = {
   llega: () => tono({ f: 700, f2: 760, dur: 0.08, vol: 0.06 }),
   fin: () => [523, 440, 349].forEach((f, i) => tono({ f, dur: 0.2, tipo: 'triangle', vol: 0.12, retraso: i * 0.14 })),
   caer: () => tono({ f: 180, f2: 110, dur: 0.08, tipo: 'sine', vol: 0.1 }),
+  /** Una nota más por cada franja tejida a la vez. */
+  tejer: (n = 1) => {
+    const notas = [523, 659, 784, 988, 1175, 1319];
+    for (let i = 0; i < Math.min(n + 1, notas.length); i++) {
+      tono({ f: notas[i], dur: 0.12, tipo: 'triangle', vol: 0.12, retraso: i * 0.06 });
+    }
+  },
   /** Cuanto más grande la fruta, más grave el sonido. */
   union: (nivel = 0) => {
     const base = 880 / Math.pow(1.12, nivel);

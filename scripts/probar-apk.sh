@@ -35,3 +35,7 @@ node scripts/estado-webview.mjs http://localhost:9222 "document.getElementById('
 
 echo "== Abrir La Frutera =="
 node scripts/estado-webview.mjs http://localhost:9222 "document.querySelectorAll('.puesto a.boton')[1].click()" || echo "no se pudo abrir La Frutera"
+
+echo "== Volver y abrir El Aguayo =="
+node scripts/estado-webview.mjs http://localhost:9222 "document.getElementById('volver').click()" >/dev/null || true
+node scripts/estado-webview.mjs http://localhost:9222 "document.querySelectorAll('.puesto a.boton')[2].click()" || echo "no se pudo abrir El Aguayo"
