@@ -22,9 +22,13 @@ export function toldo({ barra = '#ffffff', alto = 40 } = {}) {
   return `<svg class="toldo" viewBox="0 0 104 34" height="${alto}" aria-hidden="true"><rect x="0" y="0" width="104" height="5" rx="1" fill="${barra}"/>${franjas}</svg>`;
 }
 
-export function logo({ claro = false } = {}) {
-  const tinta = claro ? COLORES.noche : '#ffffff';
-  return `<span class="logo" role="img" aria-label="qhatu">${toldo({ barra: tinta })}<span class="logo-texto" style="color:${tinta}">qhatu</span></span>`;
+// El logo de Qhatu, sin letras: el toldo del mercado sobre cuatro casillas, una por puesto
+// (refresco, fruta, tejido y comida). Es el mismo dibujo del ícono de la app (icono.svg).
+export const MARCA = '<rect x="7" y="8" width="86" height="7" rx="3" fill="#17131f"/><path d="M10.0 14h20.0v9a10.0 10.0 0 0 1 -20.0 0z" fill="#ef476f"/><path d="M30.0 14h20.0v9a10.0 10.0 0 0 1 -20.0 0z" fill="#ffb520"/><path d="M50.0 14h20.0v9a10.0 10.0 0 0 1 -20.0 0z" fill="#1fb5a5"/><path d="M70.0 14h20.0v9a10.0 10.0 0 0 1 -20.0 0z" fill="#9a48b8"/><rect x="13" y="36" width="34" height="25" rx="6" fill="#17131f"/><rect x="53" y="36" width="34" height="25" rx="6" fill="#17131f"/><rect x="13" y="65" width="34" height="25" rx="6" fill="#17131f"/><rect x="53" y="65" width="34" height="25" rx="6" fill="#17131f"/><g transform="translate(30 49) scale(0.95)"><rect x="-3" y="-13" width="6" height="5" rx="1" fill="#17131f"/><path d="M-3-8h6v3q5 3 5 8v8a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3v-8q0-5 5-8z" fill="#ffffff" fill-opacity=".9"/><path d="M-8 3h16v5a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3z" fill="#9a48b8"/><path d="M-8 -1h16v4h-16z" fill="#ef476f"/></g><g transform="translate(70 49) scale(0.9)"><circle cx="0" cy="2" r="10" fill="#ef476f"/><path d="M0-7q1-5 5-6" stroke="#3d6b4f" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M1-7q6-4 9 0q-5 2-9 0" fill="#a6d63a"/><circle cx="-4" cy="-1" r="2.4" fill="#fff" opacity=".5"/></g><g transform="translate(30 77) scale(0.9)"><rect x="-10" y="-10" width="20" height="20" rx="3" fill="#1fb5a5"/><path d="M0 -8L8 0L0 8L-8 0Z" fill="#ffb520"/><path d="M0 -5L5 0L0 5L-5 0Z" fill="#ef476f"/><path d="M0 -2L2 0L0 2L-2 0Z" fill="#17131f"/><path d="M-10 -6h20M-10 6h20" stroke="#fff" stroke-opacity=".35" stroke-width="1.4"/></g><g transform="translate(70 79) scale(0.95)"><path d="M-12 5c0-9 5-14 12-14s12 5 12 14z" fill="#e3a64a"/><path d="M-12 5q3 3 6 0t6 0 6 0 6 0" stroke="#b5762a" stroke-width="2" fill="none"/><path d="M-6-3q6-4 12 0" stroke="#f6d08a" stroke-width="1.6" fill="none"/></g>';
+
+/** El logo: la marca sobre su fondo crema, como el ícono de la app. */
+export function logo({ tam = 48 } = {}) {
+  return `<span class="logo" role="img" aria-label="Qhatu"><svg viewBox="0 0 100 100" width="${tam}" height="${tam}" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#f3ead2"/>${MARCA}</svg></span>`;
 }
 
 // La Casera, la dueña del mercado. Es la misma anfitriona en todos los países (cara, sonrisa,

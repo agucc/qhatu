@@ -250,7 +250,7 @@ function pintarTodo() {
 window.QHATU_LISTO = true;
 aplicarDecoracion();
 iniciarPlataforma();
-document.getElementById('logo').innerHTML = logo();
+document.getElementById('logo').innerHTML = logo({ tam: 52 });
 document.getElementById('chip-yapa').innerHTML = chipYapa();
 contadorYapa();
 pintarIdiomas();

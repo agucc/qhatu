@@ -126,7 +126,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `i18n.js` | Textos en español, inglés y portugués |
 | `anuncios.js` | Una sola interfaz para CrazyGames, Poki y el sitio propio |
 | `sonido.js` | Sonidos sintetizados con Web Audio, sin archivos |
-| `marca.js` | Toldo, logo, La Casera y caseritos en SVG |
+| `marca.js` | Toldo, logo (sin letras), La Casera y caseritos en SVG |
 | `ui.js` | Avisos, ventanas y contador de yapa |
 | `qhatu.css` | Colores de la marca (los refrescos del mercado) y componentes |
 | `progreso.js` | Nivel y experiencia de cada puesto |
@@ -179,6 +179,8 @@ La app es el mismo código web empaquetado con Capacitor; no se reescribe nada.
 - **Desde GitHub:** cada push compila la APK en GitHub Actions (`.github/workflows/apk.yml`) y la publica suelta en el release **apk-prueba**: `https://github.com/agucc/qhatu/releases/download/apk-prueba/qhatu.apk`.
 - **Prueba en emulador:** el flujo *Probar APK en emulador* (manual) instala la APK en un Android 14, abre cada pantalla y deja en el registro el estado de la página y los errores.
 - **En tu computadora** (con el SDK de Android): `npm install` y `npm run android:apk`.
+
+**Logo:** sin letras: el toldo del mercado sobre cuatro casillas, una por puesto (refresco, fruta, tejido y comida). El dibujo está en `icono.svg`; los íconos de Android y la pantalla de carga se generan con `node scripts/iconos.cjs`.
 
 El identificador de la app es `bo.qhatu.mercado` (en `capacitor.config.json`). Se puede cambiar hasta que se publique en Google Play; después queda fijo.
 

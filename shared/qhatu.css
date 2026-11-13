@@ -169,22 +169,13 @@ button {
 
 .logo {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  line-height: 1;
+  line-height: 0;
 }
 
-.logo .toldo {
+.logo svg {
   display: block;
-}
-
-.logo-texto {
-  font-family: var(--cuerpo);
-  font-weight: 800;
-  font-size: 30px;
-  letter-spacing: -0.02em;
-  margin-top: -2px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px #0006;
 }
 
 /* ---------- Botones ---------- */
