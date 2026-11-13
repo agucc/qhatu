@@ -602,3 +602,7 @@
 .pais {
   position: relative;
 }
+
+.amigos-tarjeta {
+  background: linear-gradient(120deg, #1f3a2e, var(--puesto) 70%);
+}

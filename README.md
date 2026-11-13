@@ -90,6 +90,13 @@ Modo opcional en cada puesto, con su propio récord; el modo normal no cambia:
 
 El reloj se detiene con las ventanas abiertas o la pantalla oculta y pita los últimos cinco segundos. Al final: récord, yapa (según lo hecho, hasta 20, y 10 más si es récord) y la opción de jugar otra vez, volver al modo normal o al mercado.
 
+## Jugar con amigos: salas en vivo (`salas/`, `shared/sala.js`, `nube/src/sala.js`)
+
+- Desde la portada, **Jugar con amigos**: se elige el puesto y se crea una sala con un código de 4 letras (por ejemplo `K7MQ`) para compartir. Entran de 2 a 4 jugadores.
+- El anfitrión toca **Empezar**: todos pasan al puesto, ven una cuenta regresiva y juegan el mismo contrarreloj al mismo tiempo, con la **misma semilla** (las mismas frutas, piezas y tandas para todos).
+- Arriba se ve el **marcador en vivo** de todos. Al terminar, el ranking: el ganador recibe 15 de yapa y los demás 5 si hicieron algo. Después se vuelve a la sala para otra ronda.
+- Servidor: un Durable Object de Cloudflare por sala (con SQLite, incluido en el plan gratis), con WebSockets que hibernan. Las reglas están en `nube/src/sala-logica.js` y se prueban en `tests/salas.test.js`. Una sala dura 3 horas.
+
 ## La tienda (`tienda/`)
 
 - **Yapa gratis:** ver un anuncio da 15 de yapa, hasta 5 veces por día.
@@ -147,6 +154,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
 | `cultura.js` | Contenido cultural: láminas, caseritos con nombre y fiestas de cada país |
+| `sala.js` | Salas en vivo: conexión, cuenta regresiva, marcador y resultado |
 | `reloj.js` | Contrarreloj de los puestos: cuenta regresiva, barra de tiempo, récord y yapa |
 | `album.js` | Reglas del álbum, del sello del pasaporte, de los caseritos con nombre y de las fiestas |
 | `dibujos-fiesta.js` | Dibujo de cada fiesta |
@@ -231,6 +239,7 @@ saltenera/                          cuarto puesto
   juego.js                          horno, mejoras y hora pico
 tienda/                             yapa por anuncios, compras y decoración
 album/                              Álbum del Mercado y sello del pasaporte
+salas/                              Jugar con amigos (salas en vivo)
 nube/                               servidor de partidas en Cloudflare (Worker + D1)
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales

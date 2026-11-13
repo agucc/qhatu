@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Jugar con amigos · Qhatu</title>
+  <meta name="description" content="Salas en vivo de Qhatu: jueguen el mismo contrarreloj al mismo tiempo.">
+  <meta name="theme-color" content="#17131f">
+  <script>
+    // Si el juego no arranca en unos segundos, muestra qué falló (sirve para depurar en celulares).
+    (function () {
+      var errores = [];
+      window.addEventListener('error', function (e) {
+        var t = e.target;
+        if (t && t !== window && (t.src || t.href)) errores.push('No cargó: ' + (t.src || t.href));
+        else errores.push((e.message || 'Error') + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        errores.push('Promesa: ' + ((e.reason && e.reason.message) || e.reason));
+      });
+      setTimeout(function () {
+        if (window.QHATU_LISTO) return;
+        var hojas = [];
+        for (var i = 0; i < document.styleSheets.length; i++) {
+          var s = document.styleSheets[i];
+          var n;
+          try { n = s.cssRules.length; } catch (x) { n = 'bloqueada'; }
+          hojas.push((s.href || 'interna') + ' -> ' + n + ' reglas');
+        }
+        var d = document.createElement('pre');
+        d.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:70%;overflow:auto;margin:0;padding:12px;background:#fff;color:#000;font:12px monospace;white-space:pre-wrap;z-index:99999;border-radius:8px';
+        d.textContent = 'Qhatu no pudo arrancar. Manda una captura de esto.\n\n' +
+          location.href + '\n' + navigator.userAgent +
+          '\n\nEstilos:\n' + (hojas.join('\n') || 'ninguno') +
+          '\n\nErrores:\n' + (errores.join('\n') || 'ninguno') +
+          '\n\nMódulos JS: ' + ('noModule' in document.createElement('script'));
+        document.body.appendChild(d);
+      }, 4000);
+    })();
+  </script>
+  <link rel="icon" href="../icono.svg" type="image/svg+xml">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../shared/qhatu.css">
+  <link rel="stylesheet" href="../shared/puesto.css">
+  <link rel="stylesheet" href="salas.css">
+</head>
+<body class="salas">
+  <div class="franja-aguayo"></div>
+  <header class="barra">
+    <a class="boton-icono" id="volver" href="../index.html" data-t-aria="mercado" aria-label="Mercado">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="barra-titulo">
+      <span class="barra-puesto" data-t="jugarAmigos">Jugar con amigos</span>
+    </div>
+    <div id="chip-yapa"></div>
+  </header>
+
+  <main class="salas-cuerpo">
+    <p class="nota" id="sin-red" hidden data-t="salaNecesitaRed">Para jugar con amigos necesitas internet.</p>
+
+    <section class="bloque" id="inicio">
+      <p class="nota" data-t="jugarAmigosDesc">Crea una sala, comparte el código y jueguen el mismo contrarreloj al mismo tiempo.</p>
+      <label class="campo">
+        <span data-t="tuNombre">Tu nombre</span>
+        <input id="nombre" maxlength="16" autocomplete="nickname" spellcheck="false">
+      </label>
+      <h2 data-t="crearSala">Crear sala</h2>
+      <div class="puestos-sala" id="puestos-sala"></div>
+      <h2 data-t="unirseSala">Entrar a una sala</h2>
+      <form class="unirse" id="unirse">
+        <input id="codigo" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="K7MQ" data-t-aria="codigoSala" aria-label="Código de la sala">
+        <button class="boton" type="submit" data-t="entrar">Entrar</button>
+      </form>
+    </section>
+
+    <section class="bloque" id="espera" hidden>
+      <p class="codigo-sala-titulo" data-t="codigoSala">Código de la sala</p>
+      <p class="codigo-sala" id="codigo-grande"></p>
+      <p class="nota" id="sala-puesto"></p>
+      <button class="boton secundario" type="button" id="compartir" data-t="compartirSala">Compartir código</button>
+      <ol class="jugadores-sala" id="jugadores"></ol>
+      <p class="nota" id="sala-estado"></p>
+      <div class="acciones-sala">
+        <button class="boton" type="button" id="empezar" data-t="empezarSala">Empezar</button>
+        <button class="boton secundario" type="button" id="salir" data-t="salirSala">Salir</button>
+      </div>
+    </section>
+  </main>
+  <div class="franja-aguayo"></div>
+
+  <script type="module" src="salas.js"></script>
+</body>
+</html>

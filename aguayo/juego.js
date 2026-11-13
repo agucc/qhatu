@@ -13,6 +13,7 @@ import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, htmlCaserito, esCasera, anotarFranjas, jugarEnFiesta } from '../shared/album.js';
 import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
+import { salasActivas, codigoDeUrl, jugarEnSala, azar } from '../shared/sala.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
@@ -27,6 +28,8 @@ datos.record ??= 0;
 datos.partidas ??= 0;
 
 const rnd = Math.random;
+// Las piezas: en una sala salen de la semilla de la ronda, iguales para todos.
+let rndPiezas = rnd;
 
 const juego = {
   telar: A.crearTelar(),
@@ -218,7 +221,7 @@ function pintarTodo() {
 
 function empezar() {
   juego.telar = A.crearTelar();
-  juego.mano = A.nuevaMano(rnd, juego.telar, HILOS);
+  juego.mano = A.nuevaMano(rndPiezas, juego.telar, HILOS);
   juego.puntos = 0;
   juego.tela = [];
   juego.elegida = null;
@@ -296,7 +299,7 @@ function colocarPieza(i, fila, col) {
 }
 
 function despuesDeJugar() {
-  if (juego.mano.every((m) => m === null)) juego.mano = A.nuevaMano(rnd, juego.telar, HILOS);
+  if (juego.mano.every((m) => m === null)) juego.mano = A.nuevaMano(rndPiezas, juego.telar, HILOS);
   pintarTelar();
   pintarMano();
   pintarDatos();
@@ -500,6 +503,7 @@ $('#cambiar').addEventListener('click', () => {
 });
 
 $('#reiniciar').addEventListener('click', () => {
+  if (juego.sala) return;
   if (juego.pausas || juego.bloqueado) return;
   if (juego.puntos > datos.record) {
     datos.record = juego.puntos;
@@ -543,6 +547,11 @@ async function finReloj() {
   if (!juego.reloj || juego.cerrandoReloj) return;
   juego.cerrandoReloj = true;
   reloj.detener();
+  if (juego.sala) {
+    jugar(false);
+    enSala.terminar(juego.puntos);
+    return;
+  }
   juego.terminado = true;
   jugar(false);
   const puntos = juego.puntos;
@@ -571,6 +580,29 @@ $('#contrarreloj').addEventListener('click', async () => {
   juego.pausas--;
   if (si) empezarReloj();
 });
+
+// ---------- Sala en vivo: la misma ronda que los amigos ----------
+
+const SALA = salasActivas ? codigoDeUrl() : null;
+let enSala = null;
+if (SALA) {
+  $('#contrarreloj').hidden = true;
+  juego.pausas++; // nada se mueve hasta la cuenta regresiva
+  enSala = jugarEnSala({
+    codigo: SALA,
+    empezarRonda: (queda, semilla) => {
+      juego.pausas = Math.max(0, juego.pausas - 1);
+      rndPiezas = azar(semilla);
+      juego.sala = true;
+      juego.reloj = true;
+      juego.cerrandoReloj = false;
+      $('#contrarreloj').classList.add('activa');
+      empezar();
+      reloj.empezar(queda);
+    },
+    puntos: () => juego.puntos,
+  });
+}
 
 $('#sonido').addEventListener('click', () => {
   alternar();

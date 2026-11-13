@@ -10,7 +10,12 @@
 //                                → 200 { version } | 409 { datos, version, actualizada }
 //   POST /v1/google/vincular     ← { idToken }                     (con llave) une la cuenta a Google
 //   POST /v1/google/entrar       ← { idToken }                     → { llave } nueva para esa cuenta
+//   POST /v1/salas               ← { puesto }                      → { codigo } crea una sala en vivo
+//   GET  /v1/salas/CODIGO        → estado público de la sala
+//   GET  /v1/salas/CODIGO/ws     (WebSocket) entra a la sala: ?jugador=&nombre=&pais=
 //   GET  /v1/salud               → { ok: true }
+
+import { nuevoCodigo, normalizarCodigo, SEGUNDOS as SEGUNDOS_SALA } from './sala-logica.js';
 
 export const MAX_PARTIDA = 100_000; // bytes del JSON de la partida
 const ALFABETO = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // sin 0, 1, I ni O para no confundirse al copiar
@@ -211,6 +216,25 @@ async function entrarConGoogle(env, cuerpo, clavesGoogle, ahora) {
   return respuesta({ llave });
 }
 
+// ---------- Salas en vivo ----------
+
+async function crearSala(env, cuerpo) {
+  const puesto = String(cuerpo?.puesto || '');
+  if (!SEGUNDOS_SALA[puesto]) return error(400, 'puesto');
+  for (let intento = 0; intento < 6; intento++) {
+    const codigo = nuevoCodigo();
+    const sala = env.SALAS.get(env.SALAS.idFromName(codigo));
+    const r = await sala.fetch('https://sala/crear', { method: 'POST', body: JSON.stringify({ codigo, puesto }) });
+    if (r.status === 200) return respuesta({ codigo }, 201);
+    if (r.status !== 409) return error(500, 'sala');
+  }
+  return error(503, 'sin-codigo');
+}
+
+function irASala(req, env, codigo) {
+  return env.SALAS.get(env.SALAS.idFromName(codigo)).fetch(req);
+}
+
 export function crearServidor({ clavesGoogle = clavesGoogleReales, reloj = () => Date.now() } = {}) {
   return async function manejar(req, env) {
     const url = new URL(req.url);
@@ -224,6 +248,23 @@ export function crearServidor({ clavesGoogle = clavesGoogleReales, reloj = () =>
       if (ruta === 'POST /v1/cuenta') {
         if (!(await limitar(env, req, 'cuenta'))) return error(429, 'espera');
         return await crearCuenta(env, ahora);
+      }
+
+      if (ruta === 'POST /v1/salas') {
+        if (!env.SALAS) return error(501, 'salas-apagadas');
+        if (!(await limitar(env, req, 'sala'))) return error(429, 'espera');
+        const { cuerpo } = await leerJson(req);
+        return await crearSala(env, cuerpo);
+      }
+
+      const enSala = url.pathname.match(/^\/v1\/salas\/([0-9A-Za-z]{4})(\/ws)?\/?$/);
+      if (enSala && req.method === 'GET') {
+        if (!env.SALAS) return error(501, 'salas-apagadas');
+        const codigo = normalizarCodigo(enSala[1]);
+        if (!codigo) return error(404, 'no-existe');
+        const r = await irASala(req, env, codigo);
+        if (r.status === 101) return r;
+        return new Response(r.body, { status: r.status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...CORS } });
       }
 
       if (ruta === 'POST /v1/google/entrar') {

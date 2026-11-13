@@ -14,6 +14,7 @@ import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, htmlCaserito, esCasera, anotarFruta, jugarEnFiesta } from '../shared/album.js';
 import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
+import { salasActivas, codigoDeUrl, jugarEnSala, azar } from '../shared/sala.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
 
@@ -31,6 +32,8 @@ datos.record ??= 0;
 datos.partidas ??= 0;
 
 const rnd = Math.random;
+// Las frutas que caen: en una sala salen de la semilla de la ronda, iguales para todos.
+let rndPiezas = rnd;
 const lienzo = $('#canasto');
 const ctx = lienzo.getContext('2d');
 
@@ -139,8 +142,8 @@ function pintarSonido() {
 
 function empezar() {
   juego.mundo = F.crearMundo();
-  juego.enMano = frutaAlAzar(rnd);
-  juego.siguiente = frutaAlAzar(rnd);
+  juego.enMano = frutaAlAzar(rndPiezas);
+  juego.siguiente = frutaAlAzar(rndPiezas);
   juego.x = F.CANASTO.ancho / 2;
   juego.espera = 0;
   juego.ventas = 0;
@@ -169,7 +172,7 @@ function soltarFruta() {
   avisarLamina(anotarFruta(PAIS, FRUTAS[juego.enMano].id));
   sonar.soltar();
   juego.enMano = juego.siguiente;
-  juego.siguiente = frutaAlAzar(rnd);
+  juego.siguiente = frutaAlAzar(rndPiezas);
   juego.espera = ESPERA_SOLTAR;
   if (juego.primerSoltar) {
     juego.primerSoltar = false;
@@ -493,6 +496,7 @@ $('#cambiar').addEventListener('click', () => {
   sonar.elegir();
 });
 $('#reiniciar').addEventListener('click', () => {
+  if (juego.sala) return;
   if (juego.pausas) return;
   if (juego.mundo.puntos > datos.record) {
     datos.record = juego.mundo.puntos;
@@ -535,6 +539,11 @@ async function finReloj() {
   if (!juego.reloj || juego.cerrandoReloj) return;
   juego.cerrandoReloj = true;
   reloj.detener();
+  if (juego.sala) {
+    jugar(false);
+    enSala.terminar(juego.mundo.puntos);
+    return;
+  }
   juego.mundo.terminado = true;
   jugar(false);
   const puntos = juego.mundo.puntos;
@@ -563,6 +572,29 @@ $('#contrarreloj').addEventListener('click', async () => {
   juego.pausas--;
   if (si) empezarReloj();
 });
+
+// ---------- Sala en vivo: la misma ronda que los amigos ----------
+
+const SALA = salasActivas ? codigoDeUrl() : null;
+let enSala = null;
+if (SALA) {
+  $('#contrarreloj').hidden = true;
+  juego.pausas++; // nada se mueve hasta la cuenta regresiva
+  enSala = jugarEnSala({
+    codigo: SALA,
+    empezarRonda: (queda, semilla) => {
+      juego.pausas = Math.max(0, juego.pausas - 1);
+      rndPiezas = azar(semilla);
+      juego.sala = true;
+      juego.reloj = true;
+      juego.cerrandoReloj = false;
+      $('#contrarreloj').classList.add('activa');
+      empezar();
+      reloj.empezar(queda);
+    },
+    puntos: () => juego.mundo.puntos,
+  });
+}
 
 $('#sonido').addEventListener('click', () => {
   alternar();

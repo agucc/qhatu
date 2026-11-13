@@ -13,6 +13,7 @@ import { ganarXp } from '../shared/progreso.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, caseritoGuardado, htmlCaserito, esCasera, anotarCocina, jugarEnFiesta } from '../shared/album.js';
 import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
+import { salasActivas, codigoDeUrl, jugarEnSala } from '../shared/sala.js';
 import { paisActual, pais as datosPais, texto as enIdioma } from '../shared/paises.js';
 import { svgComida, PARRILLA } from './comidas.js';
 
@@ -192,12 +193,12 @@ const reloj = crearReloj({
   alTerminar: () => finReloj(),
 });
 
-function empezarReloj() {
+function empezarReloj(desde) {
   juego.reloj = true;
   juego.cerrandoReloj = false;
   juego.relojHechas = 0;
   $('#contrarreloj').classList.add('activa');
-  reloj.empezar();
+  reloj.empezar(desde);
 }
 
 function salirReloj() {
@@ -213,6 +214,10 @@ async function finReloj() {
   juego.cerrandoReloj = true;
   reloj.detener();
   const hechas = juego.relojHechas;
+  if (juego.sala) {
+    enSala.terminar(hechas);
+    return;
+  }
   const nuevoRecord = hechas > 0 && hechas > (datos.relojRecord || 0);
   if (nuevoRecord) datos.relojRecord = hechas;
   guardar();
@@ -223,6 +228,9 @@ async function finReloj() {
   salirReloj();
   if (eleccion === 'mercado') location.href = '../index.html';
 }
+
+const SALA = salasActivas ? codigoDeUrl() : null;
+let enSala = null;
 
 async function alContrarreloj() {
   if (juego.pausas) return;
@@ -405,6 +413,20 @@ function iniciar() {
   });
   $('#pico').addEventListener('click', horaPico);
   $('#contrarreloj').addEventListener('click', alContrarreloj);
+  if (SALA) {
+    // Sala en vivo: pedido relámpago con los amigos; el horno espera la cuenta regresiva.
+    $('#contrarreloj').hidden = true;
+    juego.pausas++;
+    enSala = jugarEnSala({
+      codigo: SALA,
+      empezarRonda: (queda) => {
+        juego.pausas = Math.max(0, juego.pausas - 1);
+        juego.sala = true;
+        empezarReloj(queda);
+      },
+      puntos: () => juego.relojHechas || 0,
+    });
+  }
   $('#sonido').addEventListener('click', () => {
     alternar();
     pintarSonido();

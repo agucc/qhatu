@@ -11,6 +11,7 @@ import { compartir } from '../shared/compartir.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
 import { caseritoConHistoria, jugarEnFiesta } from '../shared/album.js';
 import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj as pintarCronometro, ocultarReloj, preguntarContrarreloj, finContrarreloj, yapaReloj } from '../shared/reloj.js';
+import { salasActivas, codigoDeUrl, jugarEnSala, azar } from '../shared/sala.js';
 import { obtener, guardar, puesto, sumarYapa, gastarYapa, marcarJuego, visto, marcarVisto } from '../shared/almacen.js';
 import { t, aplicarTextos } from '../shared/i18n.js';
 import { sonar, alternar, activo } from '../shared/sonido.js';
@@ -53,6 +54,8 @@ const juego = {
 };
 
 const rnd = Math.random;
+// Las tandas del contrarreloj: en una sala salen de la semilla de la ronda, iguales para todos.
+let rndPiezas = rnd;
 
 // ---------- Utilidades ----------
 
@@ -613,7 +616,7 @@ const cronometro = crearReloj({
 
 function nuevaTanda() {
   const sabores = Math.min(5, 3 + Math.floor((juego.tandas || 0) / 3));
-  juego.tablero = L.generarTablero({ semilla: Math.floor(rnd() * 1e9), sabores, vacios: 2, ids: IDS_SABORES });
+  juego.tablero = L.generarTablero({ semilla: Math.floor(rndPiezas() * 1e9), sabores, vacios: 2, ids: IDS_SABORES });
   juego.inicial = juego.tablero;
   juego.historial = [];
   juego.sel = null;
@@ -624,12 +627,12 @@ function nuevaTanda() {
   jugar(true);
 }
 
-function empezarReloj() {
+function empezarReloj(desde) {
   juego.modo = 'reloj';
   juego.tandas = 0;
   juego.cerrandoReloj = false;
   nuevaTanda();
-  cronometro.empezar();
+  cronometro.empezar(desde);
 }
 
 function salirReloj() {
@@ -656,6 +659,10 @@ async function finReloj() {
   cronometro.detener();
   juego.bloqueado = true;
   jugar(false);
+  if (juego.sala) {
+    enSala.terminar(juego.tandas);
+    return;
+  }
   const tandas = juego.tandas;
   const nuevoRecord = tandas > 0 && tandas > (datos.relojRecord || 0);
   if (nuevoRecord) datos.relojRecord = tandas;
@@ -672,6 +679,11 @@ async function finReloj() {
   juego.modo = null;
   cambiarModo(datos.modo === 'pedidos' ? 'pedidos' : 'niveles');
 }
+
+// ---------- Sala en vivo: la misma ronda que los amigos ----------
+
+const SALA = salasActivas ? codigoDeUrl() : null;
+let enSala = null;
 
 // ---------- Ayudas ----------
 
@@ -894,7 +906,24 @@ function iniciar() {
   document.addEventListener('qhatu:idioma', () => pintar());
   window.addEventListener('resize', ajustarTamano);
 
-  if (juego.modo === 'pedidos') empezarPedidos();
+  if (SALA) {
+    // En una sala solo se juega el contrarreloj: sin pestañas, y quieto hasta la cuenta regresiva.
+    document.querySelector('.modos').hidden = true;
+    juego.modo = 'reloj';
+    juego.tandas = 0;
+    juego.pausas++;
+    nuevaTanda();
+    enSala = jugarEnSala({
+      codigo: SALA,
+      empezarRonda: (queda, semilla) => {
+        juego.pausas = Math.max(0, juego.pausas - 1);
+        rndPiezas = azar(semilla);
+        juego.sala = true;
+        empezarReloj(queda);
+      },
+      puntos: () => juego.tandas || 0,
+    });
+  } else if (juego.modo === 'pedidos') empezarPedidos();
   else empezarNiveles();
   requestAnimationFrame(reloj);
 

@@ -47,8 +47,9 @@ export function crearReloj({ segundos, pausado = () => false, alTic = () => {}, 
     requestAnimationFrame(paso);
   }
   return {
-    empezar() {
-      restante = segundos;
+    /** Empieza la cuenta; en las salas se le pasa lo que queda de la ronda. */
+    empezar(desde = segundos) {
+      restante = desde;
       pitado = 0;
       activo = true;
       ultimo = performance.now();
