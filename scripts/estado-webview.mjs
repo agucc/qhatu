@@ -5,7 +5,9 @@ const accion = process.argv[3];
 
 async function conectar() {
   const paginas = await (await fetch(`${base}/json`)).json();
-  const pagina = paginas.find((p) => p.type === 'page') || paginas[0];
+  // AdMob abre su propia WebView en la app: se elige la página del juego.
+  const delJuego = paginas.filter((p) => p.type === 'page' && p.url.startsWith('https://localhost'));
+  const pagina = delJuego[delJuego.length - 1] || paginas.find((p) => p.type === 'page') || paginas[0];
   const ws = new WebSocket(pagina.webSocketDebuggerUrl);
   await new Promise((ok) => ws.addEventListener('open', ok));
   let id = 0;
