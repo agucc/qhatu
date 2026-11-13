@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Qhatu · Juega en el mercado</title>
+  <meta name="description" content="Qhatu es un mercado boliviano de juegos casuales. Cada juego es un puesto y todo se paga con yapa.">
+  <meta name="theme-color" content="#17131f">
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chango&family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared/qhatu.css">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <div class="franja-aguayo"></div>
+  <header class="cabecera">
+    <a href="./" class="cabecera-logo" id="logo"></a>
+    <div id="chip-yapa"></div>
+  </header>
+
+  <main class="portal">
+    <section class="casera-tarjeta" aria-labelledby="saludo">
+      <div class="casera-dibujo" id="casera"></div>
+      <div class="casera-burbuja">
+        <h1 id="saludo" data-t="saludo">¡Hola, caserito!</h1>
+        <p id="regalo-texto"></p>
+        <button class="boton" id="regalo-boton" data-t="regaloBoton">Recibir yapa</button>
+        <div class="racha">
+          <span class="racha-titulo" data-t="racha">Racha</span>
+          <div class="racha-dias" id="racha-dias" aria-hidden="true"></div>
+          <span class="racha-texto" id="racha-texto"></span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="titulo-puestos">
+      <h2 class="seccion-titulo" id="titulo-puestos" data-t="puestos">Los puestos</h2>
+      <div class="puestos" id="puestos"></div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p class="lema" data-t="lema">Juega en el mercado.</p>
+    <div class="pie-acciones">
+      <label class="idioma">
+        <span data-t="idioma">Idioma</span>
+        <select id="idioma"></select>
+      </label>
+      <button class="boton secundario" id="instalar" hidden data-t="instalar">Instalar en el celular</button>
+    </div>
+  </footer>
+  <div class="franja-aguayo"></div>
+
+  <script type="module" src="portal.js"></script>
+</body>
+</html>

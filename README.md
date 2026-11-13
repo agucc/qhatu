@@ -1,0 +1,71 @@
+# qhatu
+
+**El mercado de juegos.** Cada juego es un puesto. Todo se paga con yapa.
+
+Qhatu es un mercado boliviano de juegos casuales hecho en HTML5 y JavaScript, sin motor ni dependencias. La portada es el mercado: tocas un puesto y juegas al instante, sin descargar ni registrarte.
+
+## Puestos
+
+| Puesto | Género | Estado |
+| --- | --- | --- |
+| La Refresquera | ordenar colores | v2 jugable |
+| La Frutera | merge | pronto |
+| El Aguayo | bloques | pronto |
+| La Salteñera | idle | pronto |
+
+### La Refresquera v2
+
+- **Niveles:** infinitos, con semilla (el nivel N siempre es igual) y con solución comprobada. Los cinco primeros se ganan en menos de un minuto.
+- **Modo pedidos:** llegan caseritos pidiendo un sabor. Cada vaso completo de ese sabor se sirve solo y en su lugar entra un vaso nuevo mezclado. La partida termina cuando se llena la fila.
+- **Vaso extra:** se paga con yapa o viendo un anuncio con recompensa.
+- **Pistas, deshacer y reiniciar.**
+- **Símbolos por sabor:** cada refresco tiene un ícono además del color.
+
+## Lo que comparten todos los puestos (`shared/`)
+
+| Archivo | Qué hace |
+| --- | --- |
+| `almacen.js` | Guardado en el dispositivo: yapa, racha, regalo diario y progreso de cada puesto |
+| `i18n.js` | Textos en español, inglés y portugués |
+| `anuncios.js` | Una sola interfaz para CrazyGames, Poki y el sitio propio |
+| `sonido.js` | Sonidos sintetizados con Web Audio, sin archivos |
+| `marca.js` | Toldo, logo, La Casera y caseritos en SVG |
+| `ui.js` | Avisos, ventanas y contador de yapa |
+| `qhatu.css` | Colores de la marca (los refrescos del mercado) y componentes |
+
+Reglas del mercado que el código respeta:
+
+- Un anuncio obligatorio como máximo cada tres niveles, nunca en medio de una partida ni en los cinco primeros niveles.
+- Todo lo que se compra con yapa también se gana jugando.
+- Sin cajas de premios al azar ni contadores falsos.
+
+## Desarrollo
+
+```bash
+npm run dev     # sirve el sitio en http://localhost:8080
+npm test        # pruebas de la lógica (node:test, sin dependencias)
+```
+
+Parámetros útiles en la URL:
+
+- `?portal=crazygames` o `?portal=poki`: carga el SDK de ese portal.
+- `?anuncios=demo`: simula un anuncio con recompensa en el sitio propio.
+
+## Publicar
+
+- **Sitio Qhatu:** la raíz del repositorio es un sitio estático. Se sube tal cual a Cloudflare Pages o Vercel. Se instala en el celular como app web (`manifest.webmanifest` y `sw.js`). Al publicar cambios, sube `VERSION` en `sw.js`.
+- **Portales:** `npm run empaquetar` arma `dist/refresquera-crazygames.zip` y `dist/refresquera-poki.zip`, con `index.html` en la raíz y el SDK de cada portal activado.
+
+## Estructura
+
+```
+index.html, portal.js, portal.css   portada del mercado
+refresquera/                        primer puesto
+  logica.js                         reglas, niveles, solucionador y pistas (puro)
+  pedidos.js                        modo pedidos (puro)
+  sabores.js                        colores y símbolos
+  juego.js                          pantalla, yapa y anuncios
+shared/                             código base de todos los puestos
+scripts/empaquetar.mjs              zips para portales
+tests/                              pruebas
+```

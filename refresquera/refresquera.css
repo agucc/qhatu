@@ -1,0 +1,388 @@
+/* La Refresquera */
+
+body.refresquera {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---------- Barra de arriba ---------- */
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 16px 6px;
+}
+
+.barra-titulo {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  line-height: 1.1;
+}
+
+.barra-puesto {
+  font-family: var(--titulo);
+  font-size: 20px;
+  color: var(--tumbo);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barra-sub {
+  font-size: 14px;
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+/* ---------- Modos ---------- */
+
+.modos {
+  display: flex;
+  gap: 6px;
+  width: calc(100% - 32px);
+  max-width: 360px;
+  margin: 4px auto 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--puesto);
+}
+
+.modo {
+  flex: 1;
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.modo[aria-pressed='true'] {
+  background: var(--api);
+  color: #fff;
+}
+
+/* ---------- Mesa ---------- */
+
+.mesa {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 16px 0;
+}
+
+.vasos {
+  flex: 1 1 0;
+  min-height: 160px;
+  display: grid;
+  grid-template-columns: repeat(var(--por-fila, 4), var(--ancho, 56px));
+  justify-content: center;
+  align-content: center;
+  gap: 20px 12px;
+}
+
+.vaso {
+  position: relative;
+  width: var(--ancho, 56px);
+  aspect-ratio: 1 / 3.9;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.16s ease;
+}
+
+.vaso::before {
+  /* el vidrio */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--ancho, 56px) * 0.42);
+  background: linear-gradient(90deg, #ffffff10, #ffffff05 40%, #ffffff12);
+  box-shadow: inset 0 0 0 2.5px #8a7f9c;
+  pointer-events: none;
+  z-index: 1;
+  transition: box-shadow 0.2s ease;
+}
+
+.vaso-interior {
+  position: absolute;
+  inset: 5px;
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: calc(var(--ancho, 56px) * 0.36);
+  overflow: hidden;
+}
+
+.capa {
+  flex: 0 0 25%;
+  display: grid;
+  place-items: center;
+  background: var(--c);
+  box-shadow: inset 0 -2px 0 #00000022;
+  transform-origin: bottom;
+}
+
+.capa svg {
+  width: 52%;
+  max-width: 28px;
+  height: auto;
+}
+
+.capa.llega {
+  animation: llenar 0.28s ease-out both;
+  animation-delay: var(--retraso, 0ms);
+}
+
+@keyframes llenar {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.vaso.elegido {
+  transform: translateY(-16px);
+}
+
+.vaso.elegido::before {
+  box-shadow: inset 0 0 0 3px var(--tumbo), 0 0 0 3px #ffb52033;
+}
+
+.vaso.completo::before {
+  box-shadow: inset 0 0 0 3px var(--brillo), 0 0 18px var(--brillo);
+}
+
+.vaso.completo::after {
+  /* tapita del vaso listo */
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: -7px;
+  height: 7px;
+  border-radius: 6px 6px 0 0;
+  background: var(--brillo);
+  z-index: 2;
+}
+
+.vaso.nuevo {
+  animation: cae 0.4s cubic-bezier(0.2, 1.3, 0.5, 1);
+}
+
+@keyframes cae {
+  from {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+}
+
+.vaso.sacude {
+  animation: sacude 0.3s ease;
+}
+
+@keyframes sacude {
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.vaso.pista-origen::before {
+  box-shadow: inset 0 0 0 3px var(--limonada), 0 0 16px var(--limonada);
+  animation: late 0.8s ease infinite;
+}
+
+.vaso.pista-destino::before {
+  box-shadow: inset 0 0 0 3px var(--limonada);
+  animation: late 0.8s ease 0.4s infinite;
+}
+
+@keyframes late {
+  50% { opacity: 0.4; }
+}
+
+/* ---------- Pedidos ---------- */
+
+.pedidos-zona {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-radius: 18px;
+  background: var(--puesto);
+  box-shadow: inset 0 0 0 2px var(--borde);
+}
+
+.pedidos-zona[hidden] {
+  display: none;
+}
+
+.pedidos-datos {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.pedidos-datos strong {
+  color: var(--texto);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asiento {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  height: 82px;
+  border-radius: 12px;
+  border: 2px dashed var(--borde);
+}
+
+.asiento.ocupado {
+  border-style: solid;
+  border-color: transparent;
+  background: var(--puesto-2);
+}
+
+.fila.casi-llena .asiento.ocupado {
+  border-color: #ef476f66;
+}
+
+.asiento.llega {
+  animation: cae 0.35s ease-out;
+}
+
+.caserito-cara {
+  width: 46px;
+  height: 46px;
+}
+
+.pedido {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 30px;
+  border-radius: 4px 4px 10px 10px;
+  background: var(--c);
+  box-shadow: 0 0 0 2px var(--noche);
+}
+
+.pedido svg {
+  width: 16px;
+  height: 16px;
+}
+
+.llegada {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+.llegada-barra {
+  flex: 1;
+  height: 6px;
+  border-radius: 6px;
+  background: var(--puesto-2);
+  overflow: hidden;
+}
+
+.llegada-barra div {
+  height: 100%;
+  width: 0;
+  background: var(--tumbo);
+  border-radius: 6px;
+}
+
+/* ---------- Acciones ---------- */
+
+.acciones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+}
+
+.accion {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-height: 58px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--puesto);
+  color: var(--texto);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.accion svg {
+  width: 24px;
+  height: 24px;
+}
+
+.accion:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.accion .costo {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--tumbo);
+  color: var(--noche);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+@media (max-height: 640px) {
+  .asiento {
+    height: 64px;
+  }
+
+  .caserito-cara {
+    width: 38px;
+    height: 38px;
+  }
+
+  .accion {
+    min-height: 48px;
+    font-size: 12px;
+  }
+}

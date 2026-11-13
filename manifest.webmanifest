@@ -1,0 +1,15 @@
+{
+  "name": "Qhatu · Juega en el mercado",
+  "short_name": "Qhatu",
+  "description": "Un mercado boliviano de juegos casuales. Cada juego es un puesto.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17131f",
+  "theme_color": "#17131f",
+  "lang": "es",
+  "icons": [
+    { "src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

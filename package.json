@@ -1,0 +1,12 @@
+{
+  "name": "qhatu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Qhatu, el mercado de juegos. Cada juego es un puesto.",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "test": "node --test tests/*.test.js",
+    "empaquetar": "node scripts/empaquetar.mjs"
+  }
+}

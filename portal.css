@@ -1,0 +1,237 @@
+/* Portada del mercado */
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 18px 16px;
+}
+
+.cabecera-logo {
+  text-decoration: none;
+}
+
+.portal {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 8px 16px 40px;
+  display: grid;
+  gap: 40px;
+}
+
+/* ---------- La Casera ---------- */
+
+.casera-tarjeta {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  align-items: end;
+  padding: 20px 20px 0;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #2b2140, var(--puesto));
+  box-shadow: inset 0 0 0 2px var(--borde);
+  overflow: hidden;
+}
+
+.casera-dibujo svg {
+  display: block;
+  width: 100%;
+}
+
+.casera-burbuja {
+  align-self: center;
+  padding-bottom: 20px;
+}
+
+.casera-burbuja h1 {
+  font-size: clamp(28px, 6vw, 44px);
+  color: var(--tumbo);
+}
+
+.casera-burbuja p {
+  margin: 8px 0 14px;
+  color: var(--texto);
+  font-size: 17px;
+}
+
+.racha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+.racha-titulo {
+  font-weight: 800;
+  color: var(--texto);
+}
+
+.racha-dias {
+  display: flex;
+  gap: 5px;
+}
+
+.racha-dias span {
+  width: 14px;
+  height: 22px;
+  border-radius: 0 0 7px 7px;
+  background: var(--puesto-2);
+  box-shadow: inset 0 0 0 2px var(--borde);
+}
+
+.racha-dias span.lleno:nth-child(5n + 1) { background: var(--frutilla); }
+.racha-dias span.lleno:nth-child(5n + 2) { background: var(--tumbo); }
+.racha-dias span.lleno:nth-child(5n + 3) { background: var(--hierbabuena); }
+.racha-dias span.lleno:nth-child(5n + 4) { background: var(--api); }
+.racha-dias span.lleno:nth-child(5n + 5) { background: var(--limonada); }
+
+.racha-dias span.lleno {
+  box-shadow: none;
+}
+
+/* ---------- Puestos ---------- */
+
+.seccion-titulo {
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+
+.puestos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.puesto {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 8px;
+  padding: 0 18px 18px;
+  border-radius: 20px;
+  background: var(--puesto);
+  box-shadow: inset 0 0 0 2px var(--borde);
+  overflow: hidden;
+}
+
+.puesto::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--acento);
+}
+
+.puesto-toldo {
+  display: flex;
+  justify-content: center;
+  margin: 0 -18px;
+  padding-top: 14px;
+}
+
+.puesto-toldo svg {
+  width: 62%;
+  max-width: 150px;
+  height: auto;
+}
+
+.puesto-dibujo svg {
+  display: block;
+  width: 100%;
+  max-height: 96px;
+}
+
+.puesto h3 {
+  font-size: 22px;
+  color: var(--acento);
+}
+
+.puesto p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 15px;
+}
+
+.puesto .boton {
+  justify-self: start;
+  margin-top: 6px;
+}
+
+.puesto.cerrado .puesto-dibujo {
+  opacity: 0.55;
+  filter: saturate(0.6);
+}
+
+.sello-pronto {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 2px dashed var(--borde);
+  color: var(--texto-suave);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* ---------- Pie ---------- */
+
+.pie {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lema {
+  margin: 0;
+  font-family: var(--titulo);
+  font-size: 20px;
+  color: var(--tumbo);
+}
+
+.pie-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.idioma {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+.idioma select {
+  min-height: 40px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 2px solid var(--borde);
+  background: var(--puesto);
+  color: var(--texto);
+  font: inherit;
+}
+
+@media (max-width: 520px) {
+  .casera-tarjeta {
+    grid-template-columns: 84px 1fr;
+    gap: 12px;
+    padding: 16px 16px 0;
+  }
+
+  .casera-burbuja p {
+    font-size: 15px;
+  }
+}
