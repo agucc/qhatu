@@ -9,4 +9,4 @@ export const ADMOB_RECOMPENSA = 'ca-app-pub-3940256099942544/5224354917';
 
 // Partida en la nube: dirección del servidor de Qhatu en Cloudflare (carpeta nube/), por ejemplo
 // 'https://qhatu-nube.TU-SUBDOMINIO.workers.dev'. Vacío = sin nube (todo queda solo en el celular).
-export const NUBE_URL = '';
+export const NUBE_URL = 'https://qhatu-nube.kreno.workers.dev';

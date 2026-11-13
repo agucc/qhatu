@@ -47,7 +47,8 @@ const ESTADO = `JSON.stringify({
   pedido: document.querySelector('#pedido-texto')?.textContent || null,
   colorTexto: getComputedStyle(document.body).color,
   hojas: [...document.styleSheets].map(s => { try { return s.href + ' ' + s.cssRules.length } catch (e) { return s.href + ' bloqueada' } }),
-  diagnostico: document.querySelector('pre')?.textContent || null
+  diagnostico: document.querySelector('pre')?.textContent || null,
+  nube: (() => { try { const m = JSON.parse(localStorage.getItem('qhatu.nube') || '{}'); return { cuenta: !!m.llave, version: m.version ?? null, pendiente: !!m.pendiente }; } catch (e) { return null } })()
 }, null, 2)`;
 
 let { ws, evaluar } = await conectar();
