@@ -31,6 +31,6 @@ GOOGLE_CLIENT_ID = ""
 # Pagos con cripto directo a tu billetera (vacío = apagado). Red: "polygon" o "base".
 # La dirección es pública (0x…); nunca va aquí la frase secreta ni la llave privada.
 CRIPTO_RED = "polygon"
-CRIPTO_DIRECCION = ""
+CRIPTO_DIRECCION = "0x58C289698FA572F8448fC4e6f1B685B3B00226C8"
 # Verificación de compras de Google Play: el JSON de la cuenta de servicio va como SECRETO
 # (wrangler secret put GOOGLE_PLAY_CUENTA o en el panel de Cloudflare), nunca aquí.
