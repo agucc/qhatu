@@ -103,6 +103,23 @@ El reloj se detiene con las ventanas abiertas o la pantalla oculta y pita los ú
 - **Packs de yapa** (0,99 / 2,99 / 4,99 USD) y **pase sin anuncios** (2,99 USD): quien lo compra recibe la yapa de los anuncios sin verlos.
 - **Decoración con yapa:** fondos, toldos y formas de vaso. Solo cambia cómo se ve; nadie paga para ganar.
 
+### Lo que se vende
+
+| Categoría | Con yapa (se gana jugando) | Con dinero |
+| --- | --- | --- |
+| Paquetes de yapa | — | 150, 500, 1000 y 3000 de yapa |
+| Vestimentas y elementos culturales | Sombreros y prendas de cada país (bombín paceño, montera cusqueña, sombrero charro, vueltiao, poncho salteño, rebozo, chita…), que se desbloquean al visitar el país | — |
+| Personalización del personaje | Peinados, piel y colores gratis; accesorios y marcos con yapa | — |
+| Pasaportes especiales | Portadas andina, de la selva y de carnaval | **Pasaporte viajero**: 2 pasajes y la portada dorada |
+| Experiencia y progresión | Doble experiencia 24 h y pasaje extra | **Doble experiencia 7 días** |
+| Temporadas y desafíos premium | Premios gratis de la temporada y 3 desafíos por semana | **Pase de temporada**: premios premium (chullo de fiesta, poncho dorado, marco de oro, portada dorada, estrellas) y 2 desafíos más por semana |
+| Sin anuncios | — | Pase sin anuncios |
+
+- **Tu caserito** (`perfil/`, `shared/catalogo.js`, `avatar()` en `shared/marca.js`): el personaje del jugador, con las prendas y sombreros que usa La Casera en cada país. Se ve en la portada y en las salas.
+- **Temporada** (`temporada/`, `shared/temporada.js`): 20 niveles; la experiencia de los puestos da puntos de temporada y los desafíos de la semana también. Temporada 1: *Fiestas de fin de año* (1 nov 2026 – 31 ene 2027).
+- La experiencia y los pasajes solo sirven para subir de nivel y viajar: no cambian los puntajes contra amigos ni los contrarrelojes.
+- Productos de Google Play (crear con estos identificadores): `yapa_150`, `yapa_500`, `yapa_1000`, `yapa_3000`, `pase_temporada_t1` (no consumible), `pasaporte_viajero`, `doble_xp_7d`, `sin_anuncios` (no consumible).
+
 ### Métodos de pago
 
 | Versión | Cómo se paga | Qué falta para activarlo |
@@ -167,6 +184,8 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
 | `cultura.js` | Contenido cultural: láminas, caseritos con nombre y fiestas de cada país |
 | `sala.js` | Salas en vivo: conexión, cuenta regresiva, marcador y resultado |
+| `catalogo.js` | Artículos con yapa: vestimentas, personalización, portadas de pasaporte e impulsos |
+| `temporada.js` | Temporadas: niveles, premios gratis y premium, y desafíos de la semana |
 | `reloj.js` | Contrarreloj de los puestos: cuenta regresiva, barra de tiempo, récord y yapa |
 | `album.js` | Reglas del álbum, del sello del pasaporte, de los caseritos con nombre y de las fiestas |
 | `dibujos-fiesta.js` | Dibujo de cada fiesta |
@@ -252,6 +271,8 @@ saltenera/                          cuarto puesto
 tienda/                             yapa por anuncios, compras y decoración
 album/                              Álbum del Mercado y sello del pasaporte
 salas/                              Jugar con amigos (salas en vivo)
+perfil/                             Tu caserito: vestimentas y personalización
+temporada/                          Temporada: premios y desafíos
 nube/                               servidor de partidas en Cloudflare (Worker + D1)
 shared/                             código base de todos los puestos
 scripts/empaquetar.mjs              zips para portales

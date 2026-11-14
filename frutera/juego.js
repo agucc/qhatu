@@ -17,6 +17,7 @@ import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preg
 import { salasActivas, codigoDeUrl, jugarEnSala, azar } from '../shared/sala.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
+import { registrar } from '../shared/temporada.js';
 
 const COSTO_CAMBIAR = 5;
 const COSTO_SEGUIR = 20;
@@ -194,6 +195,7 @@ function alEvento(e) {
     return;
   }
   sonar.union(e.nivel);
+  registrar('frutas');
   avisarLamina(anotarFruta(PAIS, FRUTAS[e.nivel].id));
   juego.efectos.push({ tipo: 'estallido', x: e.x, y: e.y, color: FRUTAS[e.nivel].color, r: FRUTAS[e.nivel].r, vida: 0 });
   if (juego.pedido && e.nivel === juego.pedido.nivel) {

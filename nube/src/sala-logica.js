@@ -54,17 +54,23 @@ export function vencida(sala, ahora) {
 }
 
 /** Entra (o vuelve) un jugador. Devuelve null si todo bien, o el motivo del rechazo. */
-export function unirse(sala, id, nombre, pais, ahora) {
+export function limpiarAvatar(c) {
+  const a = String(c || '').toLowerCase();
+  return /^[0-9a-z.]{1,60}$/.test(a) ? a : '';
+}
+
+export function unirse(sala, id, nombre, pais, ahora, avatar = '') {
   if (vencida(sala, ahora)) return 'vencida';
   const ya = sala.jugadores[id];
   if (!ya) {
     if (sala.estado !== 'esperando') return 'empezada';
     if (conectados(sala).length >= MAX_JUGADORES) return 'llena';
-    sala.jugadores[id] = { nombre: limpiarNombre(nombre), pais: String(pais || 'bo').slice(0, 2), puntos: 0, fin: false, conectado: true };
+    sala.jugadores[id] = { nombre: limpiarNombre(nombre), pais: String(pais || 'bo').slice(0, 2), avatar: limpiarAvatar(avatar), puntos: 0, fin: false, conectado: true };
     sala.orden.push(id);
   } else {
     ya.conectado = true;
     if (nombre) ya.nombre = limpiarNombre(nombre);
+    if (avatar) ya.avatar = limpiarAvatar(avatar);
   }
   sala.creador ??= id;
   // El que creó la sala vuelve a ser anfitrión cuando regresa; si no, el primero conectado.
@@ -127,7 +133,7 @@ export function terminarJugador(sala, id, n, ahora) {
 
 export function ranking(sala) {
   return sala.orden
-    .map((id) => ({ id, nombre: sala.jugadores[id].nombre, pais: sala.jugadores[id].pais, puntos: sala.jugadores[id].puntos }))
+    .map((id) => ({ id, nombre: sala.jugadores[id].nombre, pais: sala.jugadores[id].pais, avatar: sala.jugadores[id].avatar || '', puntos: sala.jugadores[id].puntos }))
     .sort((a, b) => b.puntos - a.puntos);
 }
 

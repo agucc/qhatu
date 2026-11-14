@@ -400,3 +400,9 @@ body.juego {
   width: 24px;
   text-align: center;
 }
+
+.cara-sala svg {
+  display: block;
+  width: 30px;
+  height: 32px;
+}

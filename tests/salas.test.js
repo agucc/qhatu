@@ -99,3 +99,9 @@ test('misma semilla, misma secuencia de piezas para todos', () => {
   assert.notDeepEqual(sa, Array.from({ length: 20 }, azar(54321)));
   assert.ok(sa.every((x) => x >= 0 && x < 1));
 });
+
+test('el personaje que viaja a la sala se limpia', () => {
+  assert.equal(S.limpiarAvatar('3.Trenzas.aguayo.0.bombin.flor.oro'), '3.trenzas.aguayo.0.bombin.flor.oro');
+  assert.equal(S.limpiarAvatar('<script>alert(1)</script>'), '');
+  assert.equal(S.limpiarAvatar('a'.repeat(80)), '');
+});

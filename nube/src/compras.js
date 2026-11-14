@@ -11,6 +11,10 @@ export const PRODUCTOS = {
   yapa_150: 0.99,
   yapa_500: 2.99,
   yapa_1000: 4.99,
+  yapa_3000: 9.99,
+  pase_temporada_t1: 2.99,
+  pasaporte_viajero: 1.99,
+  doble_xp_7d: 0.99,
   sin_anuncios: 2.99,
 };
 

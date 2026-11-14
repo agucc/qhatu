@@ -188,3 +188,127 @@ export function caserito(cara = 0, sombreros = ['chullo', 'bombin']) {
     <path d="M25 38q5 4 10 0" stroke="#1d1a24" stroke-width="1.8" fill="none" stroke-linecap="round"/>
   </svg>`;
 }
+
+// ---------- Tu caserito: el personaje del jugador ----------
+// Se arma con piezas: piel, peinado, prenda, sombrero, accesorio y marco.
+// Las prendas y sombreros de cada país son los mismos que usa La Casera allí.
+
+export const PIELES_AVATAR = ['#8d5a3b', '#b9784f', '#d39b72', '#6e4429', '#e0b088'];
+
+const SOMBREROS_AVATAR = {
+  ninguno: () => '',
+  bombin: VESTUARIO.bo.sombrero,
+  montera: VESTUARIO.pe.sombrero,
+  vueltiao: VESTUARIO.co.sombrero,
+  ala: VESTUARIO.ar.sombrero,
+  lenco: VESTUARIO.br.sombrero,
+  gorra: VESTUARIO.us.sombrero,
+  chullo: () => `<path d="M33 46c0-16 12-26 27-26s27 10 27 26z" fill="${COLORES.frutilla}"/>
+    <path d="M34 40h52" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-dasharray="4 3"/>
+    <path d="M36 44v16M84 44v16" stroke="${COLORES.frutilla}" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="60" cy="18" r="5" fill="${COLORES.tumbo}"/>`,
+  boina: () => `<ellipse cx="58" cy="37" rx="28" ry="10" fill="#2b2433"/><circle cx="58" cy="27" r="2.5" fill="#2b2433"/>`,
+  charro: () => `<ellipse cx="60" cy="38" rx="46" ry="8" fill="#3a2a22"/>
+    <path d="M44 38c0-14 7-22 16-22s16 8 16 22z" fill="#3a2a22"/>
+    <path d="M18 38q42 10 84 0" stroke="${COLORES.tumbo}" stroke-width="2.5" fill="none" stroke-dasharray="3 3"/>
+    <path d="M45 33h30" stroke="${COLORES.tumbo}" stroke-width="3"/>`,
+  palha: () => `<ellipse cx="60" cy="38" rx="40" ry="7" fill="#e3c27a"/>
+    <path d="M44 38c0-12 7-18 16-18s16 6 16 18z" fill="#d9b25f"/>
+    <path d="M44.5 34h31" stroke="${COLORES.frutilla}" stroke-width="3"/>`,
+  vaquero: () => `<path d="M16 38q10 8 44 4q34 4 44-4q-6 10-44 10t-44-10z" fill="#8a5a33"/>
+    <path d="M42 40c0-14 6-24 18-24s18 10 18 24q-18 4-36 0z" fill="#9c6a3e"/>
+    <path d="M43 34q17 4 34 0" stroke="#5a3a20" stroke-width="3" fill="none"/>`,
+  fiesta: () => `<path d="M33 46c0-16 12-26 27-26s27 10 27 26z" fill="#ffb520"/>
+    <path d="M34 40h52" stroke="#9a48b8" stroke-width="3" stroke-dasharray="4 3"/>
+    <path d="M36 44v16M84 44v16" stroke="#ffb520" stroke-width="6" stroke-linecap="round"/>
+    <path d="M60 10l2.5 5 5.5 .8-4 3.9 1 5.5-5-2.6-5 2.6 1-5.5-4-3.9 5.5-.8z" fill="#ef476f"/>`,
+};
+
+const PRENDAS_AVATAR = {
+  camisa: (c) => franjas(c, []),
+  aguayo: VESTUARIO.bo.prenda,
+  lliclla: VESTUARIO.pe.prenda,
+  rebozo: VESTUARIO.mx.prenda,
+  vuelos: VESTUARIO.co.prenda,
+  poncho: VESTUARIO.ar.prenda,
+  avental: VESTUARIO.br.prenda,
+  cuadros: VESTUARIO.us.prenda,
+  dorado: () => franjas('#e0a526', [[100, 4, '#fff3c4'], [110, 4, '#b07a10'], [120, 4, '#fff3c4']]),
+};
+
+const PEINADOS = {
+  corto: () => '',
+  trenzas: () => `<path d="M34 56c-7 18-5 40-1 54" stroke="${PELO}" stroke-width="9" stroke-linecap="round" fill="none"/>
+       <path d="M86 56c7 18 5 40 1 54" stroke="${PELO}" stroke-width="9" stroke-linecap="round" fill="none"/>`,
+  mono: () => `<circle cx="60" cy="30" r="10" fill="${PELO}"/>`,
+  cola: () => `<path d="M86 56c10 10 12 26 6 38" stroke="${PELO}" stroke-width="9" stroke-linecap="round" fill="none"/>`,
+  rizos: () => [30, 38, 82, 90].map((x, i) => `<circle cx="${x}" cy="${58 + (i % 2) * 8}" r="8" fill="${PELO}"/>`).join(''),
+};
+
+const ACCESORIOS = {
+  ninguno: () => '',
+  aretes: () => `<circle cx="33" cy="76" r="4" fill="${COLORES.tumbo}"/><circle cx="87" cy="76" r="4" fill="${COLORES.tumbo}"/>`,
+  flor: () => `<circle cx="38" cy="44" r="6" fill="${COLORES.frutilla}"/><circle cx="38" cy="44" r="2.5" fill="${COLORES.tumbo}"/><circle cx="46" cy="40" r="4" fill="${COLORES.tumbo}"/>`,
+  lentes: () => `<circle cx="51.5" cy="62" r="7" fill="none" stroke="#1d1a24" stroke-width="2.5"/><circle cx="68.5" cy="62" r="7" fill="none" stroke="#1d1a24" stroke-width="2.5"/><path d="M58.5 62h3" stroke="#1d1a24" stroke-width="2.5"/>`,
+  bufanda: () => `<path d="M38 88q22 12 44 0v8q-22 12-44 0z" fill="${COLORES.hierbabuena}"/><path d="M70 94v18" stroke="${COLORES.hierbabuena}" stroke-width="7" stroke-linecap="round"/>`,
+  estrellas: () => [[24, 30], [96, 26], [100, 60]].map(([x, y]) => `<path d="M${x} ${y - 6}l1.8 4 4.2.4-3.2 2.8 1 4.2-3.8-2.2-3.8 2.2 1-4.2-3.2-2.8 4.2-.4z" fill="#ffd23f"/>`).join(''),
+};
+
+const MARCOS = {
+  simple: () => '<rect x="2" y="2" width="116" height="126" rx="22" fill="#2c2539"/>',
+  madera: () => '<rect x="2" y="2" width="116" height="126" rx="22" fill="#6b3f1f"/><rect x="8" y="8" width="104" height="114" rx="16" fill="#2c2539"/>',
+  aguayo: () => `<rect x="2" y="2" width="116" height="126" rx="22" fill="${COLORES.api}"/><path d="M2 20h116M2 110h116" stroke="${COLORES.tumbo}" stroke-width="5"/><rect x="8" y="8" width="104" height="114" rx="16" fill="#2c2539"/>`,
+  oro: () => '<rect x="2" y="2" width="116" height="126" rx="22" fill="#e0a526"/><rect x="7" y="7" width="106" height="116" rx="17" fill="#fff3c4" opacity=".35"/><rect x="10" y="10" width="100" height="110" rx="14" fill="#2c2539"/>',
+};
+
+export const PIEZAS_AVATAR = {
+  sombrero: Object.keys(SOMBREROS_AVATAR),
+  prenda: Object.keys(PRENDAS_AVATAR),
+  peinado: Object.keys(PEINADOS),
+  accesorio: Object.keys(ACCESORIOS),
+  marco: Object.keys(MARCOS),
+};
+
+export const AVATAR_INICIAL = { piel: 1, peinado: 'corto', prenda: 'camisa', color: 0, sombrero: 'ninguno', accesorio: 'ninguno', marco: 'simple' };
+const COLORES_CAMISA = [COLORES.hierbabuena, COLORES.frutilla, COLORES.api, COLORES.tumbo, '#3657a8'];
+
+/** Dibuja el personaje del jugador. `conMarco: false` para mostrarlo chiquito sin fondo. */
+export function avatar(av = {}, { conMarco = true, id = 'av' } = {}) {
+  const a = { ...AVATAR_INICIAL, ...av };
+  const piel = PIELES_AVATAR[a.piel] || PIELES_AVATAR[1];
+  const prenda = (PRENDAS_AVATAR[a.prenda] || PRENDAS_AVATAR.camisa)(COLORES_CAMISA[a.color] || COLORES_CAMISA[0]);
+  return `<svg class="avatar" viewBox="0 0 120 130" aria-hidden="true">
+  <defs><clipPath id="manta-casera"><path d="M12 130c2-26 20-40 48-40s46 14 48 40z"/></clipPath></defs>
+  ${conMarco ? (MARCOS[a.marco] || MARCOS.simple)() : ''}
+  ${(PEINADOS[a.peinado] || PEINADOS.corto)()}
+  ${prenda}
+  <ellipse cx="60" cy="62" rx="27" ry="30" fill="${piel}"/>
+  <path d="M33 60c0-16 12-27 27-27s27 11 27 27c-8-8-18-12-27-12s-19 4-27 12z" fill="${PELO}"/>
+  ${(SOMBREROS_AVATAR[a.sombrero] || SOMBREROS_AVATAR.ninguno)()}
+  <path d="M47 63q4.5-5 9 0M64 63q4.5-5 9 0" stroke="${PELO}" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <circle cx="45" cy="73" r="5" fill="${COLORES.frutilla}" opacity=".35"/>
+  <circle cx="75" cy="73" r="5" fill="${COLORES.frutilla}" opacity=".35"/>
+  <path d="M51 78q9 8 18 0" stroke="${PELO}" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  ${(ACCESORIOS[a.accesorio] || ACCESORIOS.ninguno)()}
+</svg>`.replace(/id="av"/g, `id="${id}"`);
+}
+
+/** Código corto del personaje para mandarlo a las salas: "piel.peinado.prenda.color.sombrero.accesorio.marco". */
+export function codigoAvatar(av = {}) {
+  const a = { ...AVATAR_INICIAL, ...av };
+  return [a.piel, a.peinado, a.prenda, a.color, a.sombrero, a.accesorio, a.marco].join('.');
+}
+
+export function leerCodigoAvatar(c) {
+  const [piel, peinado, prenda, color, sombrero, accesorio, marco] = String(c || '').split('.');
+  const ok = (lista, v, def) => (lista.includes(v) ? v : def);
+  return {
+    piel: Math.min(PIELES_AVATAR.length - 1, Math.max(0, Number(piel) || 0)),
+    peinado: ok(PIEZAS_AVATAR.peinado, peinado, 'corto'),
+    prenda: ok(PIEZAS_AVATAR.prenda, prenda, 'camisa'),
+    color: Math.min(4, Math.max(0, Number(color) || 0)),
+    sombrero: ok(PIEZAS_AVATAR.sombrero, sombrero, 'ninguno'),
+    accesorio: ok(PIEZAS_AVATAR.accesorio, accesorio, 'ninguno'),
+    marco: ok(PIEZAS_AVATAR.marco, marco, 'simple'),
+  };
+}

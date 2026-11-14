@@ -238,3 +238,32 @@
   color: var(--texto);
   font: 12px ui-monospace, monospace;
 }
+
+.icono-producto svg {
+  display: block;
+  width: 48px;
+  height: 48px;
+}
+
+.accesos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.acceso {
+  display: grid;
+  gap: 2px;
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(140deg, var(--puesto-2), var(--puesto));
+  box-shadow: inset 0 0 0 2px var(--borde);
+  color: var(--texto);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.acceso small {
+  font-weight: 600;
+  color: var(--texto-suave);
+}

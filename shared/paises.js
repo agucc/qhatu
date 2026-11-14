@@ -208,7 +208,8 @@ export function pasajesGanados(xp) {
 
 /** Pasajes que el jugador puede usar ahora para viajar a un país nuevo. */
 export function pasajesLibres(estado) {
-  return Math.max(0, pasajesGanados(xpTotal(estado)) - (paisesAbiertos(estado).length - 1));
+  // Los pasajes extra (impulso o pasaporte viajero) se suman a los ganados con experiencia.
+  return Math.max(0, pasajesGanados(xpTotal(estado)) + (estado.pasajesExtra || 0) - (paisesAbiertos(estado).length - 1));
 }
 
 /** Experiencia del próximo pasaje, o null si ya se ganaron todos. */

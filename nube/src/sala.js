@@ -53,7 +53,7 @@ export class Sala extends DurableObject {
     const par = new WebSocketPair();
     const [cliente, servidor] = Object.values(par);
     const id = url.searchParams.get('jugador') || '';
-    const rechazo = ID_VALIDO.test(id) ? S.unirse(sala, id, url.searchParams.get('nombre'), url.searchParams.get('pais'), ahora) : 'jugador';
+    const rechazo = ID_VALIDO.test(id) ? S.unirse(sala, id, url.searchParams.get('nombre'), url.searchParams.get('pais'), ahora, url.searchParams.get('avatar')) : 'jugador';
     if (rechazo) {
       // Se acepta para poder decir por qué no puede entrar, y se cierra.
       servidor.accept();

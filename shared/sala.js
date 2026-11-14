@@ -3,11 +3,14 @@
 
 import { NUBE_URL } from './compilacion.js';
 import { EN_PORTAL } from './config.js';
-import { obtener, sumarYapa } from './almacen.js';
+import { obtener, sumarYapa, guardar } from './almacen.js';
 import { paisActual, bandera } from './paises.js';
 import { t } from './i18n.js';
 import { ventana, confeti, aviso, escapar, el } from './ui.js';
 import { sonar } from './sonido.js';
+import { registrar } from './temporada.js';
+import { avatar, codigoAvatar, leerCodigoAvatar } from './marca.js';
+import { miAvatar } from './catalogo.js';
 
 export const salasActivas = Boolean(NUBE_URL) && !EN_PORTAL;
 export const YAPA_GANADOR = 15;
@@ -98,7 +101,7 @@ export function conectarSala(codigo, { alEstado, alError = () => {} }) {
     },
   };
   function abrir() {
-    const q = new URLSearchParams({ jugador: yo.id, nombre: yo.nombre || '', pais: paisActual(obtener()) });
+    const q = new URLSearchParams({ jugador: yo.id, nombre: yo.nombre || '', pais: paisActual(obtener()), avatar: codigoAvatar(miAvatar()) });
     ws = new WebSocket(`${base().replace(/^http/, 'ws')}/v1/salas/${codigo}/ws?${q}`);
     ws.onmessage = (e) => {
       let m;
@@ -185,10 +188,13 @@ export async function resultadoSala(sala, yo) {
   const mio = r.findIndex((x) => x.id === yo);
   const gane = mio === 0 && r.length > 1 && r[0].puntos > (r[1]?.puntos ?? -1);
   const yapa = gane ? YAPA_GANADOR : (r[mio]?.puntos || 0) > 0 ? YAPA_JUGAR : 0;
+  registrar('sala');
+  registrar('contrarreloj');
   if (yapa) sumarYapa(yapa);
+  else guardar();
   if (gane) confeti();
   const filas = r
-    .map((x, i) => `<li class="${x.id === yo ? 'yo' : ''}"><span class="puesto-num">${MEDALLAS[i] || i + 1}</span>${bandera(x.pais, 16)}<span>${escapar(x.nombre)}</span><b>${x.puntos}</b></li>`)
+    .map((x, i) => `<li class="${x.id === yo ? 'yo' : ''}"><span class="puesto-num">${MEDALLAS[i] || i + 1}</span><span class="cara-sala">${avatar(leerCodigoAvatar(x.avatar), { id: `rk-${i}`, conMarco: false })}</span>${bandera(x.pais, 16)}<span>${escapar(x.nombre)}</span><b>${x.puntos}</b></li>`)
     .join('');
   return ventana({
     titulo: gane ? t('salaGanaste') : t('salaResultado'),

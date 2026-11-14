@@ -10,13 +10,21 @@ import { EN_APP } from './config.js';
 import { complementoNativo } from './nativo.js';
 import { VERSION_DE_PRUEBA, CANAL, NUBE_URL } from './compilacion.js';
 import { llaveNube } from './nube.js';
+import { aplicarImpulso, darArticulo } from './catalogo.js';
+import { activarPase, miTemporada, temporadaActual } from './temporada.js';
+
+const miTemporadaProducto = () => temporadaActual()?.producto;
 
 /** Los identificadores deben existir igual en Google Play Console (productos integrados en la app). */
 export const PRODUCTOS = [
   { id: 'yapa_150', tipo: 'yapa', yapa: 150, usd: 0.99 },
   { id: 'yapa_500', tipo: 'yapa', yapa: 500, usd: 2.99 },
   { id: 'yapa_1000', tipo: 'yapa', yapa: 1000, usd: 4.99 },
-  { id: 'sin_anuncios', tipo: 'sin_anuncios', usd: 2.99 },
+  { id: 'yapa_3000', tipo: 'yapa', yapa: 3000, usd: 9.99 },
+  { id: 'pase_temporada_t1', tipo: 'temporada', usd: 2.99, unaVez: true },
+  { id: 'pasaporte_viajero', tipo: 'pasaporte', pasajes: 2, usd: 1.99 },
+  { id: 'doble_xp_7d', tipo: 'xp2', horas: 7 * 24, usd: 0.99 },
+  { id: 'sin_anuncios', tipo: 'sin_anuncios', usd: 2.99, unaVez: true },
 ];
 
 const demo = typeof location !== 'undefined' && new URLSearchParams(location.search).get('compras') === 'demo';
@@ -84,10 +92,10 @@ export async function iniciarCompras() {
 async function restaurar(plugin) {
   try {
     const { purchases } = await plugin.getPurchases({ productType: 'inapp' });
-    if ((purchases || []).some((c) => c.productIdentifier === 'sin_anuncios' && String(c.purchaseState ?? '1') === '1')) {
-      obtener().sinAnuncios = true;
-      guardar();
-    }
+    const pagadas = (purchases || []).filter((c) => String(c.purchaseState ?? '1') === '1').map((c) => c.productIdentifier);
+    if (pagadas.includes('sin_anuncios')) obtener().sinAnuncios = true;
+    if (pagadas.some((id) => id.startsWith('pase_temporada_') && id === miTemporadaProducto())) activarPase(obtener());
+    guardar();
   } catch {
     /* sin conexión: se intenta otro día */
   }
@@ -120,20 +128,35 @@ export function sinAnuncios() {
   return Boolean(obtener().sinAnuncios);
 }
 
+/** ¿Ya lo tiene? (el pase sin anuncios y el pase de temporada se compran una vez). */
+export function yaComprado(producto) {
+  if (producto.tipo === 'sin_anuncios') return sinAnuncios();
+  if (producto.tipo === 'temporada') return Boolean(miTemporada()?.premium);
+  return false;
+}
+
 /** Entrega lo comprado. */
 export function entregar(producto) {
-  if (producto.tipo === 'yapa') sumarYapa(producto.yapa);
-  else if (producto.tipo === 'sin_anuncios') {
-    obtener().sinAnuncios = true;
-    guardar();
+  const e = obtener();
+  if (producto.tipo === 'yapa') {
+    sumarYapa(producto.yapa);
+    return;
   }
+  if (producto.tipo === 'sin_anuncios') e.sinAnuncios = true;
+  else if (producto.tipo === 'temporada') activarPase(e);
+  else if (producto.tipo === 'xp2') aplicarImpulso('xp2', e, { horas: producto.horas });
+  else if (producto.tipo === 'pasaporte') {
+    for (let i = 0; i < producto.pasajes; i++) aplicarImpulso('pasaje', e);
+    darArticulo('portada:dorada', e);
+  }
+  guardar();
 }
 
 /** Compra con Google Play (o simulada en la versión de prueba). Devuelve true si se entregó. */
 export async function comprar(id, { simular = false } = {}) {
   const producto = PRODUCTOS.find((p) => p.id === id);
   if (!producto) return false;
-  if (producto.tipo === 'sin_anuncios' && sinAnuncios()) return false;
+  if (yaComprado(producto)) return false;
   const m = await iniciarCompras();
   if (simular || m === 'prueba') {
     if (!sePuedeSimular()) return false;

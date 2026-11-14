@@ -210,7 +210,7 @@
 
 .tienda-tarjeta {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   padding: 18px 20px;
@@ -605,4 +605,37 @@
 
 .amigos-tarjeta {
   background: linear-gradient(120deg, #1f3a2e, var(--puesto) 70%);
+}
+
+/* ---------- Tu caserito y temporada ---------- */
+
+.mi-avatar {
+  display: block;
+  width: 42px;
+  height: 46px;
+  flex: none;
+}
+
+.mi-avatar svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.temporada-tarjeta {
+  background: linear-gradient(120deg, #4a1f3a, var(--puesto) 70%);
+}
+
+.temporada-tarjeta[hidden] {
+  display: none;
+}
+
+.titulo-con-portada {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.portada-mini svg {
+  display: block;
 }

@@ -9,6 +9,7 @@ import { nombreBebida, descBebida } from '../refresquera/bebidas.js';
 import { recetasDe, nivelesEn } from '../refresquera/recetario.js';
 import { frutasDe, nombreFruta } from '../frutera/frutas.js';
 import { FRUTAS_ALBUM, COMIDA_ALBUM, TEJIDO_ALBUM, PALABRA_ALBUM, FIESTAS, CASERITOS } from './cultura.js';
+import { registrar } from './temporada.js';
 
 export const YAPA_LAMINA = 5;
 export const YAPA_SELLO = 50;
@@ -121,6 +122,7 @@ function nombreLamina(pais, id, estado) {
 /** Gana una lámina: guarda, da yapa y devuelve el texto del aviso (o null si ya la tenía). */
 function cobrar(pais, id, estado = obtener()) {
   if (!ganar(id, estado)) return null;
+  registrar('lamina', 1, estado);
   sumarYapa(YAPA_LAMINA); // también guarda
   return t('laminaNueva', { nombre: nombreLamina(pais, id, estado), n: YAPA_LAMINA });
 }

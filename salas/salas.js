@@ -11,6 +11,7 @@ import { dibujoTejido } from '../shared/tejidos.js';
 import { svgComida } from '../saltenera/comidas.js';
 import { salasActivas, miJugador, guardarNombre, crearSala, conectarSala, PAGINA } from '../shared/sala.js';
 import { SEGUNDOS } from '../shared/reloj.js';
+import { avatar, leerCodigoAvatar } from '../shared/marca.js';
 
 const $ = (sel) => document.querySelector(sel);
 const PAIS = datosPais(paisActual(obtener()));
@@ -43,7 +44,7 @@ function pintarEspera() {
   $('#sala-puesto').textContent = `${nombrePuesto(sala.puesto)} · ${t('contrarreloj')} ${sala.segundos} s`;
   $('#jugadores').innerHTML = sala.jugadores
     .filter((j) => j.conectado)
-    .map((j) => `<li class="${j.id === yo ? 'yo' : ''}">${bandera(j.pais, 20)}<span>${escapar(j.nombre)}</span>${j.id === sala.anfitrion ? `<small>${escapar(t('anfitrion'))}</small>` : ''}</li>`)
+    .map((j, i) => `<li class="${j.id === yo ? 'yo' : ''}"><span class="cara-sala">${avatar(leerCodigoAvatar(j.avatar), { id: `ls-${i}`, conMarco: false })}</span>${bandera(j.pais, 20)}<span>${escapar(j.nombre)}</span>${j.id === sala.anfitrion ? `<small>${escapar(t('anfitrion'))}</small>` : ''}</li>`)
     .join('');
   const soyAnfitrion = sala.anfitrion === yo;
   const conectados = sala.jugadores.filter((j) => j.conectado).length;

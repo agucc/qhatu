@@ -16,6 +16,7 @@ import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preg
 import { salasActivas, codigoDeUrl, jugarEnSala } from '../shared/sala.js';
 import { paisActual, pais as datosPais, texto as enIdioma } from '../shared/paises.js';
 import { svgComida, PARRILLA } from './comidas.js';
+import { registrar } from '../shared/temporada.js';
 
 const COSTO_PICO = 15;
 
@@ -247,6 +248,7 @@ async function alContrarreloj() {
 function alTocar(ev) {
   if (juego.pausas || juego.cerrandoReloj) return;
   if (juego.reloj) juego.relojHechas++;
+  registrar('cocina');
   const lamina = anotarCocina(PAIS_DATOS.id);
   if (lamina) aviso(lamina, { tipo: 'exito' });
   const monto = S.toque(e, Date.now());

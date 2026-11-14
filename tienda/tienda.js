@@ -4,7 +4,9 @@ import { obtener, guardar, diaLocal, anunciosYapaRestantes, cobrarAnuncioYapa, Y
 import { t, aplicarTextos, nombreDeco } from '../shared/i18n.js';
 import { sonar } from '../shared/sonido.js';
 import { iniciarAnuncios, anuncios } from '../shared/anuncios.js';
-import { PRODUCTOS, modoCompras, comprar, precio, sinAnuncios, iniciarCompras, datosCripto, precioCripto, comprarConCripto, sePuedeSimular } from '../shared/compras.js';
+import { PRODUCTOS, modoCompras, comprar, precio, iniciarCompras, datosCripto, precioCripto, comprarConCripto, sePuedeSimular, yaComprado } from '../shared/compras.js';
+import { articulo, comprarArticulo } from '../shared/catalogo.js';
+import { texto } from '../shared/paises.js';
 import { GRUPOS, aplicarDecoracion, enUso, esMio, usar, disponibles } from '../shared/decoracion.js';
 import { chipYapa, contadorYapa, aviso, confeti, escapar, ventana } from '../shared/ui.js';
 import { iniciarPlataforma } from '../shared/plataforma.js';
@@ -48,21 +50,64 @@ $('#anuncio-yapa').addEventListener('click', async (ev) => {
 
 // ---------- Compras ----------
 
+const ICONOS_PRODUCTO = {
+  temporada: '<svg viewBox="0 0 40 40"><path d="M20 4l4.7 9.6 10.6 1.5-7.7 7.5 1.8 10.5L20 28.1l-9.4 5 1.8-10.5-7.7-7.5 10.6-1.5z" fill="#ffd23f"/></svg>',
+  pasaporte: '<svg viewBox="0 0 40 40"><rect x="8" y="4" width="24" height="32" rx="3" fill="#b07a10"/><rect x="11" y="7" width="18" height="26" rx="2" fill="#ffd23f"/><circle cx="20" cy="17" r="5" fill="none" stroke="#b07a10" stroke-width="2"/><path d="M14 27h12" stroke="#b07a10" stroke-width="2"/></svg>',
+  xp2: '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16" fill="#1fb5a5"/><path d="M12 24l8-10 8 10M12 30l8-10 8 10" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+};
+
+function textosProducto(p) {
+  if (p.tipo === 'yapa') return { titulo: t('packYapa', { n: p.yapa }), detalle: '' };
+  if (p.tipo === 'temporada') return { titulo: t('paseTemporada'), detalle: t('paseTemporadaDesc') };
+  if (p.tipo === 'pasaporte') return { titulo: t('pasaporteViajero'), detalle: t('pasaporteViajeroDesc', { n: p.pasajes }) };
+  if (p.tipo === 'xp2') return { titulo: t('dobleXpSemana'), detalle: t('dobleXpSemanaDesc') };
+  return { titulo: t('quitarAnuncios'), detalle: t('quitarAnunciosDesc') };
+}
+
+// ---------- Impulsos con yapa ----------
+
+function pintarImpulsos() {
+  const e = obtener();
+  const quedan = Math.max(0, (e.impulsos?.xp2Hasta || 0) - Date.now());
+  $('#impulsos').innerHTML = ['impulso:xp2', 'impulso:pasaje']
+    .map((id) => {
+      const a = articulo(id);
+      const activo = a.pieza === 'xp2' && quedan > 0 ? `<p class="nota">${escapar(t('xpActiva', { h: Math.ceil(quedan / 3600_000) }))}</p>` : '';
+      const desc = a.pieza === 'xp2' ? t('dobleXpDesc') : t('pasajeExtraDesc');
+      return `<article class="producto"><span class="icono-producto" aria-hidden="true">${a.pieza === 'xp2' ? ICONOS_PRODUCTO.xp2 : ICONOS_PRODUCTO.pasaporte}</span>
+        <div class="producto-texto"><h3>${escapar(texto(a.nombre))}</h3><p>${escapar(desc)}</p>${activo}</div>
+        <button class="boton" type="button" data-impulso="${id}"><span class="yapa-icono" aria-hidden="true"></span>${a.precio}</button></article>`;
+    })
+    .join('');
+}
+
+$('#impulsos').addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-impulso]');
+  if (!b) return;
+  const r = comprarArticulo(b.dataset.impulso);
+  if (r === 'ok') {
+    sonar.yapa();
+    aviso(t('impulsoListo'), { tipo: 'exito' });
+  } else aviso(t('faltaYapa'), { tipo: 'alerta' });
+  pintarImpulsos();
+});
+
 function pintarProductos() {
   const modo = modoCompras();
   $('#productos').innerHTML = PRODUCTOS.map((p) => {
     const esYapa = p.tipo === 'yapa';
-    const yaComprado = !esYapa && sinAnuncios();
-    const titulo = esYapa ? t('packYapa', { n: p.yapa }) : t('quitarAnuncios');
-    const detalle = esYapa ? '' : `<p>${escapar(t('quitarAnunciosDesc'))}</p>`;
+    const comprado = yaComprado(p);
+    const { titulo, detalle } = textosProducto(p);
     const dibujo = esYapa
-      ? `<span class="pila pila-${p.yapa}" aria-hidden="true"><i></i><i></i><i></i></span>`
-      : '<span class="sin-anuncios" aria-hidden="true"></span>';
+      ? `<span class="pila pila-${Math.min(p.yapa, 1000)}" aria-hidden="true"><i></i><i></i><i></i></span>`
+      : p.tipo === 'sin_anuncios'
+        ? '<span class="sin-anuncios" aria-hidden="true"></span>'
+        : `<span class="icono-producto" aria-hidden="true">${ICONOS_PRODUCTO[p.tipo] || ''}</span>`;
     const conCripto = modo === 'directo' ? precioCripto(p) : null;
-    const boton = yaComprado
+    const boton = comprado
       ? `<span class="sello">${escapar(t('comprado'))}</span>`
       : `<button class="boton" type="button" data-producto="${p.id}" ${modo === 'no' ? 'disabled' : ''}>${escapar(conCripto ? `${conCripto} USD` : precio(p))}</button>`;
-    return `<article class="producto">${dibujo}<div class="producto-texto"><h3>${escapar(titulo)}</h3>${detalle}</div>${boton}</article>`;
+    return `<article class="producto">${dibujo}<div class="producto-texto"><h3>${escapar(titulo)}</h3>${detalle ? `<p>${escapar(detalle)}</p>` : ''}</div>${boton}</article>`;
   }).join('');
   const c = datosCripto();
   $('#compras-nota').textContent =
@@ -202,10 +247,12 @@ $('#chip-yapa').innerHTML = chipYapa();
 contadorYapa();
 pintarGratis();
 pintarProductos();
+pintarImpulsos();
 pintarDecoracion();
 document.addEventListener('qhatu:idioma', () => {
   pintarGratis();
   pintarProductos();
+  pintarImpulsos();
   pintarDecoracion();
 });
 iniciarCompras().then(pintarProductos);

@@ -3,8 +3,9 @@
 
 import { t } from './i18n.js';
 import { ventana, confeti } from './ui.js';
-import { sumarYapa } from './almacen.js';
+import { sumarYapa, guardar } from './almacen.js';
 import { sonar } from './sonido.js';
+import { registrar } from './temporada.js';
 
 /** Segundos de cada puesto. El puesto de comida es un "pedido relámpago" más corto. */
 export const SEGUNDOS = { refresquera: 90, frutera: 90, aguayo: 90, saltenera: 30 };
@@ -112,7 +113,9 @@ export async function preguntarContrarreloj({ segundos, que, record }) {
  * `hecho`: texto de lo logrado (por ejemplo "12 vasos").
  */
 export async function finContrarreloj({ hecho, nuevoRecord, yapa }) {
+  registrar('contrarreloj');
   if (yapa > 0) sumarYapa(yapa);
+  else guardar();
   sonar.fin?.();
   if (nuevoRecord) confeti();
   return ventana({

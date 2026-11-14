@@ -148,3 +148,9 @@ body.salas {
   display: grid;
   gap: 10px;
 }
+
+.cara-sala svg {
+  display: block;
+  width: 30px;
+  height: 32px;
+}

@@ -21,6 +21,7 @@ import { chipYapa, contadorYapa, aviso, flotante, ventana, escapar, confeti, cel
 import { caserito } from '../shared/marca.js';
 import { aplicarDecoracion, enUso } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
+import { registrar } from '../shared/temporada.js';
 
 const COSTO_EXTRA = 25;
 const COSTO_PISTA = 10;
@@ -480,6 +481,7 @@ async function intentarServir() {
 
 async function nivelCompleto() {
   juego.bloqueado = true;
+  registrar('tandas');
   datos.nivel++;
   guardar();
   sumarYapa(YAPA_NIVEL);
@@ -644,6 +646,7 @@ function salirReloj() {
 async function tandaLista() {
   juego.bloqueado = true;
   juego.tandas++;
+  registrar('tandas');
   sonar.servido();
   confeti({ cantidad: 18 });
   aviso(t('relojTanda', { n: juego.tandas }), { tipo: 'exito' });

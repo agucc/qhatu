@@ -2,7 +2,7 @@
 
 import { obtener, guardar, diaLocal, rachaVigente, regaloDisponible, recibirRegalo, montoRegalo, alCambiar } from './shared/almacen.js';
 import { t, aplicarTextos, IDIOMAS, idioma, cambiarIdioma } from './shared/i18n.js';
-import { logo, casera, toldo, COLORES } from './shared/marca.js';
+import { logo, casera, toldo, COLORES, avatar } from './shared/marca.js';
 import { chipYapa, contadorYapa, flotante, aviso, escapar, ventana } from './shared/ui.js';
 import { sonar } from './shared/sonido.js';
 import { EN_APP } from './shared/config.js';
@@ -17,6 +17,8 @@ import { svgComida } from './saltenera/comida-portal.js';
 import { dibujoTejido } from './shared/tejidos.js';
 import { visitarPais, progresoAlbum, sellado, fiestaActiva, textoFechas } from './shared/album.js';
 import { dibujoFiesta } from './shared/dibujos-fiesta.js';
+import { registrar, temporadaActual, miTemporada, nivelTemporada, nombreTemporada, NIVELES } from './shared/temporada.js';
+import { miAvatar, miPortada, PORTADAS } from './shared/catalogo.js';
 
 // Enlaces siempre a un archivo .html: dentro de la app Android, una ruta de carpeta
 // ("refresquera/") devuelve la portada en vez del puesto.
@@ -216,6 +218,20 @@ function elegirPaisSiFalta() {
   });
 }
 
+function pintarPersonaje() {
+  document.getElementById('mi-avatar').innerHTML = avatar(miAvatar(), { id: 'av-cabecera' });
+  const [a, b] = PORTADAS[miPortada()] || PORTADAS.clasica;
+  document.getElementById('portada-mini').innerHTML = `<svg viewBox="0 0 48 64" width="22"><rect width="48" height="64" rx="5" fill="${a}"/><rect x="5" y="5" width="38" height="54" rx="3" fill="none" stroke="${b}" stroke-width="3"/><circle cx="24" cy="27" r="9" fill="none" stroke="${b}" stroke-width="3"/></svg>`;
+  const tmp = temporadaActual();
+  const tarjeta = document.querySelector('.temporada-tarjeta');
+  tarjeta.hidden = !tmp;
+  if (tmp) {
+    const m = miTemporada();
+    document.getElementById('temporada-titulo').textContent = t('temporada');
+    document.getElementById('temporada-texto').textContent = `${nombreTemporada(tmp)} · ${t('nivelTemporada', { n: nivelTemporada(m.puntos), total: NIVELES })}`;
+  }
+}
+
 function pintarAlbumYFiesta() {
   const e = obtener();
   const aqui = paisActual(e);
@@ -245,6 +261,7 @@ function pintarTodo() {
   pintarPais();
   pintarPasaporte();
   pintarAlbumYFiesta();
+  pintarPersonaje();
 }
 
 window.QHATU_LISTO = true;
@@ -261,12 +278,14 @@ document.addEventListener('qhatu:idioma', () => {
   pintarPais();
   pintarPasaporte();
   pintarAlbumYFiesta();
+  pintarPersonaje();
 });
 alCambiar(() => pintarCasera());
 
 document.getElementById('regalo-boton').addEventListener('click', (ev) => {
   const monto = recibirRegalo(obtener(), diaLocal());
   if (!monto) return;
+  registrar('regalo');
   guardar();
   sonar.yapa();
   flotante(`+${monto}`, ev.currentTarget);

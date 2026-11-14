@@ -48,6 +48,7 @@
   <header class="cabecera">
     <a href="index.html" class="cabecera-logo" id="logo"></a>
     <div class="cabecera-derecha">
+      <a class="mi-avatar" id="mi-avatar" href="perfil/index.html" data-t-aria="tuCaserito" aria-label="Tu caserito"></a>
       <a class="pais-chip" id="pais-chip" href="#pasaporte"></a>
       <div id="chip-yapa"></div>
     </div>
@@ -76,11 +77,19 @@
     </section>
 
     <section class="pasaporte" id="pasaporte" aria-labelledby="titulo-pasaporte">
-      <h2 class="seccion-titulo" id="titulo-pasaporte" data-t="pasaporte">Tu pasaporte</h2>
+      <h2 class="seccion-titulo titulo-con-portada" id="titulo-pasaporte"><span class="portada-mini" id="portada-mini" aria-hidden="true"></span><span data-t="pasaporte">Tu pasaporte</span></h2>
       <p class="pasaporte-estado" id="pasaporte-estado"></p>
       <div class="barra-pasaje" aria-hidden="true"><i id="barra-pasaje"></i></div>
       <div class="paises" id="paises"></div>
     </section>
+
+    <a class="tienda-tarjeta temporada-tarjeta" href="temporada/index.html">
+      <div>
+        <h2 id="temporada-titulo" data-t="temporada">Temporada</h2>
+        <p id="temporada-texto"></p>
+      </div>
+      <span class="boton" data-t="entrar">Entrar</span>
+    </a>
 
     <a class="tienda-tarjeta amigos-tarjeta" href="salas/index.html">
       <div>

@@ -16,6 +16,7 @@ import { SEGUNDOS, crearReloj, montarBarraReloj, pintarReloj, ocultarReloj, preg
 import { salasActivas, codigoDeUrl, jugarEnSala, azar } from '../shared/sala.js';
 import { aplicarDecoracion } from '../shared/decoracion.js';
 import { ganarXp } from '../shared/progreso.js';
+import { registrar } from '../shared/temporada.js';
 
 const COSTO_CAMBIAR = 10;
 const COSTO_SEGUIR = 20;
@@ -262,6 +263,7 @@ function colocarPieza(i, fila, col) {
     juego.bloqueado = true;
     pintarTelar({ lleno: r.lleno, tejer: r.franjas });
     sonar.tejer(r.franjas.length);
+    registrar('franjas', r.franjas.length);
     const lamina = anotarFranjas(PAIS, r.franjas.length);
     if (lamina) setTimeout(() => aviso(lamina, { tipo: 'exito' }), 900);
     juego.tela = [...r.franjas.map((fr) => fr.colores).reverse(), ...juego.tela].slice(0, MAX_TELA);
