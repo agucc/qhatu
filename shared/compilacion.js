@@ -9,9 +9,11 @@ export const VERSION_DE_PRUEBA = true;
 // La compilación para Play lo cambia sola (QHATU_CANAL=play en scripts/web.mjs).
 export const CANAL = 'directo';
 
-// AdMob: identificadores de PRUEBA de Google (muestran "Test Ad"). Al publicar, cambiar por los tuyos
-// y también el APPLICATION_ID en android/app/src/main/res/values/strings.xml.
-export const ADMOB_RECOMPENSA = 'ca-app-pub-3940256099942544/5224354917';
+// Unity Ads (anuncios con recompensa en la app Android, sin AdMob). En el panel de Unity
+// (Monetization → Ad Units) se crea el proyecto y se copian aquí el Game ID de Android y el
+// nombre del bloque con recompensa. Vacío = sin Unity (en la versión de prueba se simula).
+export const UNITY_GAME_ID = '';
+export const UNITY_RECOMPENSA = 'Rewarded_Android';
 
 // Partida en la nube: dirección del servidor de Qhatu en Cloudflare (carpeta nube/), por ejemplo
 // 'https://qhatu-nube.TU-SUBDOMINIO.workers.dev'. Vacío = sin nube (todo queda solo en el celular).

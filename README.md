@@ -161,7 +161,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `progreso.js` | Nivel y experiencia de cada puesto |
 | `decoracion.js` | Fondos, toldos y vasos que se compran con yapa |
 | `compras.js` | Packs de yapa y pase sin anuncios (Google Play Billing) |
-| `compilacion.js` | Versión de prueba o de tienda, e identificadores de AdMob |
+| `compilacion.js` | Versión de prueba o de tienda, canal, Unity Ads y servidor |
 | `compartir.js` | Retar a un amigo (Telegram, menú de Android o portapapeles) |
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
@@ -220,7 +220,7 @@ El identificador de la app es `bo.qhatu.mercado` (en `capacitor.config.json`). S
 ### Antes de publicar en Google Play
 
 1. **`shared/compilacion.js`:** poner `VERSION_DE_PRUEBA = false`. En la versión de prueba las compras se simulan sin cobrar y los anuncios son de prueba.
-2. **AdMob** (`@capacitor-community/admob`): crear la app y un bloque de anuncios *bonificado* en AdMob. Cambiar `ADMOB_RECOMPENSA` en `shared/compilacion.js` y `admob_app_id` en `android/app/src/main/res/values/strings.xml`. Hoy tienen los identificadores de prueba de Google, que muestran "Test Ad".
+2. **Unity Ads** (complemento propio `AnunciosUnity`, SDK `com.unity3d.ads:unity-ads`, sin AdMob): crear el proyecto en el panel de Unity (Monetization), copiar el *Game ID* de Android en `UNITY_GAME_ID` y el bloque con recompensa en `UNITY_RECOMPENSA` (`shared/compilacion.js`). Unity Ads está en la lista de SDK certificados para Familias de Google Play. Los cobros llegan en dólares por Tipalti.
 3. **Compras** (`@capgo/native-purchases`, Google Play Billing): en Play Console crear los productos integrados `yapa_150`, `yapa_500`, `yapa_1000` (consumibles) y `sin_anuncios` (no consumible). Cuando existen, la tienda los usa con el precio de Play; el pase sin anuncios se recupera solo al reinstalar.
 4. Firmar la APK o el AAB de publicación con tu propia clave (la APK de prueba es *debug*).
 
