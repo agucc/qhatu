@@ -178,7 +178,7 @@ Atender caseritos da experiencia al puesto. Al subir de nivel hay papel picado y
 | `progreso.js` | Nivel y experiencia de cada puesto |
 | `decoracion.js` | Fondos, toldos y vasos que se compran con yapa |
 | `compras.js` | Packs de yapa y pase sin anuncios (Google Play Billing) |
-| `compilacion.js` | Versión de prueba o de tienda, canal, Unity Ads y servidor |
+| `compilacion.js` | Versión de prueba o de tienda, canal, anuncios (AppLovin MAX / Unity) y servidor |
 | `compartir.js` | Retar a un amigo (Telegram, menú de Android o portapapeles) |
 | `transferir.js` | Código para pasar el progreso a otro dispositivo |
 | `nube.js` | Cuenta anónima, subida de la partida y código de recuperación |
@@ -240,6 +240,7 @@ El identificador de la app es `bo.qhatu.mercado` (en `capacitor.config.json`). S
 
 1. **`shared/compilacion.js`:** poner `VERSION_DE_PRUEBA = false`. En la versión de prueba las compras se simulan sin cobrar y los anuncios son de prueba.
 2. **Unity Ads** (complemento propio `AnunciosUnity`, SDK `com.unity3d.ads:unity-ads`, sin AdMob): crear el proyecto en el panel de Unity (Monetization), copiar el *Game ID* de Android en `UNITY_GAME_ID` y el bloque con recompensa en `UNITY_RECOMPENSA` (`shared/compilacion.js`). Unity Ads está en la lista de SDK certificados para Familias de Google Play. Los cobros llegan en dólares por Tipalti.
+   **AppLovin MAX** (complemento propio `AnunciosMax`, SDK `com.applovin:applovin-sdk`): crear la cuenta en AppLovin, copiar la *SDK Key* (Account → Keys) en `APPLOVIN_SDK_KEY` y el ID de un bloque *Rewarded* de Android (MAX → Ad Units) en `APPLOVIN_RECOMPENSA`. Si está puesto, el juego usa MAX primero y Unity como respaldo; MAX también puede mediar Unity Ads desde su panel. **Ojo:** AppLovin no está en el programa de Familias de Google Play, así que en Play Console el público objetivo debe ser de 13 años o más (no niños).
 3. **Compras** (`@capgo/native-purchases`, Google Play Billing): en Play Console crear los productos integrados `yapa_150`, `yapa_500`, `yapa_1000` (consumibles) y `sin_anuncios` (no consumible). Cuando existen, la tienda los usa con el precio de Play; el pase sin anuncios se recupera solo al reinstalar.
 4. Firmar la APK o el AAB de publicación con tu propia clave (la APK de prueba es *debug*).
 

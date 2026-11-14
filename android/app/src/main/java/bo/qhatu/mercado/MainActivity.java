@@ -7,6 +7,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // Complementos propios de Qhatu (antes de super.onCreate, como pide Capacitor).
+        registerPlugin(AnunciosMax.class);
         registerPlugin(AnunciosUnity.class);
         super.onCreate(savedInstanceState);
     }

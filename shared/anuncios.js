@@ -6,7 +6,7 @@ import { PORTAL, ANUNCIOS_DEMO, EN_APP } from './config.js';
 import { obtener } from './almacen.js';
 import { pausar } from './sonido.js';
 import { complementoNativo } from './nativo.js';
-import { VERSION_DE_PRUEBA, UNITY_GAME_ID, UNITY_RECOMPENSA } from './compilacion.js';
+import { VERSION_DE_PRUEBA, UNITY_GAME_ID, UNITY_RECOMPENSA, APPLOVIN_SDK_KEY, APPLOVIN_RECOMPENSA } from './compilacion.js';
 
 const SDK_CRAZYGAMES = 'https://sdk.crazygames.com/crazygames-sdk-v3.js';
 const SDK_POKI = 'https://game-cdn.poki.com/scripts/v2/poki-sdk.js';
@@ -61,16 +61,15 @@ const demo = {
   },
 };
 
-/** Unity Ads en la app Android: anuncios con recompensa (complemento propio AnunciosUnity). */
-async function unity(plugin) {
-  await plugin.iniciar({ gameId: UNITY_GAME_ID, prueba: VERSION_DE_PRUEBA });
+/** Anuncio con recompensa de un complemento nativo: mostrar(opciones) → { completo }. */
+function nativo(plugin, opciones) {
   return {
     ...sinAnuncios,
     recompensa: true,
     async verRecompensa() {
       pausar(true);
       try {
-        const r = await plugin.mostrar({ lugar: UNITY_RECOMPENSA });
+        const r = await plugin.mostrar(opciones);
         return Boolean(r?.completo);
       } catch {
         return false;
@@ -79,6 +78,33 @@ async function unity(plugin) {
       }
     },
   };
+}
+
+/** AppLovin MAX en la app Android (complemento propio AnunciosMax). */
+async function max(plugin) {
+  await plugin.iniciar({ sdkKey: APPLOVIN_SDK_KEY });
+  return nativo(plugin, { unidad: APPLOVIN_RECOMPENSA });
+}
+
+/** Unity Ads en la app Android (complemento propio AnunciosUnity). */
+async function unity(plugin) {
+  await plugin.iniciar({ gameId: UNITY_GAME_ID, prueba: VERSION_DE_PRUEBA });
+  return nativo(plugin, { lugar: UNITY_RECOMPENSA });
+}
+
+/** El proveedor nativo que esté configurado: primero MAX, luego Unity. */
+async function proveedorNativo() {
+  if (!EN_APP) return null;
+  const pMax = APPLOVIN_SDK_KEY && APPLOVIN_RECOMPENSA && complementoNativo('AnunciosMax');
+  if (pMax) {
+    try {
+      return await max(pMax);
+    } catch {
+      // si MAX no arranca, se intenta con Unity
+    }
+  }
+  const pUnity = UNITY_GAME_ID && complementoNativo('AnunciosUnity');
+  return pUnity ? unity(pUnity) : null;
 }
 
 function crazygames() {
@@ -135,10 +161,8 @@ export async function iniciarAnuncios() {
       await cargarScript(SDK_POKI);
       await window.PokiSDK.init();
       proveedor = poki();
-    } else if (EN_APP && UNITY_GAME_ID && complementoNativo('AnunciosUnity')) {
-      proveedor = await unity(complementoNativo('AnunciosUnity'));
     } else {
-      proveedor = ANUNCIOS_DEMO || (EN_APP && VERSION_DE_PRUEBA) ? demo : sinAnuncios;
+      proveedor = (await proveedorNativo()) || (ANUNCIOS_DEMO || (EN_APP && VERSION_DE_PRUEBA) ? demo : sinAnuncios);
     }
   } catch {
     proveedor = EN_APP && VERSION_DE_PRUEBA ? demo : sinAnuncios;

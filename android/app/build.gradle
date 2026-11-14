@@ -59,6 +59,9 @@ dependencies {
     implementation project(':capacitor-android')
     // Unity Ads: anuncios con recompensa (certificado para Familias de Google Play desde la 4.0.1).
     implementation 'com.unity3d.ads:unity-ads:4.20.1'
+    // AppLovin MAX: anuncios con recompensa (puede mediar Unity y otras redes). No está en el
+    // programa de Familias de Google Play: el público objetivo en Play debe ser 13+.
+    implementation 'com.applovin:applovin-sdk:13.6.4'
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"

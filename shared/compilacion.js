@@ -15,6 +15,12 @@ export const CANAL = 'directo';
 export const UNITY_GAME_ID = '';
 export const UNITY_RECOMPENSA = 'Rewarded_Android';
 
+// AppLovin MAX (anuncios con recompensa; si está puesto, se usa antes que Unity). En el panel de
+// AppLovin: Account → Keys → "SDK Key", y MAX → Ad Units → un bloque "Rewarded" de Android (su ID).
+// Ambos son identificadores públicos, no contraseñas. Vacío = sin MAX.
+export const APPLOVIN_SDK_KEY = '';
+export const APPLOVIN_RECOMPENSA = '';
+
 // Partida en la nube: dirección del servidor de Qhatu en Cloudflare (carpeta nube/), por ejemplo
 // 'https://qhatu-nube.TU-SUBDOMINIO.workers.dev'. Vacío = sin nube (todo queda solo en el celular).
 export const NUBE_URL = 'https://qhatu-nube.kreno.workers.dev';
